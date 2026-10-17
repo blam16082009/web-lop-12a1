@@ -528,17 +528,27 @@ function openAdminModal(){
         <h3>Đăng nhập Quản trị viên</h3>
         <div class="form-group"><label>Tên đăng nhập</label><input type="text" id="admin-user"></div>
         <div class="form-group"><label>Mật khẩu</label><input type="password" id="admin-pass"></div>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">* Mặc định: <b>admin</b> / <b>123456</b></p>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAdminLogin()">Đăng nhập</button></div>
     `);
 }
 function submitAdminLogin(){
-    const u=document.getElementById("admin-user").value.trim(), p=document.getElementById("admin-pass").value.trim();
-    if(u==="admin"&&p==="123456"){
+    const u=document.getElementById("admin-user").value.trim();
+    const p=document.getElementById("admin-pass").value.trim();
+    
+    // Mã hóa mật khẩu người dùng nhập vào
+    const passHash = btoa(p); 
+    
+    // btoa("123456") = "MTIzNDU2"
+    if(u === "admin" && passHash === "MTIzNDU2"){
         isAdmin=true; document.body.classList.add("admin-mode");
-        const btn=document.getElementById("admin-toggle-btn"); btn.classList.add("logged-in"); btn.innerHTML=`✓ <span>Admin</span>`;
-        alert("Đăng nhập thành công!"); renderMembers(); renderTKB(); renderAchievements(); renderFolders(); if(currentFolderId) renderMedia(); renderPosts(); renderCountdowns(); closeModal();
-    } else alert("Sai tài khoản hoặc mật khẩu!");
+        const btn=document.getElementById("admin-toggle-btn"); 
+        btn.classList.add("logged-in"); 
+        btn.innerHTML=`✓ <span>Admin</span>`;
+        alert("Đăng nhập thành công!"); 
+        renderMembers(); renderTKB(); renderAchievements(); renderFolders(); if(currentFolderId) renderMedia(); renderPosts(); renderCountdowns(); closeModal();
+    } else {
+        alert("Sai tài khoản hoặc mật khẩu!");
+    }
 }
 
 /* ===== COUNTDOWN ===== */
