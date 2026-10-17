@@ -30,46 +30,13 @@ button{cursor:pointer}
 .admin-btn.logged-in{background:#0f2a22;border-color:var(--success);color:#38d9a9}
 
 /* LAYOUT */
-.layout{max-width:100%;margin:0 auto;padding:24px 3%}
+.layout{max-width:1100px;margin:0 auto;padding:24px 3%}
 .page{animation:appear .35s ease}
 .hidden{display:none!important}
 @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* TRANG CHỦ & COUNTDOWN SIDEBAR */
-.home-grid {
-    display: flex;
-    justify-content: center; /* Căn giữa toàn bộ cụm */
-    align-items: flex-start;
-    gap: 24px;
-    width: 100%;
-}
-
-.feed-wrap {
-    flex: 1;
-    max-width: 1200px; /* Bảng tin to vừa phải, không bị dãn */
-}
-
-.sidebar {
-    width: 380px;
-    flex-shrink: 0;
-    margin-right: 40px;
-    position: sticky;
-    top: 85px;
-    max-height: calc(100vh - 105px);
-    overflow-y: auto;
-    padding: 18px;
-    border: 1px solid #2e2b45;
-    border-radius: 22px;
-    background: linear-gradient(160deg,#1c1b2c,#231f36);
-    scrollbar-width: thin;
-    margin-top: 0;
-}
-
-@media(max-width: 950px) {
-    .home-grid { flex-direction: column; align-items: center; }
-    .feed-wrap { max-width: 100%; width: 100%; }
-    .sidebar { width: 100%; max-width: 760px; position: static; margin-right: 0; }
-}
+/* TRANG CHỦ */
+.feed-wrap{max-width:720px;margin:0 auto}
 .feed-title{font-size:22px;margin-bottom:16px;text-align:center}
 .composer{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:18px}
 .composer-top{display:flex;gap:12px}
@@ -100,25 +67,6 @@ button{cursor:pointer}
 .heart-icon{display:inline-block;transition:transform .25s}
 .post-actions button.on .heart-icon{animation:heartPop .4s ease}
 @keyframes heartPop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
-
-/* SIDEBAR COUNTDOWN */
-.sidebar{position:sticky;top:85px;max-height:calc(100vh - 105px);overflow-y:auto;padding:18px;border:1px solid #2e2b45;border-radius:22px;background:linear-gradient(160deg,#1c1b2c,#231f36);scrollbar-width:thin}
-.sidebar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.sidebar-heading h2{font-size:18px;margin-top:5px;color:var(--text)}
-.sidebar-heading p{color:var(--muted);font-size:11px}
-.countdown-grid{display:flex;flex-direction:column;gap:12px}
-.countdown-card{position:relative;padding:15px;border:1px solid #2b2a3c;border-radius:16px;background:#111115;box-shadow:0 4px 15px rgba(0,0,0,.3);transition:.2s}
-.countdown-card:hover{transform:translateY(-2px);border-color:#5b50a8}
-.event-icon{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#2a2545;font-size:18px;margin-bottom:8px}
-.countdown-card h3{font-size:14px;color:var(--text);margin-bottom:2px}
-.event-date{color:var(--muted);font-size:11px}
-.countdown-time{display:flex;gap:4px;margin-top:10px}
-.time-box{flex:1;padding:6px 1px;border-radius:8px;background:#23223a;text-align:center}
-.time-box strong{display:block;color:var(--deep);font-size:15px}
-.time-box span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase}
-.event-status{margin-top:8px;color:var(--deep);font-size:11px;font-weight:700}
-.btn-delete-item{position:absolute;top:10px;right:10px;z-index:2;background:#3a1f25;color:#ff8787;border:none;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:bold;display:none;align-items:center;justify-content:center;cursor:pointer}
-body.admin-mode .btn-delete-item{display:flex}
 
 /* COMMENT */
 .cmt-list{margin-top:10px;display:flex;flex-direction:column;gap:10px}
@@ -177,7 +125,7 @@ body.admin-mode .phone-blur{filter:none;user-select:auto}
 .tkb-side{width:80px;font-weight:800;color:var(--blue);font-size:13px;background:#15151a!important;text-align:center;padding:10px 5px!important}
 .tkb-side-row{height:30px;background:#111!important;color:var(--muted)!important;font-size:11px!important;letter-spacing:1px;font-weight:800;cursor:default!important}
 
-/* THÀNH TÍCH */
+/* THÀNH TÍCH - CARD VINH DANH */
 .achieve-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:25px 5% 15px;flex-wrap:wrap}
 .achieve-grid{display:flex;flex-wrap:wrap;gap:20px;padding:0 5% 30px;justify-content:center}
 .achieve-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,.25);transition:.3s;width:260px;display:flex;flex-direction:column;align-items:center;padding:25px 15px;position:relative;border:4px solid #e2e8f0;background:linear-gradient(180deg, #eaf4ff 0%, #fff 40%)}
@@ -216,7 +164,7 @@ body.admin-mode .media-del{display:flex;align-items:center;justify-content:cente
 .btn-back{background:none;border:none;color:var(--deep);font-weight:700;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:5px}
 .btn-back:hover{text-decoration:underline}
 
-/* MODAL & OTHERS */
+/* MODAL */
 .admin-only{display:none!important}
 body.admin-mode .admin-only{display:inline-flex!important}
 body.admin-mode div.admin-only{display:block!important}
@@ -233,6 +181,7 @@ body.admin-mode td.admin-only,body.admin-mode th.admin-only{display:table-cell!i
 .btn-cancel{background:#2a2a33;color:var(--text);border:none;padding:9px 16px;border-radius:10px;font-weight:600}
 .btn-submit{background:var(--purple);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-weight:700}
 
+/* LIGHTBOX & SINH NHẬT & BONG BÓNG */
 .lightbox{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px}
 .lightbox img{max-width:min(96vw,1100px);max-height:80vh;object-fit:contain;border-radius:8px}
 .lb-btn{position:absolute;background:rgba(255,255,255,.14);border:none;color:#fff;width:44px;height:44px;border-radius:50%;font-size:24px}
@@ -275,7 +224,7 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
 <body>
 
 <header class="navbar">
-    <a href="#" class="logo" onclick="showPage('home'); return false;"><span>✿</span> TRANG CHỦ</a>
+    <a href="#" class="logo" onclick="showPage('home'); return false;"><span>✿</span> trang chủ lớp 12A1</a>
     <nav>
         <button class="nav-link active" id="nav-home" onclick="showPage('home')">Trang chủ</button>
         <button class="nav-link" id="nav-members" onclick="showPage('members')">Thành viên</button>
@@ -292,37 +241,21 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
 
     <!-- TRANG CHỦ -->
     <section id="home-page" class="page">
-        <div class="home-grid">
-            <!-- BẢNG TIN -->
-            <div class="feed-wrap">
-                <div id="birthday-banner" class="birthday-banner hidden"></div>
-                <h1 class="feed-title">📰 Bảng tin lớp 12A1</h1>
-                <div class="composer admin-only">
-                    <div class="composer-top">
-                        <div class="avatar-circle">12A1</div>
-                        <textarea id="post-text" placeholder="Bạn đang nghĩ gì về lớp mình?"></textarea>
-                    </div>
-                    <div id="post-preview" class="post-preview"></div>
-                    <div class="composer-actions">
-                        <label class="photo-pick">🖼️ Thêm ảnh<input type="file" id="post-files" accept="image/*" multiple hidden onchange="previewPostFiles()"></label>
-                        <button class="primary-btn" style="margin:0;padding:9px 22px;" onclick="submitPost()">Đăng</button>
-                    </div>
+        <div class="feed-wrap">
+            <div id="birthday-banner" class="birthday-banner hidden"></div>
+            <h1 class="feed-title">📰 Bảng tin lớp 12A1</h1>
+            <div class="composer admin-only">
+                <div class="composer-top">
+                    <div class="avatar-circle">12A1</div>
+                    <textarea id="post-text" placeholder="Bạn đang nghĩ gì về lớp mình?"></textarea>
                 </div>
-                <div id="post-feed"></div>
+                <div id="post-preview" class="post-preview"></div>
+                <div class="composer-actions">
+                    <label class="photo-pick">🖼️ Thêm ảnh<input type="file" id="post-files" accept="image/*" multiple hidden onchange="previewPostFiles()"></label>
+                    <button class="primary-btn" style="margin:0;padding:9px 22px;" onclick="submitPost()">Đăng</button>
+                </div>
             </div>
-
-            <!-- CỘT PHẢI: ĐẾM NGƯỢC -->
-            <aside class="sidebar">
-                <div class="sidebar-header">
-                    <div class="sidebar-heading">
-                        <span class="tag">COUNTDOWN</span>
-                        <h2>Ngày đặc biệt</h2>
-                        <p>Đếm từng khoảnh khắc đáng nhớ ♡</p>
-                    </div>
-                    <button class="primary-btn admin-only" style="padding:5px 10px;font-size:11px;margin:0;" onclick="openAddEventModal()">+ Thêm</button>
-                </div>
-                <div id="countdown-list" class="countdown-grid"></div>
-            </aside>
+            <div id="post-feed"></div>
         </div>
     </section>
 
@@ -366,12 +299,13 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
             <div class="schedule-hero">
                 <span class="tag">CLASS SCHEDULE</span>
                 <h1>Thời khóa biểu <span>lớp mình</span></h1>
+                <p>Lịch học cố định các ngày trong tuần. Admin click vào ô để sửa môn.</p>
             </div>
             <div class="tkb-container">
                 <table class="tkb-table">
                     <thead>
                         <tr>
-                            <th class="tkb-side" style="background:#1e1c33!important;color:var(--muted)!important;width:80px;font-size:12px;"></th>
+                            <th class="tkb-side" style="background:#1e1c33!important;color:var(--muted)!important;width:80px;font-size:12px;">Buổi / Tiết</th>
                             <th>Thứ 2</th>
                             <th>Thứ 3</th>
                             <th>Thứ 4</th>
@@ -432,7 +366,7 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
 
 <footer>
     <span class="footer-logo">12A1-k59</span>
-    <span style="font-weight:600;">by: baolam</span>
+    <span style="font-weight:600;">by: dinh bảo lâm</span>
     <span class="footer-tagline" style="color:#a19bc9;">Every moment matters ✿</span>
 </footer>
 
@@ -451,119 +385,45 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
 
 <div id="modal-container"></div>
 
-<!-- FIREBASE SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCgWgSWA2UPP4cUsHhgnxolPHYVvi_NwLE",
-    authDomain: "lop-12a1.firebaseapp.com",
-    projectId: "lop-12a1",
-    storageBucket: "lop-12a1.firebasestorage.app",
-    messagingSenderId: "836811943685",
-    appId: "1:836811943685:web:822831a214777db694d16c"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// Gắn các hàm Firebase ra ngoài window để code HTML gọi được
-window.fbDoc = doc;
-window.fbGetDoc = getDoc;
-window.fbSetDoc = setDoc;
-window.db = db;
-window.firebaseReady = true;
-</script>
-
 <script>
 /* ===== STATE ===== */
 let isAdmin = false;
-// Trạng thái mặc định ban đầu
-let members = [];
-let achievements = [];
-let posts = [];
+let members = JSON.parse(localStorage.getItem('class_members')) || [
+    { name: "Nguyễn Văn A", gender: "Nam", birthday: "2008-01-15", phone: "0912 345 678" },
+    { name: "Trần Thị B", gender: "Nữ", birthday: "2008-05-20", phone: "0987 654 321" },
+    { name: "Lê Văn C", gender: "Nam", birthday: "2008-10-12", phone: "0900 111 222" }
+];
+let achievements = JSON.parse(localStorage.getItem('class_achievements')) || [];
+let posts = JSON.parse(localStorage.getItem('class_posts')) || [
+    { id: 1, text: "Chào mừng các bạn đến với trang kỷ niệm lớp 12A1 - K59 ♡", images: [], time: Date.now(), likes: 0, comments: [] }
+];
 let myLikes = JSON.parse(localStorage.getItem('class_my_likes')) || {};
-let bdayData = {};
-let memoryFolders = [];
+let bdayData = JSON.parse(localStorage.getItem('class_bday')) || {};
+let memoryFolders = JSON.parse(localStorage.getItem('class_mem_folders')) || [
+    { id: 1, name: "Tháng 1", icon: "📁", media: [] },
+    { id: 2, name: "Tháng 2", icon: "📁", media: [] }
+];
 let currentFolderId = null;
 let previewBubbles = false;
-let countdownEvents = [];
-let scheduleData = {};
 
 /* TKB DATA */
 const TKB_DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"];
 const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
 const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
+let scheduleData = JSON.parse(localStorage.getItem('class_schedule_grid')) || {};
 
-/* FIREBASE LOAD & SAVE */
-async function loadDataFromFirebase() {
-    // Đợi Firebase khởi tạo
-    while(!window.firebaseReady) { await new Promise(r => setTimeout(r, 100)); }
-
+function saveData() {
     try {
-        const docRef = window.fbDoc(window.db, "class_data", "main");
-        const docSnap = await window.fbGetDoc(docRef);
-        
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            members = data.members || [];
-            achievements = data.achievements || [];
-            posts = data.posts || [];
-            bdayData = data.bdayData || {};
-            memoryFolders = data.memoryFolders || [];
-            countdownEvents = data.countdownEvents || [];
-            scheduleData = data.scheduleData || {};
-            // myLikes vẫn lưu local vì nó là trạng thái cá nhân
-        } else {
-            // Nếu chưa có dữ liệu trên Firebase (lần đầu chạy), khởi tạo dữ liệu mẫu
-            members = [
-                { name: "Nguyễn Văn A", gender: "Nam", birthday: "2008-01-15", phone: "0912 345 678" },
-                { name: "Trần Thị B", gender: "Nữ", birthday: "2008-05-20", phone: "0987 654 321" }
-            ];
-            countdownEvents = [
-                { id: 1, name: "Ngày Phụ nữ VN 20/10", icon: "🌷", date: "2026-10-20" },
-                { id: 3, name: "Tết Dương Lịch", icon: "🎆", date: "2027-01-01" }
-            ];
-            memoryFolders = [
-                { id: 1, name: "Tháng 1", icon: "📁", media: [] }
-            ];
-            posts = [
-                { id: Date.now(), text: "Chào mừng các bạn đến với trang kỷ niệm lớp 12A1 - K59 ♡", images: [], time: Date.now(), likes: 0, comments: [] }
-            ];
-            await saveData(); // Lưu mẫu lên Firebase
-        }
-        
-        // Render lại giao diện sau khi có dữ liệu
-        renderMembers();
-        renderAchievements();
-        renderTKB();
-        renderPosts();
-        renderBirthdays();
-        renderFolders();
-        renderCountdowns();
-        renderHeartBubbles();
-    } catch (e) {
-        console.error("Lỗi tải dữ liệu:", e);
-        alert("Không thể kết nối đến cơ sở dữ liệu. Vui lòng kiểm tra mạng!");
-    }
-}
-
-async function saveData() {
-    if(!window.firebaseReady) return false;
-    try {
-        const docRef = window.fbDoc(window.db, "class_data", "main");
-        await window.fbSetDoc(docRef, {
-            members, achievements, posts, bdayData, memoryFolders, countdownEvents, scheduleData
-        });
+        localStorage.setItem('class_members', JSON.stringify(members));
+        localStorage.setItem('class_achievements', JSON.stringify(achievements));
+        localStorage.setItem('class_posts', JSON.stringify(posts));
         localStorage.setItem('class_my_likes', JSON.stringify(myLikes));
+        localStorage.setItem('class_bday', JSON.stringify(bdayData));
+        localStorage.setItem('class_mem_folders', JSON.stringify(memoryFolders));
+        localStorage.setItem('class_schedule_grid', JSON.stringify(scheduleData));
         return true;
-    } catch (e) {
-        alert("Lỗi khi lưu dữ liệu lên Firebase! Có thể do mất mạng.");
-        return false;
-    }
+    } catch (e) { alert("Bộ nhớ đã đầy! Hãy xóa bớt ảnh/video cũ."); return false; }
 }
-
 function escapeHtml(str){return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function showModal(html){document.getElementById("modal-container").innerHTML=`<div class="modal-overlay"><div class="modal-card">${html}</div></div>`;}
 function closeModal(){document.getElementById("modal-container").innerHTML="";}
@@ -586,132 +446,32 @@ function openAdminModal(){
         isAdmin=false; document.body.classList.remove("admin-mode");
         const btn=document.getElementById("admin-toggle-btn");
         btn.classList.remove("logged-in"); btn.innerHTML=`🔑 <span>Admin</span>`;
-        alert("Đã đăng xuất!"); renderMembers(); renderTKB(); renderAchievements(); renderFolders(); if(currentFolderId) renderMedia(); renderPosts(); renderCountdowns(); return;
+        alert("Đã đăng xuất!"); renderMembers(); renderTKB(); renderAchievements(); renderFolders(); if(currentFolderId) renderMedia(); renderPosts(); return;
     }
     showModal(`
         <h3>Đăng nhập Quản trị viên</h3>
         <div class="form-group"><label>Tên đăng nhập</label><input type="text" id="admin-user"></div>
         <div class="form-group"><label>Mật khẩu</label><input type="password" id="admin-pass"></div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">* Mặc định: <b>admin</b> / <b>123456</b></p>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAdminLogin()">Đăng nhập</button></div>
     `);
 }
 function submitAdminLogin(){
-    const u=document.getElementById("admin-user").value.trim();
-    const p=document.getElementById("admin-pass").value.trim();
-    
-    // Mã hóa mật khẩu người dùng nhập vào
-    const passHash = btoa(p); 
-    
-    // btoa("123456") = "MTIzNDU2"
-    if(u === "admin" && passHash === "MTIzNDU2"){
+    const u=document.getElementById("admin-user").value.trim(), p=document.getElementById("admin-pass").value.trim();
+    if(u==="admin"&&p==="123456"){
         isAdmin=true; document.body.classList.add("admin-mode");
-        const btn=document.getElementById("admin-toggle-btn"); 
-        btn.classList.add("logged-in"); 
-        btn.innerHTML=`✓ <span>Admin</span>`;
-        alert("Đăng nhập thành công!"); 
-        renderMembers(); renderTKB(); renderAchievements(); renderFolders(); if(currentFolderId) renderMedia(); renderPosts(); renderCountdowns(); closeModal();
-    } else {
-        alert("Sai tài khoản hoặc mật khẩu!");
-    }
+        const btn=document.getElementById("admin-toggle-btn"); btn.classList.add("logged-in"); btn.innerHTML=`✓ <span>Admin</span>`;
+        alert("Đăng nhập thành công!"); renderMembers(); renderTKB(); renderAchievements(); renderFolders(); if(currentFolderId) renderMedia(); renderPosts(); closeModal();
+    } else alert("Sai tài khoản hoặc mật khẩu!");
 }
 
-/* ===== COUNTDOWN ===== */
-function renderCountdowns() {
-    const container = document.getElementById("countdown-list");
-    if (!container) return;
-    container.innerHTML = "";
-
-    countdownEvents.forEach(ev => {
-        const card = document.createElement("article");
-        card.className = "countdown-card";
-        card.id = `ev-${ev.id}`;
-        card.innerHTML = `
-            <button class="btn-delete-item" onclick="deleteEvent(${ev.id})">×</button>
-            <div class="event-icon">${escapeHtml(ev.icon || '📅')}</div>
-            <h3>${escapeHtml(ev.name)}</h3>
-            <p class="event-date">${ev.date.split('-').reverse().join('/')}</p>
-            <div class="countdown-time">
-                <div class="time-box"><strong class="d">00</strong><span>Ngày</span></div>
-                <div class="time-box"><strong class="h">00</strong><span>Giờ</span></div>
-                <div class="time-box"><strong class="m">00</strong><span>Phút</span></div>
-                <div class="time-box"><strong class="s">00</strong><span>Giây</span></div>
-            </div>
-            <p class="event-status">Đang tính...</p>
-        `;
-        container.appendChild(card);
-    });
-    updateCountdowns();
-}
-
-function updateCountdowns() {
-    const now = new Date();
-    countdownEvents.forEach(ev => {
-        const card = document.getElementById(`ev-${ev.id}`);
-        if (!card) return;
-
-        const targetDate = new Date(ev.date + "T00:00:00");
-        const remaining = targetDate - now;
-        
-        const dBox = card.querySelector(".d"), hBox = card.querySelector(".h");
-        const mBox = card.querySelector(".m"), sBox = card.querySelector(".s");
-        const status = card.querySelector(".event-status");
-
-        if (remaining <= 0) {
-            dBox.textContent = hBox.textContent = mBox.textContent = sBox.textContent = "00";
-            status.textContent = "Đã diễn ra! ♡";
-            return;
-        }
-
-        const totalSec = Math.floor(remaining / 1000);
-        const days = Math.floor(totalSec / 86400);
-        dBox.textContent = String(days).padStart(2, "0");
-        hBox.textContent = String(Math.floor((totalSec % 86400) / 3600)).padStart(2, "0");
-        mBox.textContent = String(Math.floor((totalSec % 3600) / 60)).padStart(2, "0");
-        sBox.textContent = String(totalSec % 60).padStart(2, "0");
-        status.textContent = `Còn ${days} ngày nữa thôi! ✨`;
-    });
-}
-
-function openAddEventModal() {
-    showModal(`
-        <h3>Thêm ngày đếm ngược</h3>
-        <div class="form-group"><label>Tên sự kiện</label><input type="text" id="e-name" placeholder="VD: Tết Trung Thu, 20/11..."></div>
-        <div class="form-group"><label>Biểu tượng (Icon)</label><input type="text" id="e-icon" placeholder="VD: 🎉, 🎂, 🧧..." value="📅"></div>
-        <div class="form-group"><label>Ngày diễn ra</label><input type="date" id="e-date"></div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-            <button class="btn-submit" onclick="submitAddEvent()">Thêm</button>
-        </div>
-    `);
-}
-
-async function submitAddEvent() {
-    const name = document.getElementById("e-name").value.trim();
-    const icon = document.getElementById("e-icon").value.trim() || "📅";
-    const date = document.getElementById("e-date").value;
-    if (!name || !date) return alert("Vui lòng nhập đầy đủ tên và ngày!");
-    
-    countdownEvents.push({ id: Date.now(), name, icon, date });
-    countdownEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-    await saveData();
-    renderCountdowns();
-    closeModal();
-}
-
-async function deleteEvent(id) {
-    if (confirm("Xóa ngày đếm ngược này?")) {
-        countdownEvents = countdownEvents.filter(e => e.id !== id);
-        await saveData();
-        renderCountdowns();
-    }
-}
-
-/* ===== THỜI KHÓA BIỂU ===== */
+/* ===== THỜI KHÓA BIỂU DẠNG LƯỚI ===== */
 function renderTKB() {
     const tbody = document.getElementById('tkb-body');
     if(!tbody) return;
     let html = '';
     
+    // Sáng (Tiết 1-6)
     html += `<tr><td class="tkb-side-row" colspan="8">BUỔI SÁNG</td></tr>`;
     TKB_PERIODS_SANG.forEach(tiet => {
         html += `<tr>`;
@@ -723,14 +483,14 @@ function renderTKB() {
         html += `</tr>`;
     });
 
+    // Chiều (Tiết 7-11)
     html += `<tr><td class="tkb-side-row" colspan="8" style="color:var(--purple)!important;">BUỔI CHIỀU</td></tr>`;
-    const displayChieu = [1, 2, 3, 4, 5]; 
-    TKB_PERIODS_CHIEU.forEach((tietLuuTru, index) => {
+    TKB_PERIODS_CHIEU.forEach(tiet => {
         html += `<tr>`;
-        html += `<td class="tkb-side">TIẾT ${displayChieu[index]}</td>`;
+        html += `<td class="tkb-side">TIẾT ${tiet}</td>`;
         TKB_DAYS.forEach(day => {
-            const mon = scheduleData[day]?.[tietLuuTru] || '';
-            html += `<td class="${mon?'':'empty-slot'}" onclick="editTKB('${day}', ${tietLuuTru})">${mon || ''}</td>`;
+            const mon = scheduleData[day]?.[tiet] || '';
+            html += `<td class="${mon?'':'empty-slot'}" onclick="editTKB('${day}', ${tiet})">${mon || ''}</td>`;
         });
         html += `</tr>`;
     });
@@ -757,7 +517,7 @@ function editTKB(day, tiet) {
     `);
 }
 
-async function saveTKB(day, tiet) {
+function saveTKB(day, tiet) {
     const mon = document.getElementById('tkb-mon').value.trim().toLocaleUpperCase("vi");
     if(!scheduleData[day]) scheduleData[day] = {};
     if(mon) {
@@ -765,7 +525,7 @@ async function saveTKB(day, tiet) {
     } else {
         delete scheduleData[day][tiet]; 
     }
-    await saveData();
+    saveData();
     renderTKB();
     closeModal();
 }
@@ -814,13 +574,8 @@ function renderMembers(keyword=""){
 }
 document.getElementById("search-member").addEventListener("input",function(){renderMembers(this.value.trim());});
 
-async function deleteMember(index){
-    if(confirm("Xóa thành viên này?")){
-        members.splice(index,1);
-        await saveData();
-        renderMembers(document.getElementById("search-member").value.trim());
-        renderHeartBubbles();
-    }
+function deleteMember(index){
+    if(confirm("Xóa thành viên này?")){members.splice(index,1);saveData();renderMembers(document.getElementById("search-member").value.trim());renderHeartBubbles();}
 }
 function openAddMemberModal(){openMemberModal(-1);}
 function openMemberModal(index=-1){
@@ -844,74 +599,27 @@ async function submitMember(index){
     if(!name) return alert("Nhập tên!"); if(!gender) return alert("Chọn giới tính!");
     let photo=index>=0?(members[index].photo||""):"";
     if(file){try{photo=await compressImage(file,400,0.75);}catch(e){return alert("Lỗi ảnh!");}}
+    const backup=JSON.stringify(members);
     const data={name,gender,birthday,phone,photo};
     if(index>=0) members[index]=data; else members.push(data);
-    
-    await saveData();
+    if(!saveData()){members=JSON.parse(backup);return;}
     renderMembers(document.getElementById("search-member").value.trim());
     renderHeartBubbles(); closeModal();
 }
 
-function compressImage(file, maxSize = 900, quality = 0.7) {
-    return new Promise((resolve, reject) => {
-        // Nếu là video, gửi thẳng file lên Cloudinary (không nén)
-        if (file.type.startsWith('video/')) {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", "lop12a1");
-            formData.append("resource_type", "video"); // Bắt buộc phải có cho video
-
-            fetch("https://api.cloudinary.com/v1_1/trtlu8uw/video/upload", { // Đổi image thành video
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.secure_url) resolve(data.secure_url);
-                else reject("Lỗi Cloudinary: " + (data.error?.message || "Không xác định"));
-            })
-            .catch(err => reject("Lỗi mạng: " + err.message));
-            return;
-        }
-
-        // Nếu là ảnh, giữ nguyên logic nén như cũ
-        const reader = new FileReader();
-        reader.onerror = reject;
-        reader.onload = e => {
-            const img = new Image();
-            img.onerror = reject;
-            img.onload = async () => {
-                try {
-                    const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
-                    const c = document.createElement("canvas");
-                    c.width = Math.round(img.width * scale);
-                    c.height = Math.round(img.height * scale);
-                    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-                    
-                    c.toBlob(async (blob) => {
-                        const formData = new FormData();
-                        formData.append("file", blob);
-                        formData.append("upload_preset", "lop12a1"); 
-                        
-                        try {
-                            const res = await fetch("https://api.cloudinary.com/v1_1/trtlu8uw/image/upload", { 
-                                method: "POST",
-                                body: formData
-                            });
-                            const data = await res.json();
-                            if(data.secure_url) resolve(data.secure_url);
-                            else reject("Lỗi Cloudinary: " + (data.error?.message || "Không xác định"));
-                        } catch (err) {
-                            reject("Lỗi mạng: " + err.message);
-                        }
-                    }, "image/jpeg", quality);
-                } catch (err) {
-                    reject("Lỗi xử lý ảnh: " + err.message);
-                }
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+function compressImage(file,maxSize=900,quality=0.7){
+    return new Promise((resolve,reject)=>{
+        const reader=new FileReader(); reader.onerror=reject;
+        reader.onload=e=>{
+            const img=new Image(); img.onerror=reject;
+            img.onload=()=>{
+                const scale=Math.min(1,maxSize/Math.max(img.width,img.height));
+                const c=document.createElement("canvas");
+                c.width=Math.round(img.width*scale); c.height=Math.round(img.height*scale);
+                c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+                resolve(c.toDataURL("image/jpeg",quality));
+            }; img.src=e.target.result;
+        }; reader.readAsDataURL(file);
     });
 }
 
@@ -920,16 +628,9 @@ function renderAchievements(){
     const grid=document.getElementById("achieve-grid");
     if(!grid) return; grid.innerHTML="";
     if(achievements.length===0){grid.innerHTML=`<p class="empty-achieve">Chưa có thành tích nào. Admin hãy thêm nhé ♡</p>`;return;}
-    
     achievements.forEach((a,i)=>{
         const card=document.createElement("article");
         card.className="achieve-card";
-        
-        let imgSrc = a.image;
-        if (!imgSrc) {
-            imgSrc = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
-        }
-
         card.innerHTML=`
             <div class="achieve-admin-btns admin-only">
                 <button onclick="openAchieveModal(${i})" title="Sửa">✎</button>
@@ -938,7 +639,7 @@ function renderAchievements(){
             <div class="achieve-badge">🏆</div>
             <div class="achieve-title-top">Vinh danh học sinh</div>
             <div class="achieve-title-sub">Đạt thành tích xuất sắc</div>
-            <img class="achieve-photo" src="${imgSrc}" alt="${escapeHtml(a.person)}">
+            <img class="achieve-photo" src="${a.image||'data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' fill=\\'%23cbd5e1\\'><path d=\\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\\'/></svg>'}" alt="${escapeHtml(a.person)}">
             <h3>${escapeHtml(a.person||"Tập thể lớp")}</h3>
             <div class="achieve-desc">${escapeHtml(a.title)}</div>
             <div class="achieve-footer">
@@ -972,18 +673,14 @@ async function submitAchievement(index){
     let image=index>=0?(achievements[index].image||""):"";
     if(file){try{image=await compressImage(file,600,0.8);}catch(e){return alert("Lỗi ảnh!");}}
     if(!image && index<0) return alert("Chọn ảnh chân dung!");
+    const backup=JSON.stringify(achievements);
     const data={id:index>=0?achievements[index].id:Date.now(),person,title,date,image};
     if(index>=0) achievements[index]=data; else achievements.unshift(data);
-    
-    await saveData();
+    if(!saveData()){achievements=JSON.parse(backup);return;}
     renderAchievements(); closeModal();
 }
-async function deleteAchievement(id){
-    if(confirm("Xóa thành tích này?")){
-        achievements=achievements.filter(a=>a.id!==id);
-        await saveData();
-        renderAchievements();
-    }
+function deleteAchievement(id){
+    if(confirm("Xóa thành tích này?")){achievements=achievements.filter(a=>a.id!==id);saveData();renderAchievements();}
 }
 
 /* ===== KỶ NIỆM FOLDERS ===== */
@@ -1060,18 +757,18 @@ function openAddFolderModal() {
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAddFolder()">Tạo</button></div>
     `);
 }
-async function submitAddFolder() {
+function submitAddFolder() {
     const name = document.getElementById('f-name').value.trim();
     const icon = document.getElementById('f-icon').value.trim() || '📁';
     if (!name) return alert("Nhập tên thư mục!");
     memoryFolders.push({ id: Date.now(), name, icon, media: [] });
-    await saveData(); renderFolders(); closeModal();
+    saveData(); renderFolders(); closeModal();
 }
-async function deleteFolder(e, id) {
+function deleteFolder(e, id) {
     e.stopPropagation();
     if (confirm("Xóa thư mục này và toàn bộ file bên trong?")) {
         memoryFolders = memoryFolders.filter(f => f.id !== id);
-        await saveData(); renderFolders();
+        saveData(); renderFolders();
     }
 }
 function openAddMediaModal() {
@@ -1103,14 +800,14 @@ async function submitAddMedia() {
             }
         } catch (e) { console.error("Lỗi:", e); }
     }
-    await saveData(); renderMedia(); closeModal();
+    saveData(); renderMedia(); closeModal();
 }
-async function deleteMedia(id) {
+function deleteMedia(id) {
     if (!confirm("Xóa file này?")) return;
     const folder = memoryFolders.find(f => f.id === currentFolderId);
     if (folder) {
         folder.media = folder.media.filter(m => m.id !== id);
-        await saveData(); renderMedia();
+        saveData(); renderMedia();
     }
 }
 
@@ -1123,16 +820,9 @@ async function submitPost(){
     const text=document.getElementById("post-text").value.trim();
     const files=[...document.getElementById("post-files").files].slice(0,12);
     if(!text&&files.length===0) return alert("Hãy viết gì đó hoặc chọn ảnh nhé!");
-    
-    let images=[]; 
-    try{
-        images=await Promise.all(files.map(f=>compressImage(f,1000,0.65)));
-    }catch(e){
-        return alert(e); // Hiển thị đúng lỗi ra màn hình
-    }
-    
+    let images=[]; try{images=await Promise.all(files.map(f=>compressImage(f,1000,0.65)));}catch(e){return alert("Lỗi ảnh!");}
     posts.unshift({id:Date.now(),text,images,time:Date.now(),likes:0,comments:[]});
-    await saveData();
+    if(!saveData()){posts.shift();return;}
     document.getElementById("post-text").value="";
     document.getElementById("post-files").value="";
     document.getElementById("post-preview").innerHTML="";
@@ -1198,36 +888,19 @@ function renderPosts(){
     });
 }
 function refreshPost(id){
-    const p = posts.find(x => x.id === id);
-    const el = document.getElementById(`post-${id}`);
-    if(!p || !el) return;
-    
-    el.innerHTML = postHtml(p);
-    document.getElementById(`c-text-${id}`).value = "";
-    
-    const nameInput = document.getElementById(`c-name-${id}`);
-    if(isAdmin) {
-        nameInput.value = "Admin";
-    } else {
-        nameInput.value = localStorage.getItem('class_visitor') || "";
-    }
+    const p=posts.find(x=>x.id===id), el=document.getElementById(`post-${id}`);
+    if(!p||!el) return;
+    const tx=document.getElementById(`c-text-${id}`).value;
+    el.innerHTML=postHtml(p);
+    document.getElementById(`c-text-${id}`).value=tx;
 }
 function openPostImage(id,i){const p=posts.find(x=>x.id===id); if(p) openLightbox(p.images,i,p.text.slice(0,120));}
-async function toggleLike(id){
-    const p=posts.find(x=>x.id===id); 
-    if(myLikes[id]){delete myLikes[id];p.likes=Math.max(0,p.likes-1);}
-    else{myLikes[id]=true;p.likes++;} 
-    await saveData(); 
-    refreshPost(id);
-}
+function toggleLike(id){const p=posts.find(x=>x.id===id); if(myLikes[id]){delete myLikes[id];p.likes=Math.max(0,p.likes-1);}else{myLikes[id]=true;p.likes++;} saveData(); refreshPost(id);}
 
-async function addComment(id){
-    const p = posts.find(x => x.id === id);
+function addComment(id){
+    const p=posts.find(x=>x.id===id);
     const nameInput = document.getElementById(`c-name-${id}`);
-    const textInput = document.getElementById(`c-text-${id}`);
-    
     let name = nameInput.value.trim();
-    const text = textInput.value.trim();
     
     if(isAdmin) {
         name = "Admin";
@@ -1236,27 +909,15 @@ async function addComment(id){
         localStorage.setItem('class_visitor', name);
     }
 
-    if(!text) return alert("Vui lòng nhập nội dung bình luận!");
+    const text=document.getElementById(`c-text-${id}`).value.trim();
+    if(!text) return;
 
-    p.comments.push({name, text, time: Date.now()}); 
-    await saveData(); 
+    p.comments.push({name, text, time:Date.now()}); 
+    saveData(); 
     refreshPost(id);
 }
-async function deleteComment(id,i){
-    if(confirm("Xóa bình luận này?")){
-        posts.find(x=>x.id===id).comments.splice(i,1);
-        await saveData();
-        refreshPost(id);
-    }
-}
-async function deletePost(id){
-    if(confirm("Xóa bài đăng này?")){
-        posts=posts.filter(x=>x.id!==id);
-        delete myLikes[id];
-        await saveData();
-        renderPosts();
-    }
-}
+function deleteComment(id,i){if(confirm("Xóa bình luận này?")){posts.find(x=>x.id===id).comments.splice(i,1);saveData();refreshPost(id);}}
+function deletePost(id){if(confirm("Xóa bài đăng này?")){posts=posts.filter(x=>x.id!==id);delete myLikes[id];saveData();renderPosts();}}
 
 /* ===== LIGHTBOX ===== */
 let lb={list:[],i:0,caps:""};
@@ -1308,7 +969,7 @@ function openWishChat(index){
     `);
     const cl=document.getElementById("chat-list"); cl.scrollTop=cl.scrollHeight;
 }
-async function sendWish(index){
+function sendWish(index){
     const m=members[index]; 
     let name = document.getElementById("w-name").value.trim();
     if(isAdmin) name = "Admin";
@@ -1317,16 +978,9 @@ async function sendWish(index){
         localStorage.setItem('class_visitor',name);
     }
     const text=document.getElementById("w-text").value.trim(); if(!text) return;
-    getBd(bdayKey(m)).wishes.push({name,text,time:Date.now()}); 
-    await saveData(); 
-    openWishChat(index);
+    getBd(bdayKey(m)).wishes.push({name,text,time:Date.now()}); saveData(); openWishChat(index);
 }
-async function deleteWish(index,i){
-    if(!confirm("Xóa lời chúc?"))return;
-    getBd(bdayKey(members[index])).wishes.splice(i,1);
-    await saveData();
-    openWishChat(index);
-}
+function deleteWish(index,i){if(!confirm("Xóa lời chúc?"))return;getBd(bdayKey(members[index])).wishes.splice(i,1);saveData();openWishChat(index);}
 
 /* ===== BONG BÓNG TRÁI TIM 20/10 ===== */
 const WISHES=[
@@ -1385,13 +1039,13 @@ function openWishModal(index,wishIdx){
 }
 
 /* ===== KHỞI CHẠY ===== */
-// Hiển thị loading ban đầu
-document.getElementById('post-feed').innerHTML = '<p style="text-align:center;color:var(--muted);">Đang tải dữ liệu từ máy chủ...</p>';
-loadDataFromFirebase();
-setInterval(()=>{ 
-    updateCountdowns(); 
-    renderBirthdays(); 
-}, 1000);
+renderMembers();
+renderAchievements();
+renderTKB();
+renderPosts();
+renderBirthdays();
+renderFolders();
+setInterval(()=>{renderBirthdays();},60000);
 showPage("home");
 </script>
 </body>
