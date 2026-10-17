@@ -50,7 +50,7 @@ button{cursor:pointer}
 }
 
 .sidebar {
-    width: 38   0px;
+    width: 380px;
     flex-shrink: 0;
     margin-right: 40px;
     position: sticky;
@@ -68,7 +68,7 @@ button{cursor:pointer}
 @media(max-width: 950px) {
     .home-grid { flex-direction: column; align-items: center; }
     .feed-wrap { max-width: 100%; width: 100%; }
-    .sidebar { width: 100%; max-width: 760px; position: static; }
+    .sidebar { width: 100%; max-width: 760px; position: static; margin-right: 0; }
 }
 .feed-title{font-size:22px;margin-bottom:16px;text-align:center}
 .composer{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:18px}
@@ -451,55 +451,119 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
 
 <div id="modal-container"></div>
 
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCgWgSWA2UPP4cUsHhgnxolPHYVvi_NwLE",
+    authDomain: "lop-12a1.firebaseapp.com",
+    projectId: "lop-12a1",
+    storageBucket: "lop-12a1.firebasestorage.app",
+    messagingSenderId: "836811943685",
+    appId: "1:836811943685:web:822831a214777db694d16c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Gắn các hàm Firebase ra ngoài window để code HTML gọi được
+window.fbDoc = doc;
+window.fbGetDoc = getDoc;
+window.fbSetDoc = setDoc;
+window.db = db;
+window.firebaseReady = true;
+</script>
+
 <script>
 /* ===== STATE ===== */
 let isAdmin = false;
-let members = JSON.parse(localStorage.getItem('class_members')) || [
-    { name: "Nguyễn Văn A", gender: "Nam", birthday: "2008-01-15", phone: "0912 345 678" },
-    { name: "Trần Thị B", gender: "Nữ", birthday: "2008-05-20", phone: "0987 654 321" },
-    { name: "Lê Văn C", gender: "Nam", birthday: "2008-10-12", phone: "0900 111 222" }
-];
-let achievements = JSON.parse(localStorage.getItem('class_achievements')) || [];
-let posts = JSON.parse(localStorage.getItem('class_posts')) || [
-    { id: 1, text: "Chào mừng các bạn đến với trang kỷ niệm lớp 12A1 - K59 ♡", images: [], time: Date.now(), likes: 0, comments: [] }
-];
+// Trạng thái mặc định ban đầu
+let members = [];
+let achievements = [];
+let posts = [];
 let myLikes = JSON.parse(localStorage.getItem('class_my_likes')) || {};
-let bdayData = JSON.parse(localStorage.getItem('class_bday')) || {};
-let memoryFolders = JSON.parse(localStorage.getItem('class_mem_folders')) || [
-    { id: 1, name: "Tháng 1", icon: "📁", media: [] },
-    { id: 2, name: "Tháng 2", icon: "📁", media: [] }
-];
+let bdayData = {};
+let memoryFolders = [];
 let currentFolderId = null;
 let previewBubbles = false;
-
-/* COUNTDOWN EVENTS DATA (Mặc định có sẵn vài ngày) */
-let countdownEvents = JSON.parse(localStorage.getItem('class_events')) || [
-    { id: 1, name: "Ngày Phụ nữ VN 20/10", icon: "🌷", date: "2026-10-20", isSurvey: false },
-    { id: 2, name: "Ngày Nhà giáo VN 20/11", icon: "🌻", date: "2026-11-20", isSurvey: false },
-    { id: 3, name: "Tết Dương Lịch", icon: "🎆", date: "2027-01-01", isSurvey: false },
-    { id: 4, name: "Tết Nguyên Đán", icon: "🧧", date: "2027-02-06", isSurvey: false },
-    { id: 5, name: "Ngày Quốc tế Phụ nữ 8/3", icon: "🌸", date: "2027-03-08", isSurvey: false }
-];
+let countdownEvents = [];
+let scheduleData = {};
 
 /* TKB DATA */
 const TKB_DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"];
 const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
 const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
-let scheduleData = JSON.parse(localStorage.getItem('class_schedule_grid')) || {};
 
-function saveData() {
+/* FIREBASE LOAD & SAVE */
+async function loadDataFromFirebase() {
+    // Đợi Firebase khởi tạo
+    while(!window.firebaseReady) { await new Promise(r => setTimeout(r, 100)); }
+
     try {
-        localStorage.setItem('class_members', JSON.stringify(members));
-        localStorage.setItem('class_achievements', JSON.stringify(achievements));
-        localStorage.setItem('class_posts', JSON.stringify(posts));
-        localStorage.setItem('class_my_likes', JSON.stringify(myLikes));
-        localStorage.setItem('class_bday', JSON.stringify(bdayData));
-        localStorage.setItem('class_mem_folders', JSON.stringify(memoryFolders));
-        localStorage.setItem('class_schedule_grid', JSON.stringify(scheduleData));
-        localStorage.setItem('class_events', JSON.stringify(countdownEvents));
-        return true;
-    } catch (e) { alert("Bộ nhớ đã đầy! Hãy xóa bớt ảnh/video cũ."); return false; }
+        const docRef = window.fbDoc(window.db, "class_data", "main");
+        const docSnap = await window.fbGetDoc(docRef);
+        
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            members = data.members || [];
+            achievements = data.achievements || [];
+            posts = data.posts || [];
+            bdayData = data.bdayData || {};
+            memoryFolders = data.memoryFolders || [];
+            countdownEvents = data.countdownEvents || [];
+            scheduleData = data.scheduleData || {};
+            // myLikes vẫn lưu local vì nó là trạng thái cá nhân
+        } else {
+            // Nếu chưa có dữ liệu trên Firebase (lần đầu chạy), khởi tạo dữ liệu mẫu
+            members = [
+                { name: "Nguyễn Văn A", gender: "Nam", birthday: "2008-01-15", phone: "0912 345 678" },
+                { name: "Trần Thị B", gender: "Nữ", birthday: "2008-05-20", phone: "0987 654 321" }
+            ];
+            countdownEvents = [
+                { id: 1, name: "Ngày Phụ nữ VN 20/10", icon: "🌷", date: "2026-10-20" },
+                { id: 3, name: "Tết Dương Lịch", icon: "🎆", date: "2027-01-01" }
+            ];
+            memoryFolders = [
+                { id: 1, name: "Tháng 1", icon: "📁", media: [] }
+            ];
+            posts = [
+                { id: Date.now(), text: "Chào mừng các bạn đến với trang kỷ niệm lớp 12A1 - K59 ♡", images: [], time: Date.now(), likes: 0, comments: [] }
+            ];
+            await saveData(); // Lưu mẫu lên Firebase
+        }
+        
+        // Render lại giao diện sau khi có dữ liệu
+        renderMembers();
+        renderAchievements();
+        renderTKB();
+        renderPosts();
+        renderBirthdays();
+        renderFolders();
+        renderCountdowns();
+        renderHeartBubbles();
+    } catch (e) {
+        console.error("Lỗi tải dữ liệu:", e);
+        alert("Không thể kết nối đến cơ sở dữ liệu. Vui lòng kiểm tra mạng!");
+    }
 }
+
+async function saveData() {
+    if(!window.firebaseReady) return false;
+    try {
+        const docRef = window.fbDoc(window.db, "class_data", "main");
+        await window.fbSetDoc(docRef, {
+            members, achievements, posts, bdayData, memoryFolders, countdownEvents, scheduleData
+        });
+        localStorage.setItem('class_my_likes', JSON.stringify(myLikes));
+        return true;
+    } catch (e) {
+        alert("Lỗi khi lưu dữ liệu lên Firebase! Có thể do mất mạng.");
+        return false;
+    }
+}
+
 function escapeHtml(str){return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function showModal(html){document.getElementById("modal-container").innerHTML=`<div class="modal-overlay"><div class="modal-card">${html}</div></div>`;}
 function closeModal(){document.getElementById("modal-container").innerHTML="";}
@@ -621,28 +685,28 @@ function openAddEventModal() {
     `);
 }
 
-function submitAddEvent() {
+async function submitAddEvent() {
     const name = document.getElementById("e-name").value.trim();
     const icon = document.getElementById("e-icon").value.trim() || "📅";
     const date = document.getElementById("e-date").value;
     if (!name || !date) return alert("Vui lòng nhập đầy đủ tên và ngày!");
     
-    countdownEvents.push({ id: Date.now(), name, icon, date, isSurvey: false });
+    countdownEvents.push({ id: Date.now(), name, icon, date });
     countdownEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-    saveData();
+    await saveData();
     renderCountdowns();
     closeModal();
 }
 
-function deleteEvent(id) {
+async function deleteEvent(id) {
     if (confirm("Xóa ngày đếm ngược này?")) {
         countdownEvents = countdownEvents.filter(e => e.id !== id);
-        saveData();
+        await saveData();
         renderCountdowns();
     }
 }
 
-/* ===== THỜI KHÓA BIỂU DẠNG LƯỚI ===== */
+/* ===== THỜI KHÓA BIỂU ===== */
 function renderTKB() {
     const tbody = document.getElementById('tkb-body');
     if(!tbody) return;
@@ -693,7 +757,7 @@ function editTKB(day, tiet) {
     `);
 }
 
-function saveTKB(day, tiet) {
+async function saveTKB(day, tiet) {
     const mon = document.getElementById('tkb-mon').value.trim().toLocaleUpperCase("vi");
     if(!scheduleData[day]) scheduleData[day] = {};
     if(mon) {
@@ -701,7 +765,7 @@ function saveTKB(day, tiet) {
     } else {
         delete scheduleData[day][tiet]; 
     }
-    saveData();
+    await saveData();
     renderTKB();
     closeModal();
 }
@@ -750,8 +814,13 @@ function renderMembers(keyword=""){
 }
 document.getElementById("search-member").addEventListener("input",function(){renderMembers(this.value.trim());});
 
-function deleteMember(index){
-    if(confirm("Xóa thành viên này?")){members.splice(index,1);saveData();renderMembers(document.getElementById("search-member").value.trim());renderHeartBubbles();}
+async function deleteMember(index){
+    if(confirm("Xóa thành viên này?")){
+        members.splice(index,1);
+        await saveData();
+        renderMembers(document.getElementById("search-member").value.trim());
+        renderHeartBubbles();
+    }
 }
 function openAddMemberModal(){openMemberModal(-1);}
 function openMemberModal(index=-1){
@@ -775,10 +844,10 @@ async function submitMember(index){
     if(!name) return alert("Nhập tên!"); if(!gender) return alert("Chọn giới tính!");
     let photo=index>=0?(members[index].photo||""):"";
     if(file){try{photo=await compressImage(file,400,0.75);}catch(e){return alert("Lỗi ảnh!");}}
-    const backup=JSON.stringify(members);
     const data={name,gender,birthday,phone,photo};
     if(index>=0) members[index]=data; else members.push(data);
-    if(!saveData()){members=JSON.parse(backup);return;}
+    
+    await saveData();
     renderMembers(document.getElementById("search-member").value.trim());
     renderHeartBubbles(); closeModal();
 }
@@ -881,14 +950,18 @@ async function submitAchievement(index){
     let image=index>=0?(achievements[index].image||""):"";
     if(file){try{image=await compressImage(file,600,0.8);}catch(e){return alert("Lỗi ảnh!");}}
     if(!image && index<0) return alert("Chọn ảnh chân dung!");
-    const backup=JSON.stringify(achievements);
     const data={id:index>=0?achievements[index].id:Date.now(),person,title,date,image};
     if(index>=0) achievements[index]=data; else achievements.unshift(data);
-    if(!saveData()){achievements=JSON.parse(backup);return;}
+    
+    await saveData();
     renderAchievements(); closeModal();
 }
-function deleteAchievement(id){
-    if(confirm("Xóa thành tích này?")){achievements=achievements.filter(a=>a.id!==id);saveData();renderAchievements();}
+async function deleteAchievement(id){
+    if(confirm("Xóa thành tích này?")){
+        achievements=achievements.filter(a=>a.id!==id);
+        await saveData();
+        renderAchievements();
+    }
 }
 
 /* ===== KỶ NIỆM FOLDERS ===== */
@@ -965,18 +1038,18 @@ function openAddFolderModal() {
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAddFolder()">Tạo</button></div>
     `);
 }
-function submitAddFolder() {
+async function submitAddFolder() {
     const name = document.getElementById('f-name').value.trim();
     const icon = document.getElementById('f-icon').value.trim() || '📁';
     if (!name) return alert("Nhập tên thư mục!");
     memoryFolders.push({ id: Date.now(), name, icon, media: [] });
-    saveData(); renderFolders(); closeModal();
+    await saveData(); renderFolders(); closeModal();
 }
-function deleteFolder(e, id) {
+async function deleteFolder(e, id) {
     e.stopPropagation();
     if (confirm("Xóa thư mục này và toàn bộ file bên trong?")) {
         memoryFolders = memoryFolders.filter(f => f.id !== id);
-        saveData(); renderFolders();
+        await saveData(); renderFolders();
     }
 }
 function openAddMediaModal() {
@@ -1008,14 +1081,14 @@ async function submitAddMedia() {
             }
         } catch (e) { console.error("Lỗi:", e); }
     }
-    saveData(); renderMedia(); closeModal();
+    await saveData(); renderMedia(); closeModal();
 }
-function deleteMedia(id) {
+async function deleteMedia(id) {
     if (!confirm("Xóa file này?")) return;
     const folder = memoryFolders.find(f => f.id === currentFolderId);
     if (folder) {
         folder.media = folder.media.filter(m => m.id !== id);
-        saveData(); renderMedia();
+        await saveData(); renderMedia();
     }
 }
 
@@ -1030,7 +1103,7 @@ async function submitPost(){
     if(!text&&files.length===0) return alert("Hãy viết gì đó hoặc chọn ảnh nhé!");
     let images=[]; try{images=await Promise.all(files.map(f=>compressImage(f,1000,0.65)));}catch(e){return alert("Lỗi ảnh!");}
     posts.unshift({id:Date.now(),text,images,time:Date.now(),likes:0,comments:[]});
-    if(!saveData()){posts.shift();return;}
+    await saveData();
     document.getElementById("post-text").value="";
     document.getElementById("post-files").value="";
     document.getElementById("post-preview").innerHTML="";
@@ -1111,9 +1184,15 @@ function refreshPost(id){
     }
 }
 function openPostImage(id,i){const p=posts.find(x=>x.id===id); if(p) openLightbox(p.images,i,p.text.slice(0,120));}
-function toggleLike(id){const p=posts.find(x=>x.id===id); if(myLikes[id]){delete myLikes[id];p.likes=Math.max(0,p.likes-1);}else{myLikes[id]=true;p.likes++;} saveData(); refreshPost(id);}
+async function toggleLike(id){
+    const p=posts.find(x=>x.id===id); 
+    if(myLikes[id]){delete myLikes[id];p.likes=Math.max(0,p.likes-1);}
+    else{myLikes[id]=true;p.likes++;} 
+    await saveData(); 
+    refreshPost(id);
+}
 
-function addComment(id){
+async function addComment(id){
     const p = posts.find(x => x.id === id);
     const nameInput = document.getElementById(`c-name-${id}`);
     const textInput = document.getElementById(`c-text-${id}`);
@@ -1131,11 +1210,24 @@ function addComment(id){
     if(!text) return alert("Vui lòng nhập nội dung bình luận!");
 
     p.comments.push({name, text, time: Date.now()}); 
-    saveData(); 
+    await saveData(); 
     refreshPost(id);
 }
-function deleteComment(id,i){if(confirm("Xóa bình luận này?")){posts.find(x=>x.id===id).comments.splice(i,1);saveData();refreshPost(id);}}
-function deletePost(id){if(confirm("Xóa bài đăng này?")){posts=posts.filter(x=>x.id!==id);delete myLikes[id];saveData();renderPosts();}}
+async function deleteComment(id,i){
+    if(confirm("Xóa bình luận này?")){
+        posts.find(x=>x.id===id).comments.splice(i,1);
+        await saveData();
+        refreshPost(id);
+    }
+}
+async function deletePost(id){
+    if(confirm("Xóa bài đăng này?")){
+        posts=posts.filter(x=>x.id!==id);
+        delete myLikes[id];
+        await saveData();
+        renderPosts();
+    }
+}
 
 /* ===== LIGHTBOX ===== */
 let lb={list:[],i:0,caps:""};
@@ -1187,7 +1279,7 @@ function openWishChat(index){
     `);
     const cl=document.getElementById("chat-list"); cl.scrollTop=cl.scrollHeight;
 }
-function sendWish(index){
+async function sendWish(index){
     const m=members[index]; 
     let name = document.getElementById("w-name").value.trim();
     if(isAdmin) name = "Admin";
@@ -1196,9 +1288,16 @@ function sendWish(index){
         localStorage.setItem('class_visitor',name);
     }
     const text=document.getElementById("w-text").value.trim(); if(!text) return;
-    getBd(bdayKey(m)).wishes.push({name,text,time:Date.now()}); saveData(); openWishChat(index);
+    getBd(bdayKey(m)).wishes.push({name,text,time:Date.now()}); 
+    await saveData(); 
+    openWishChat(index);
 }
-function deleteWish(index,i){if(!confirm("Xóa lời chúc?"))return;getBd(bdayKey(members[index])).wishes.splice(i,1);saveData();openWishChat(index);}
+async function deleteWish(index,i){
+    if(!confirm("Xóa lời chúc?"))return;
+    getBd(bdayKey(members[index])).wishes.splice(i,1);
+    await saveData();
+    openWishChat(index);
+}
 
 /* ===== BONG BÓNG TRÁI TIM 20/10 ===== */
 const WISHES=[
@@ -1257,13 +1356,9 @@ function openWishModal(index,wishIdx){
 }
 
 /* ===== KHỞI CHẠY ===== */
-renderMembers();
-renderAchievements();
-renderTKB();
-renderPosts();
-renderBirthdays();
-renderFolders();
-renderCountdowns();
+// Hiển thị loading ban đầu
+document.getElementById('post-feed').innerHTML = '<p style="text-align:center;color:var(--muted);">Đang tải dữ liệu từ máy chủ...</p>';
+loadDataFromFirebase();
 setInterval(()=>{ 
     updateCountdowns(); 
     renderBirthdays(); 
@@ -1271,4 +1366,4 @@ setInterval(()=>{
 showPage("home");
 </script>
 </body>
-</html>     
+</html>
