@@ -934,6 +934,17 @@ async function saveData() {
 
 function escapeHtml(str){return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function showModal(html){document.getElementById("modal-container").innerHTML=`<div class="modal-overlay"><div class="modal-card">${html}</div></div>`;}
+function showProgressModal(title) {
+    showModal(`
+        <div style="text-align:center; padding: 10px;">
+            <h3 style="color:var(--deep); font-size:18px; margin-bottom:12px;">${escapeHtml(title)}</h3>
+            <p id="post-progress-text" style="font-size:13px; color:var(--muted); margin-bottom:12px;">Đang chuẩn bị tải lên (0%)...</p>
+            <div style="width: 100%; background: #2a2a36; border-radius: 10px; overflow: hidden; height: 12px;">
+                <div id="post-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--blue), var(--purple)); transition: width 0.1s ease;"></div>
+            </div>
+        </div>
+    `);
+}
 function closeModal(){document.getElementById("modal-container").innerHTML="";}
 
 function showPage(page){
@@ -1643,16 +1654,35 @@ async function submitPost(){
     const files = [...document.getElementById("post-files").files].slice(0, 12);
     if (!text && files.length === 0) return alert("Hãy viết gì đó hoặc chọn ảnh/video nhé!");
     
-    alert("Đang đăng bài viết, vui lòng chờ trong giây lát...");
+    // Hiển thị bảng progress đẹp mắt thay vì dùng alert()
+    showProgressModal("Đang đăng bài viết...");
 
     let mediaList = []; 
+    let totalFiles = files.length;
+
     try {
-        for (const f of files) {
-            const url = await uploadToCloudinaryWithProgress(f, () => {});
-            const type = f.type.startsWith('video/') ? 'video' : 'image';
-            mediaList.push({ url, type });
+        if (totalFiles > 0) {
+            for (let i = 0; i < totalFiles; i++) {
+                const f = files[i];
+                const url = await uploadToCloudinaryWithProgress(f, (percent) => {
+                    const overallPercent = Math.round(((i + (percent / 100)) / totalFiles) * 100);
+                    const bar = document.getElementById("post-progress-bar");
+                    const txt = document.getElementById("post-progress-text");
+                    if (bar) bar.style.width = overallPercent + "%";
+                    if (txt) txt.textContent = `Đang tải file ${i + 1}/${totalFiles}: ${f.name} (${overallPercent}%)`;
+                });
+                const type = f.type.startsWith('video/') ? 'video' : 'image';
+                mediaList.push({ url, type });
+            }
+        } else {
+            // Nếu không có ảnh/video thì chạy thanh load giả lập nhanh cho mượt
+            const bar = document.getElementById("post-progress-bar");
+            const txt = document.getElementById("post-progress-text");
+            if(bar) bar.style.width = "100%";
+            if(txt) txt.textContent = "Hoàn tất!";
         }
     } catch(e) {
+        closeModal();
         return alert("Lỗi tải file lên: " + e);
     }
     
@@ -1670,6 +1700,9 @@ async function submitPost(){
     document.getElementById("post-files").value = "";
     document.getElementById("post-preview").innerHTML = "";
     renderPosts();
+    
+    // Đóng bảng thông báo sau khi hoàn thành
+    closeModal();
 }
 function timeAgo(ts){
     const s=Math.floor((Date.now()-ts)/1000);
