@@ -438,9 +438,9 @@ body {
                 <p>Quay tên chọn ngẫu nhiên các thành viên trong lớp!</p>
             </div>
             
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:40px; padding:30px 5%;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:30px; padding:30px 5%;">
                 <!-- Khung chứa Vòng quay Canvas (420px) -->
-                <div style="position:relative; width:420px; height:420px;">
+                <div style="position:relative; width:420px; height:420px; flex-shrink:0;">
                     <!-- Mũi tên chỉ hướng quay xuống dưới -->
                     <div style="position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:32px solid var(--danger); z-index:10; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));"></div>
                     
@@ -449,25 +449,33 @@ body {
                     <button onclick="startWheel()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background:var(--purple); color:#fff; border:none; font-weight:800; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:5;">QUAY</button>
                 </div>
 
-                <!-- Bảng cài đặt & Điều chỉnh thời gian quay -->
-                <div style="flex:1; min-width:280px; max-width:400px; background:var(--card2); padding:20px; border-radius:16px; border:1px solid var(--line); text-align:left;">
+                <!-- Bảng cài đặt & Danh sách to rộng hơn -->
+                <div style="flex:1; min-width:320px; max-width:480px; background:var(--card2); padding:20px; border-radius:16px; border:1px solid var(--line); text-align:left;">
                     <h3 style="margin-bottom:12px; color:var(--deep); font-size:16px;">⚙️ Cài đặt vòng quay</h3>
                     
-                    <!-- Ô điều chỉnh thời gian quay -->
+                    <!-- Ô điều chỉnh thời gian quay có nút + / - đơn vị 0.2s -->
                     <div class="form-group" style="margin-bottom:12px;">
                         <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Thời gian quay (giây):</label>
-                        <input type="number" id="wheel-duration-input" value="5.2" step="0.5" min="1" max="15" style="width:100%; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <button onclick="adjustDuration(-0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:36px; height:36px; border-radius:8px; font-weight:bold; font-size:16px; cursor:pointer;">-</button>
+                            <input type="number" id="wheel-duration-input" value="5.2" step="0.2" min="0.5" max="30" style="flex:1; text-align:center; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none; font-weight:bold;">
+                            <button onclick="adjustDuration(0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:36px; height:36px; border-radius:8px; font-weight:bold; font-size:16px; cursor:pointer;">+</button>
+                        </div>
                     </div>
 
                     <div style="display:flex; gap:8px; margin-bottom:12px;">
                         <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." style="flex:1; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none;">
                         <button class="primary-btn" style="margin:0; padding:8px 14px; font-size:13px;" onclick="addWheelItem()">Thêm</button>
                     </div>
+                    
                     <div style="display:flex; gap:8px; margin-bottom:12px;">
                         <button class="mini-btn" style="padding:6px 12px; background:var(--chip);" onclick="loadClassMembersToWheel()">📥 Lấy tên từ lớp</button>
                         <button class="mini-btn danger" style="padding:6px 12px;" onclick="clearWheelList()">🗑️ Xóa hết</button>
                     </div>
-                    <div style="max-height:180px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:8px; background:#0f0f12; display:flex; flex-direction:column; gap:6px;" id="wheel-items-list">
+
+                    <!-- Danh sách tên được làm to rộng, thoáng đãng hơn -->
+                    <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Danh sách tham gia (<span id="wheel-count-lbl">0</span>):</label>
+                    <div style="max-height:240px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:10px; background:#0f0f12; display:flex; flex-direction:column; gap:8px;" id="wheel-items-list">
                         <!-- Danh sách tên -->
                     </div>
                 </div>
@@ -614,6 +622,7 @@ const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
 
 /* ===== VÒNG QUAY MAY MẮN ===== */
 let wheelItems = [];
+let lastWinnerIndex = null; // Lưu vị trí người vừa trúng để hỗ trợ xóa nhanh
 const wheelColors = ["#8dbaf5", "#a99af4", "#ff6b6b", "#51cf66", "#fcc419", "#ff922b", "#cc5de8", "#20c997"];
 
 function initWheelDefault() {
@@ -637,16 +646,26 @@ function loadClassMembersToWheel() {
 
 function renderWheelList() {
     const container = document.getElementById("wheel-items-list");
+    const countLbl = document.getElementById("wheel-count-lbl");
     if (!container) return;
+    
+    if(countLbl) countLbl.textContent = wheelItems.length;
     container.innerHTML = "";
+    
     if (wheelItems.length === 0) {
-        container.innerHTML = `<span style="color:var(--muted); font-size:12px; text-align:center;">Danh sách trống</span>`;
+        container.innerHTML = `<span style="color:var(--muted); font-size:13px; text-align:center; padding:10px;">Danh sách trống</span>`;
         return;
     }
+    
     wheelItems.forEach((item, index) => {
         const div = document.createElement("div");
-        div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:4px 8px; border-radius:6px; font-size:13px;";
-        div.innerHTML = `<span>${escapeHtml(item)}</span> <button onclick="removeWheelItem(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">×</button>`;
+        div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:8px 12px; border-radius:8px; font-size:14px;";
+        
+        // Nút dấu x được làm to, rõ và đẹp mắt hơn khi hover
+        div.innerHTML = `
+            <span style="font-weight:500;">${escapeHtml(item)}</span> 
+            <button onclick="removeWheelItem(${index})" style="background:transparent; border:none; color:var(--muted); width:26px; height:26px; border-radius:50%; font-size:16px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='rgba(255,107,107,0.2)'; this.style.color='var(--danger)';" onmouseout="this.style.background='transparent'; this.style.color='var(--muted)';">×</button>
+        `;
         container.appendChild(div);
     });
 }
@@ -673,6 +692,14 @@ function clearWheelList() {
         renderWheelList();
         drawWheel(0);
     }
+}
+
+// Hàm tăng/giảm thời gian quay theo đơn vị 0.2s
+function adjustDuration(amount) {
+    const input = document.getElementById("wheel-duration-input");
+    let val = parseFloat(input.value) || 5.2;
+    val = Math.max(0.5, Math.min(30, val + amount));
+    input.value = val.toFixed(1);
 }
 
 let currentAngle = 0;
@@ -731,7 +758,6 @@ function startWheel() {
     if (isSpinning || wheelItems.length === 0) return;
     isSpinning = true;
 
-    // Lấy thời gian giây người dùng nhập vào (mặc định 5.2 giây nếu để trống)
     let durationInput = parseFloat(document.getElementById("wheel-duration-input").value);
     let duration = (isNaN(durationInput) || durationInput <= 0) ? 5200 : durationInput * 1000;
 
@@ -758,8 +784,8 @@ function startWheel() {
             let normalizedAngle = (1.5 * Math.PI - currentAngle) % (2 * Math.PI);
             if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
             
-            const winningIndex = Math.floor(normalizedAngle / sliceAngle) % wheelItems.length;
-            const winner = wheelItems[winningIndex];
+            lastWinnerIndex = Math.floor(normalizedAngle / sliceAngle) % wheelItems.length;
+            const winner = wheelItems[lastWinnerIndex];
 
             setTimeout(() => {
                 showWinnerModal(winner);
@@ -770,19 +796,32 @@ function startWheel() {
     requestAnimationFrame(animateSpin);
 }
 
-// Bảng thông báo trúng giải: Tên người trúng được tách dòng riêng và làm to nổi bật
+// Hiển thị bảng thông báo với 2 lựa chọn: Giữ nguyên hoặc Xóa người vừa trúng
 function showWinnerModal(winnerName) {
     showModal(`
         <div style="text-align:center; padding: 10px;">
             <div style="font-size: 55px; margin-bottom: 5px;">🎉</div>
             <h3 style="color:var(--deep); font-size:18px; margin-bottom:5px;">Chúc mừng người chiến thắng!</h3>
-            <p style="font-size:14px; color:var(--muted); margin-bottom:12px;">Người may mắn được gọi tên là:</p>
+            <p style="font-size:14px; color:var(--muted); margin-bottom:8px;">Người may mắn được gọi tên là:</p>
             <div style="font-size:26px; font-weight:800; color:var(--purple); background:var(--chip); padding:12px; border-radius:12px; margin-bottom:20px; border:1px solid var(--line); word-break:break-word;">
                 ${escapeHtml(winnerName)} 🎁
             </div>
-            <button class="btn-submit" onclick="closeModal()" style="width:100%; padding: 11px; font-size:15px;">Tuyệt vời! 🥳</button>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn-cancel" onclick="closeModal()" style="flex:1; padding:11px; font-weight:700;">Giữ nguyên</button>
+                <button class="btn-submit" onclick="removeWinnerAndClose()" style="flex:1; padding:11px; background:var(--danger); font-weight:700;">Xóa tên này</button>
+            </div>
         </div>
     `);
+}
+
+function removeWinnerAndClose() {
+    if (lastWinnerIndex !== null && lastWinnerIndex < wheelItems.length) {
+        wheelItems.splice(lastWinnerIndex, 1);
+        renderWheelList();
+        drawWheel(currentAngle);
+    }
+    closeModal();
 }
 
 /* FIREBASE LOAD & SAVE (REALTIME) */
