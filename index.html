@@ -449,11 +449,11 @@ body {
                     <button onclick="startWheel()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background:var(--purple); color:#fff; border:none; font-weight:800; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:5;">QUAY</button>
                 </div>
 
-                <!-- Bảng cài đặt & Danh sách to rộng hơn -->
+                <!-- Bảng cài đặt & Danh sách -->
                 <div style="flex:1; min-width:340px; max-width:520px; background:var(--card2); padding:22px; border-radius:18px; border:1px solid var(--line); text-align:left;">
                     <h3 style="margin-bottom:12px; color:var(--deep); font-size:16px;">⚙️ Cài đặt vòng quay</h3>
                     
-                    <!-- Ô điều chỉnh thời gian quay kiểu mới (+ / - và hiển thị số 5.0) -->
+                    <!-- Ô điều chỉnh thời gian quay sạch sẽ (đã ẩn hoàn toàn mũi tên mặc định) -->
                     <div class="form-group" style="margin-bottom:14px;">
                         <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Thời gian quay (giây):</label>
                         <div style="display:flex; align-items:center; gap:8px;">
@@ -475,7 +475,7 @@ body {
                         <button class="mini-btn danger" style="padding:7px 12px;" onclick="clearWheelList()">🗑️ Xóa hết</button>
                     </div>
 
-                    <!-- Danh sách tham gia to rộng, có checkbox đánh dấu -->
+                    <!-- Danh sách tham gia có hiển thị số thứ tự (STT) -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                         <label style="font-size:12px; font-weight:700; color:var(--muted);">Danh sách tham gia (<span id="wheel-count-lbl">0</span> người được chọn):</label>
                     </div>
@@ -625,7 +625,7 @@ const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
 const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
 
 /* ===== VÒNG QUAY MAY MẮN ===== */
-let wheelItems = []; // Lưu trữ đối tượng: { name: "...", active: true }
+let wheelItems = []; 
 let lastWinnerIndex = null; 
 let currentAngle = 0;
 let isSpinning = false;
@@ -655,7 +655,6 @@ function loadClassMembersToWheel() {
     drawWheel(0);
 }
 
-// Lấy danh sách những người đang được bật checkbox để đưa lên vòng quay
 function getActiveWheelItems() {
     return wheelItems.filter(item => item.active).map(item => item.name);
 }
@@ -680,8 +679,10 @@ function renderWheelList() {
         const div = document.createElement("div");
         div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:8px 12px; border-radius:8px; font-size:14px; transition:0.2s;";
         
+        // Hiển thị số thứ tự (index + 1) kèm theo checkbox và tên
         div.innerHTML = `
             <div style="display:flex; align-items:center; gap:10px; flex:1; overflow:hidden;">
+                <span style="color:var(--muted); font-size:12px; font-weight:700; min-width:24px;">#${index + 1}</span>
                 <input type="checkbox" ${item.active ? 'checked' : ''} onchange="toggleItemActive(${index})" style="width:16px; height:16px; cursor:pointer; accent-color:var(--purple);">
                 <span style="font-weight:500; word-break:break-word; opacity:${item.active ? '1' : '0.4'}; text-decoration:${item.active ? 'none' : 'line-through'};">${escapeHtml(item.name)}</span>
             </div>
@@ -822,7 +823,6 @@ function startWheel() {
             const winningSubIndex = Math.floor(normalizedAngle / sliceAngle) % currentActiveItems.length;
             const winnerName = currentActiveItems[winningSubIndex];
 
-            // Tìm vị trí gốc trong mảng toàn bộ wheelItems để xử lý xóa nếu cần
             lastWinnerIndex = wheelItems.findIndex(i => i.name === winnerName && i.active);
 
             setTimeout(() => {
@@ -834,7 +834,6 @@ function startWheel() {
     requestAnimationFrame(animateSpin);
 }
 
-// Bảng thông báo kết quả với 2 lựa chọn rõ ràng: Giữ nguyên hoặc Xóa tên này
 function showWinnerModal(winnerName) {
     showModal(`
         <div style="text-align:center; padding: 10px;">
