@@ -270,6 +270,16 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
 .wish-photo{display:block;width:150px;height:150px;margin:0 auto;border-radius:50%;object-fit:cover;border:4px solid var(--purple);box-shadow:0 0 30px rgba(169,154,244,.4)}
 .wish-photo-empty{display:flex;align-items:center;justify-content:center;font-size:60px;background:var(--chip)}
 .wish-text{color:var(--text);font-size:15px;line-height:1.7}
+/* Thêm đoạn này vào để web mượt hơn */
+body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+.post-card, .folder-card, .achieve-card, .countdown-card, .heart-bubble {
+    will-change: transform;
+    transform: translateZ(0);
+}
 /* Giao diện thanh tiến trình tải lên */
 .upload-progress-container {
     width: 100%;
@@ -475,7 +485,10 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// Gắn hàm onSnapshot ra ngoài window
+window.fbOnSnapshot = onSnapshot;
 
 const firebaseConfig = {
     apiKey: "AIzaSyCgWgSWA2UPP4cUsHhgnxolPHYVvi_NwLE",
@@ -517,55 +530,60 @@ const TKB_DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 
 const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
 const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
 
-/* FIREBASE LOAD & SAVE */
+/* FIREBASE LOAD & SAVE (REALTIME) */
 async function loadDataFromFirebase() {
     // Đợi Firebase khởi tạo
     while(!window.firebaseReady) { await new Promise(r => setTimeout(r, 100)); }
 
     try {
         const docRef = window.fbDoc(window.db, "class_data", "main");
-        const docSnap = await window.fbGetDoc(docRef);
-        
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            members = data.members || [];
-            achievements = data.achievements || [];
-            posts = data.posts || [];
-            bdayData = data.bdayData || {};
-            memoryFolders = data.memoryFolders || [];
-            countdownEvents = data.countdownEvents || [];
-            scheduleData = data.scheduleData || {};
-            // myLikes vẫn lưu local vì nó là trạng thái cá nhân
-        } else {
-            // Nếu chưa có dữ liệu trên Firebase (lần đầu chạy), khởi tạo dữ liệu mẫu
-            members = [
-                { name: "Nguyễn Văn A", gender: "Nam", birthday: "2008-01-15", phone: "0912 345 678" },
-                { name: "Trần Thị B", gender: "Nữ", birthday: "2008-05-20", phone: "0987 654 321" }
-            ];
-            countdownEvents = [
-                { id: 1, name: "Ngày Phụ nữ VN 20/10", icon: "🌷", date: "2026-10-20" },
-                { id: 3, name: "Tết Dương Lịch", icon: "🎆", date: "2027-01-01" }
-            ];
-            memoryFolders = [
-                { id: 1, name: "Tháng 1", icon: "📁", media: [] }
-            ];
-            posts = [
-                { id: Date.now(), text: "Chào mừng các bạn đến với trang kỷ niệm lớp 12A1 - K59 ♡", images: [], time: Date.now(), likes: 0, comments: [] }
-            ];
-            await saveData(); // Lưu mẫu lên Firebase
-        }
-        
-        // Render lại giao diện sau khi có dữ liệu
-        renderMembers();
-        renderAchievements();
-        renderTKB();
-        renderPosts();
-        renderBirthdays();
-        renderFolders();
-        renderCountdowns();
-        renderHeartBubbles();
+
+        // Dùng fbOnSnapshot để tự động lắng nghe dữ liệu thay đổi realtime
+        window.fbOnSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                members = data.members || [];
+                achievements = data.achievements || [];
+                posts = data.posts || [];
+                bdayData = data.bdayData || {};
+                memoryFolders = data.memoryFolders || [];
+                countdownEvents = data.countdownEvents || [];
+                scheduleData = data.scheduleData || {};
+            } else {
+                // Khởi tạo dữ liệu mẫu nếu lần đầu sử dụng
+                members = [
+                    { name: "Nguyễn Văn A", gender: "Nam", birthday: "2008-01-15", phone: "0912 345 678" },
+                    { name: "Trần Thị B", gender: "Nữ", birthday: "2008-05-20", phone: "0987 654 321" }
+                ];
+                countdownEvents = [
+                    { id: 1, name: "Ngày Phụ nữ VN 20/10", icon: "🌷", date: "2026-10-20" },
+                    { id: 3, name: "Tết Dương Lịch", icon: "🎆", date: "2027-01-01" }
+                ];
+                memoryFolders = [
+                    { id: 1, name: "Tháng 1", icon: "📁", media: [] }
+                ];
+                posts = [
+                    { id: Date.now(), text: "Chào mừng các bạn đến với trang kỷ niệm lớp 12A1 - K59 ♡", images: [], time: Date.now(), likes: 0, comments: [] }
+                ];
+                saveData();
+            }
+
+            // Tự động vẽ lại giao diện mỗi khi có bình luận hoặc thay đổi mới
+            renderMembers();
+            renderAchievements();
+            renderTKB();
+            renderPosts();
+            renderBirthdays();
+            renderFolders();
+            renderCountdowns();
+            renderHeartBubbles();
+            if (currentFolderId) renderMedia();
+        }, (error) => {
+            console.error("Lỗi lắng nghe dữ liệu realtime:", error);
+        });
+
     } catch (e) {
-        console.error("Lỗi tải dữ liệu:", e);
+        console.error("Lỗi kết nối Firebase:", e);
         alert("Không thể kết nối đến cơ sở dữ liệu. Vui lòng kiểm tra mạng!");
     }
 }
