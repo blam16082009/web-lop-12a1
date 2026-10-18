@@ -415,6 +415,7 @@ body {
                         <tr>
                             <th>STT</th>
                             <th>Họ và tên</th>
+                            <th>Bộ môn</th>
                             <th>Ngày sinh</th>
                             <th>Giới tính</th>
                             <th>Số điện thoại</th>
@@ -1324,14 +1325,19 @@ function renderTeachers(keyword=""){
     const list=document.getElementById("teacher-list"), count=document.getElementById("teacher-count");
     if(!list) return;
     list.innerHTML="";
-    const filtered=teachers.filter(t=>t.name.toLowerCase().includes(keyword.toLowerCase()));
+    const filtered=teachers.filter(t=> (t.name || "").toLowerCase().includes(keyword.toLowerCase()) || (t.subject || "").toLowerCase().includes(keyword.toLowerCase()));
     count.textContent=`${filtered.length} thầy cô`;
-    if(filtered.length===0){list.innerHTML=`<tr><td colspan="7" style="text-align:center;">Không tìm thấy thầy cô.</td></tr>`;return;}
+    if(filtered.length===0){list.innerHTML=`<tr><td colspan="8" style="text-align:center;">Không tìm thấy thầy cô.</td></tr>`;return;}
     filtered.forEach((t,index)=>{
         const realIndex=teachers.indexOf(t);
         const tr=document.createElement("tr");
         const avatar=t.photo?`<img src="${t.photo}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;">`:"";
         
+        // Thẻ hiển thị Chức vụ (GVCN hay GVBM)
+        const roleBadge = t.role === "GVCN" 
+            ? `<span style="display:inline-block; margin-left:6px; padding:2px 8px; border-radius:10px; background:var(--purple); color:#fff; font-size:10px; font-weight:800;">GVCN</span>`
+            : `<span style="display:inline-block; margin-left:6px; padding:2px 8px; border-radius:10px; background:var(--chip); color:var(--muted); font-size:10px; font-weight:700;">GVBM</span>`;
+
         const fbBtn = t.facebook 
             ? `<a href="${escapeHtml(t.facebook)}" target="_blank" style="color:var(--fb-color);text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook
@@ -1340,7 +1346,8 @@ function renderTeachers(keyword=""){
 
         tr.innerHTML=`
             <td>${index+1}</td>
-            <td>${avatar}<strong>${escapeHtml(t.name)}</strong></td>
+            <td>${avatar}<strong>${escapeHtml(t.name)}</strong>${roleBadge}</td>
+            <td><strong style="color:var(--deep);">${escapeHtml(t.subject || "Chưa cập nhật")}</strong></td>
             <td>${formatBirthday(t.birthday)}</td>
             <td>${escapeHtml(t.gender||"Chưa cập nhật")}</td>
             <td><span class="phone-blur">${escapeHtml(t.phone||"")}</span></td>
@@ -1348,25 +1355,23 @@ function renderTeachers(keyword=""){
             <td class="admin-only">
                 <button class="mini-btn" onclick="openTeacherModal(${realIndex})">Sửa</button>
                 <button class="mini-btn danger" onclick="deleteTeacher(${realIndex})">Xóa</button>
-            `;
+            </td>`;
         list.appendChild(tr);
     });
 }
-document.getElementById("search-teacher").addEventListener("input",function(){renderTeachers(this.value.trim());});
 
-async function deleteTeacher(index){
-    if(confirm("Xóa thông tin thầy cô này?")){
-        teachers.splice(index,1);
-        await saveData();
-        renderTeachers(document.getElementById("search-teacher").value.trim());
-    }
-}
-function openAddTeacherModal(){openTeacherModal(-1);}
 function openTeacherModal(index=-1){
-    const t=index>=0?teachers[index]:{name:"",gender:"",birthday:"",phone:"",facebook:""};
+    const t=index>=0?teachers[index]:{name:"",role:"GVBM",subject:"",gender:"",birthday:"",phone:"",facebook:""};
     showModal(`
         <h3>${index>=0?"Sửa thông tin thầy cô":"Thêm thầy cô"}</h3>
         <div class="form-group"><label>Họ và tên</label><input type="text" id="t-name" value="${escapeHtml(t.name)}"></div>
+        <div class="form-group"><label>Phân loại giáo viên</label>
+            <select id="t-role">
+                <option value="GVBM" ${t.role==="GVBM"||!t.role?"selected":""}>Giáo viên bộ môn (GVBM)</option>
+                <option value="GVCN" ${t.role==="GVCN"?"selected":""}>Giáo viên chủ nhiệm (GVCN)</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Bộ môn giảng dạy</label><input type="text" id="t-subject" placeholder="VD: Toán, Ngữ Văn, Tiếng Anh..." value="${escapeHtml(t.subject||"")}"></div>
         <div class="form-group"><label>Giới tính</label>
             <select id="t-gender"><option value="">-- Chọn --</option><option value="Nam" ${t.gender==="Nam"?"selected":""}>Nam</option><option value="Nữ" ${t.gender==="Nữ"?"selected":""}>Nữ</option></select>
         </div>
@@ -1380,6 +1385,8 @@ function openTeacherModal(index=-1){
 
 async function submitTeacher(index){
     const name=document.getElementById("t-name").value.trim(), 
+        role=document.getElementById("t-role").value,
+        subject=document.getElementById("t-subject").value.trim(),
         gender=document.getElementById("t-gender").value,
         birthday=document.getElementById("t-dob").value, 
         phone=document.getElementById("t-phone").value.trim(),
@@ -1392,7 +1399,7 @@ async function submitTeacher(index){
     let photo=index>=0?(teachers[index].photo||""):"";
     if(file){try{photo=await compressImage(file,400,0.75);}catch(e){return alert("Lỗi ảnh!");}}
     
-    const data={name,gender,birthday,phone,facebook,photo};
+    const data={name,role,subject,gender,birthday,phone,facebook,photo};
     if(index>=0) teachers[index]=data; else teachers.push(data);
     
     await saveData();
