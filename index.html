@@ -311,6 +311,7 @@ body {
         <button class="nav-link active" id="nav-home" onclick="showPage('home')">Trang chủ</button>
         <button class="nav-link" id="nav-members" onclick="showPage('members')">Thành viên</button>
         <button class="nav-link" id="nav-teachers" onclick="showPage('teachers')">Thầy cô</button>
+        <button class="nav-link" id="nav-wheel" onclick="showPage('wheel')">Vòng quay</button>
         <button class="nav-link" id="nav-schedule" onclick="showPage('schedule')">Thời khóa biểu</button>
         <button class="nav-link" id="nav-achieve" onclick="showPage('achieve')">Thành tích</button>
         <button class="nav-link" id="nav-memory" onclick="showPage('memory')">Kỷ niệm</button>
@@ -425,6 +426,43 @@ body {
                 </table>
             </div>
             <p class="privacy-note">♡ Kính trọng và biết ơn thầy cô giáo.</p>
+        </div>
+    </section>
+
+    <!-- VÒNG QUAY MAY MẮN -->
+    <section id="wheel-page" class="page hidden">
+        <div class="full-page-card" style="text-align:center;">
+            <div class="achieve-hero" style="border-radius:24px 24px 0 0;">
+                <span class="tag">LUCKY WHEEL</span>
+                <h1>Vòng quay <span>may mắn</span></h1>
+                <p>Quay tên chọn ngẫu nhiên các thành viên trong lớp!</p>
+            </div>
+            
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:40px; padding:30px 5%;">
+                <!-- Khung chứa Vòng quay Canvas -->
+                <div style="position:relative; width:340px; height:340px;">
+                    <canvas id="wheel-canvas" width="340" height="340" style="width:100%; height:100%; border-radius:50%; box-shadow:0 10px 30px rgba(0,0,0,0.5); border:6px solid var(--purple);"></canvas>
+                    <!-- Kim chỉ hướng -->
+                    <div style="position:absolute; top:-15px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-bottom:30px solid var(--danger); z-index:10;"></div>
+                    <button onclick="startWheel()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:70px; height:70px; border-radius:50%; background:var(--purple); color:#fff; border:none; font-weight:800; font-size:15px; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:5;">QUAY</button>
+                </div>
+
+                <!-- Bảng cài đặt/nhập danh sách tên -->
+                <div style="flex:1; min-width:280px; max-width:400px; background:var(--card2); padding:20px; border-radius:16px; border:1px solid var(--line); text-align:left;">
+                    <h3 style="margin-bottom:12px; color:var(--deep); font-size:16px;">⚙️ Cài đặt danh sách quay</h3>
+                    <div style="display:flex; gap:8px; margin-bottom:12px;">
+                        <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." style="flex:1; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none;">
+                        <button class="primary-btn" style="margin:0; padding:8px 14px; font-size:13px;" onclick="addWheelItem()">Thêm</button>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-bottom:12px;">
+                        <button class="mini-btn" style="padding:6px 12px; background:var(--chip);" onclick="loadClassMembersToWheel()">📥 Lấy tên từ lớp</button>
+                        <button class="mini-btn danger" style="padding:6px 12px;" onclick="clearWheelList()">🗑️ Xóa hết</button>
+                    </div>
+                    <div style="max-height:180px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:8px; background:#0f0f12; display:flex; flex-direction:column; gap:6px;" id="wheel-items-list">
+                        <!-- Danh sách tên sẽ hiển thị ở đây -->
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -565,6 +603,164 @@ const TKB_DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 
 const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
 const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
 
+/* ===== VÒNG QUAY MAY MẮN ===== */
+let wheelItems = [];
+const wheelColors = ["#8dbaf5", "#a99af4", "#ff6b6b", "#51cf66", "#fcc419", "#ff922b", "#cc5de8", "#20c997"];
+
+function initWheelDefault() {
+    if (wheelItems.length === 0) {
+        // Mặc định lấy tên thành viên trong lớp nếu có, nếu không lấy mẫu
+        if (members && members.length > 0) {
+            wheelItems = members.map(m => m.name);
+        } else {
+            wheelItems = ["Nguyễn Văn A", "Trần Thị B", "Lê Văn C", "Phạm Thị D"];
+        }
+    }
+    renderWheelList();
+    drawWheel(0);
+}
+
+function loadClassMembersToWheel() {
+    if (!members || members.length === 0) return alert("Chưa có thành viên nào trong lớp!");
+    wheelItems = members.map(m => m.name);
+    renderWheelList();
+    drawWheel(0);
+}
+
+function renderWheelList() {
+    const container = document.getElementById("wheel-items-list");
+    if (!container) return;
+    container.innerHTML = "";
+    if (wheelItems.length === 0) {
+        container.innerHTML = `<span style="color:var(--muted); font-size:12px; text-align:center;">Danh sách trống</span>`;
+        return;
+    }
+    wheelItems.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:4px 8px; border-radius:6px; font-size:13px;";
+        div.innerHTML = `<span>${escapeHtml(item)}</span> <button onclick="removeWheelItem(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">×</button>`;
+        container.appendChild(div);
+    });
+}
+
+function addWheelItem() {
+    const input = document.getElementById("wheel-input-name");
+    const name = input.value.trim();
+    if (!name) return;
+    wheelItems.push(name);
+    input.value = "";
+    renderWheelList();
+    drawWheel(0);
+}
+
+function removeWheelItem(index) {
+    wheelItems.splice(index, 1);
+    renderWheelList();
+    drawWheel(0);
+}
+
+function clearWheelList() {
+    if(confirm("Xóa toàn bộ danh sách quay?")) {
+        wheelItems = [];
+        renderWheelList();
+        drawWheel(0);
+    }
+}
+
+let currentAngle = 0;
+let isSpinning = false;
+
+function drawWheel(angle) {
+    const canvas = document.getElementById("wheel-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const pusatX = canvas.width / 2;
+    const pusatY = canvas.height / 2;
+    const radius = canvas.width / 2 - 5;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (wheelItems.length === 0) {
+        ctx.beginPath();
+        ctx.arc(pusatX, pusatY, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = "#17171c";
+        ctx.fill();
+        ctx.fillStyle = "#8c8fab";
+        ctx.font = "13px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Chưa có tên trong vòng quay", pusatX, pusatY);
+        return;
+    }
+
+    const sliceAngle = (2 * Math.PI) / wheelItems.length;
+
+    wheelItems.forEach((item, i) => {
+        const startAngle = angle + i * sliceAngle;
+        const endAngle = startAngle + sliceAngle;
+
+        // Vẽ phần miếng bánh xe
+        ctx.beginPath();
+        ctx.moveTo(pusatX, pusatY);
+        ctx.arc(pusatX, pusatY, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = wheelColors[i % wheelColors.length];
+        ctx.fill();
+        ctx.strokeStyle = "#111114";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Vẽ chữ tên trên bánh xe
+        ctx.save();
+        ctx.translate(pusatX, pusatY);
+        ctx.rotate(startAngle + sliceAngle / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#0e0e11";
+        ctx.font = "bold 12px Arial";
+        ctx.fillText(item, radius - 20, 5);
+        ctx.restore();
+    });
+}
+
+function startWheel() {
+    if (isSpinning || wheelItems.length === 0) return;
+    isSpinning = true;
+
+    let spinAngle = Math.random() * 2000 + 3000; // Góc quay ngẫu nhiên lớn
+    let startTime = null;
+    const duration = 4000; // Thời gian quay 4 giây
+
+    function animateSpin(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Hiệu ứng giảm tốc dần (easeOutQuad)
+        const easeProgress = 1 - (1 - progress) * (1 - progress);
+        const currentRot = currentAngle + easeProgress * spinAngle;
+
+        drawWheel(currentRot);
+
+        if (progress < 1) {
+            requestAnimationFrame(animateSpin);
+        } else {
+            isSpinning = false;
+            currentAngle = currentRot % (2 * Math.PI);
+
+            // Tính toán tên trúng giải ở phía trên kim chỉ (góc -Math.PI/2)
+            const sliceAngle = (2 * Math.PI) / wheelItems.length;
+            const normalizedAngle = (2 * Math.PI - (currentAngle % (2 * Math.PI))) % (2 * Math.PI);
+            const winningIndex = Math.floor(normalizedAngle / sliceAngle);
+            
+            const winner = wheelItems[winningIndex];
+            setTimeout(() => {
+                alert(`🎉 Chúc mừng bạn: ${winner} đã trúng thưởng! 🎁`);
+            }, 100);
+        }
+    }
+
+    requestAnimationFrame(animateSpin);
+}
+
 /* FIREBASE LOAD & SAVE (REALTIME) */
 async function loadDataFromFirebase() {
     while(!window.firebaseReady) { await new Promise(r => setTimeout(r, 100)); }
@@ -642,13 +838,14 @@ function showModal(html){document.getElementById("modal-container").innerHTML=`<
 function closeModal(){document.getElementById("modal-container").innerHTML="";}
 
 function showPage(page){
-    ["home","members","teachers","schedule","achieve","memory"].forEach(p=>{
+    ["home","members","teachers","wheel","schedule","achieve","memory"].forEach(p=>{
         const el=document.getElementById(p+"-page"); if(el) el.classList.toggle("hidden",page!==p);
         const nav=document.getElementById("nav-"+p); if(nav) nav.classList.toggle("active",page===p);
     });
     window.scrollTo({top:0,behavior:"smooth"});
     if(page==="members"){ renderMembers(document.getElementById("search-member").value.trim()); renderHeartBubbles(); }
     if(page==="teachers"){ renderTeachers(document.getElementById("search-teacher").value.trim()); }
+    if(page==="wheel"){ initWheelDefault(); } // Khởi tạo vòng quay khi chuyển sang trang Vòng quay
     if(page==="schedule"){ renderTKB(); }
     if(page==="achieve") renderAchievements();
     if(page==="memory"){ document.getElementById('folder-view').classList.remove('hidden'); document.getElementById('folder-detail').classList.add('hidden'); renderFolders(); }
