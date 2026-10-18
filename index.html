@@ -1050,7 +1050,6 @@ async function submitAddMedia() {
     const folder = memoryFolders.find(f => f.id === currentFolderId);
     if (!folder) return;
     
-    // Hiển thị thông báo đang tải lên để người dùng biết
     alert("Đang tải file lên hệ thống, vui lòng chờ trong giây lát...");
 
     for (const file of files) {
@@ -1059,18 +1058,27 @@ async function submitAddMedia() {
                 const src = await compressImage(file, 1200, 0.7);
                 folder.media.push({ id: Date.now() + Math.random(), src, type: 'image' });
             } else if (file.type.startsWith('video/')) {
-                // Sửa lại: Dùng hàm compressImage/upload lên Cloudinary thay vì đọc FileReader base64
+                // Kiểm tra dung lượng video trước khi gửi (Ví dụ giới hạn dưới 15MB cho tài khoản miễn phí)
+                if (file.size > 15 * 1024 * 1024) {
+                    alert(`Video "${file.name}" quá lớn (>15MB). Vui lòng chọn video ngắn hơn để tránh lỗi!`);
+                    continue;
+                }
                 const src = await compressImage(file, 1200, 0.7);
                 folder.media.push({ id: Date.now() + Math.random(), src, type: 'video' });
             }
         } catch (e) { 
             console.error("Lỗi:", e); 
-            alert("Lỗi khi tải file lên: " + e);
+            alert("Lỗi tải file: " + e);
+            return; // Dừng lại nếu có lỗi để tránh lưu dữ liệu hỏng
         }
     }
-    await saveData(); 
-    renderMedia(); 
-    closeModal();
+    
+    // Thử lưu lên Firebase, nếu dữ liệu quá lớn sẽ báo rõ cho bạn biết
+    const success = await saveData();
+    if(success) {
+        renderMedia(); 
+        closeModal();
+    }
 }
 async function deleteMedia(id) {
     if (!confirm("Xóa file này?")) return;
