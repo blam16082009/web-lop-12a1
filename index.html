@@ -8,6 +8,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* Giới hạn chiều rộng tối đa và cho phép thu gọn cột Gmail */
+table th:nth-child(7), table td:nth-child(7) {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 :root{color-scheme:dark;--blue:#8dbaf5;--purple:#a99af4;--deep:#b8adff;--text:#ecebf7;--muted:#8c8fab;--bg:#0e0e11;--card:#111114;--card2:#17171c;--line:#2a2a36;--chip:#25233b;--shadow:0 12px 35px rgba(0,0,0,.45);--danger:#ff6b6b;--success:#51cf66;--fb-color:#1877f2;--heart:#ff4d6d}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -388,8 +395,8 @@ body {
                             <th>Ngày sinh</th>
                             <th>Giới tính</th>
                             <th>Số điện thoại</th>
+                            <th>Liên hệ</th>        
                             <th>Gmail</th>
-                            <th>Liên hệ</th>
                             <th class="admin-only">Thao tác</th>
                         </tr>
                     </thead>
@@ -1276,13 +1283,13 @@ function renderMembers(keyword=""){
             <td>${formatBirthday(m.birthday)}</td>
             <td>${escapeHtml(m.gender||"Chưa cập nhật")}</td>
             <td><span class="phone-blur">${escapeHtml(m.phone||"")}</span></td>
-            <td>${gmailDisplay}</td>
-            <td>${fbBtn}</td>
+            <td>${fbBtn}</td>            <!-- Đưa nút Facebook ra trước -->
+            <td>${gmailDisplay}</td>     <!-- Đưa Gmail ra sau -->
             <td class="admin-only">
                 <button class="mini-btn" onclick="openMemberModal(${realIndex})">Sửa</button>
                 <button class="mini-btn danger" onclick="deleteMember(${realIndex})">Xóa</button>
                 ${bdayTxt}
-            </td>`;
+        </td>`;
         list.appendChild(tr);
     });
 }
