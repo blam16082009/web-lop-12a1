@@ -435,7 +435,7 @@ body {
             <div class="achieve-hero" style="border-radius:24px 24px 0 0;">
                 <span class="tag">LUCKY WHEEL</span>
                 <h1>Vòng quay <span>may mắn</span></h1>
-                <p>Quay tên chọn ngẫu nhiên các thành viên trong lớp!</p>
+                <p>Quay tên thành viên hoặc random số ngẫu nhiên!</p>
             </div>
             
             <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:35px; padding:30px 4%;">
@@ -449,38 +449,55 @@ body {
                     <button onclick="startWheel()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background:var(--purple); color:#fff; border:none; font-weight:800; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:5;">QUAY</button>
                 </div>
 
-                <!-- Bảng cài đặt & Danh sách -->
+                <!-- Bảng cài đặt & Chuyển đổi tính năng -->
                 <div style="flex:1; min-width:340px; max-width:520px; background:var(--card2); padding:22px; border-radius:18px; border:1px solid var(--line); text-align:left;">
-                    <h3 style="margin-bottom:12px; color:var(--deep); font-size:16px;">⚙️ Cài đặt vòng quay</h3>
                     
-                    <!-- Ô điều chỉnh thời gian quay sạch sẽ (đã ẩn hoàn toàn mũi tên mặc định) -->
-                    <div class="form-group" style="margin-bottom:14px;">
-                        <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Thời gian quay (giây):</label>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <button onclick="adjustDuration(-0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:38px; height:38px; border-radius:10px; font-weight:bold; font-size:18px; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='var(--purple)'; this.style.color='#fff';" onmouseout="this.style.background='var(--chip)'; this.style.color='var(--deep)';">-</button>
-                            <input type="text" id="wheel-duration-input" value="5.0" readonly style="flex:1; text-align:center; padding:9px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; font-weight:bold; font-size:15px;">
-                            <button onclick="adjustDuration(0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:38px; height:38px; border-radius:10px; font-weight:bold; font-size:18px; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='var(--purple)'; this.style.color='#fff';" onmouseout="this.style.background='var(--chip)'; this.style.color='var(--deep)';">+</button>
+                    <!-- Nút chuyển đổi chế độ -->
+                    <div style="display:flex; gap:10px; margin-bottom:15px; background:#0f0f12; padding:4px; border-radius:10px; border:1px solid var(--line);">
+                        <button id="mode-name-btn" onclick="switchWheelMode('name')" style="flex:1; padding:8px; border:none; border-radius:8px; font-weight:700; font-size:13px; background:var(--purple); color:#fff; cursor:pointer; transition:0.2s;">Quay Tên</button>
+                        <button id="mode-number-btn" onclick="switchWheelMode('number')" style="flex:1; padding:8px; border:none; border-radius:8px; font-weight:700; font-size:13px; background:transparent; color:var(--muted); cursor:pointer; transition:0.2s;">Random Số</button>
+                    </div>
+
+                    <!-- KHUNG CÀI ĐẶT QUAY SỐ (Mặc định ẩn) -->
+                    <div id="wheel-number-config" class="hidden" style="margin-bottom:15px; background:var(--card); padding:12px; border-radius:10px; border:1px solid var(--line);">
+                        <label style="font-size:12px; font-weight:700; color:var(--deep); margin-bottom:8px; display:block;">⚙️ Cài đặt khoảng số:</label>
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                            <input type="number" id="num-from" value="1" placeholder="Từ số" style="flex:1; padding:8px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none;">
+                            <span style="color:var(--muted); font-weight:bold;">đến</span>
+                            <input type="number" id="num-to" value="10" placeholder="Đến số" style="flex:1; padding:8px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none;">
                         </div>
+                        <button class="primary-btn" style="width:100%; margin:0; padding:8px; font-size:13px;" onclick="generateNumberWheel()">Tạo vòng quay số</button>
                     </div>
 
-                    <div style="display:flex; gap:8px; margin-bottom:12px;">
-                        <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." style="flex:1; padding:9px 12px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none;">
-                        <button class="primary-btn" style="margin:0; padding:9px 16px; font-size:13px;" onclick="addWheelItem()">Thêm</button>
-                    </div>
-                    
-                    <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
-                        <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="loadClassMembersToWheel()">📥 Lấy tên từ lớp</button>
-                        <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="toggleSelectAll(true)">☑️ Chọn tất cả</button>
-                        <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="toggleSelectAll(false)">☒ Bỏ chọn hết</button>
-                        <button class="mini-btn danger" style="padding:7px 12px;" onclick="clearWheelList()">🗑️ Xóa hết</button>
-                    </div>
+                    <!-- KHUNG CÀI ĐẶT QUAY TÊN -->
+                    <div id="wheel-name-config">
+                        <div class="form-group" style="margin-bottom:14px;">
+                            <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Thời gian quay (giây):</label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button onclick="adjustDuration(-0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:38px; height:38px; border-radius:10px; font-weight:bold; font-size:18px; cursor:pointer;" type="button">-</button>
+                                <input type="text" id="wheel-duration-input" value="5.0" readonly style="flex:1; text-align:center; padding:9px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; font-weight:bold; font-size:15px;">
+                                <button onclick="adjustDuration(0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:38px; height:38px; border-radius:10px; font-weight:bold; font-size:18px; cursor:pointer;" type="button">+</button>
+                            </div>
+                        </div>
 
-                    <!-- Danh sách tham gia có hiển thị số thứ tự (STT) -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <label style="font-size:12px; font-weight:700; color:var(--muted);">Danh sách tham gia (<span id="wheel-count-lbl">0</span> người được chọn):</label>
-                    </div>
-                    <div style="max-height:260px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:10px; background:#0f0f12; display:flex; flex-direction:column; gap:8px;" id="wheel-items-list">
-                        <!-- Danh sách tên -->
+                        <div style="display:flex; gap:8px; margin-bottom:12px;">
+                            <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." style="flex:1; padding:9px 12px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none;">
+                            <button class="primary-btn" style="margin:0; padding:9px 16px; font-size:13px;" onclick="addWheelItem()" type="button">Thêm</button>
+                        </div>
+                        
+                        <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                            <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="loadClassMembersToWheel()" type="button">📥 Lấy tên từ lớp</button>
+                            <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="toggleSelectAll(true)" type="button">☑️ Chọn tất cả</button>
+                            <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="toggleSelectAll(false)" type="button">☒ Bỏ chọn hết</button>
+                            <button class="mini-btn danger" style="padding:7px 12px;" onclick="clearWheelList()" type="button">🗑️ Xóa hết</button>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <label style="font-size:12px; font-weight:700; color:var(--muted);">Danh sách tham gia (<span id="wheel-count-lbl">0</span> người được chọn):</label>
+                        </div>
+                        <div style="max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:10px; background:#0f0f12; display:flex; flex-direction:column; gap:8px;" id="wheel-items-list">
+                            <!-- Danh sách tên -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -624,15 +641,16 @@ const TKB_DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 
 const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
 const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
 
-/* ===== VÒNG QUAY MAY MẮN ===== */
+/* ===== VÒNG QUAY MAY MẮN & RANDOM SỐ ===== */
 let wheelItems = []; 
 let lastWinnerIndex = null; 
 let currentAngle = 0;
 let isSpinning = false;
+let currentWheelMode = 'name'; // 'name' hoặc 'number'
 const wheelColors = ["#8dbaf5", "#a99af4", "#ff6b6b", "#51cf66", "#fcc419", "#ff922b", "#cc5de8", "#20c997"];
 
 function initWheelDefault() {
-    if (wheelItems.length === 0) {
+    if (wheelItems.length === 0 && currentWheelMode === 'name') {
         if (members && members.length > 0) {
             wheelItems = members.map(m => ({ name: m.name, active: true }));
         } else {
@@ -648,8 +666,60 @@ function initWheelDefault() {
     drawWheel(0);
 }
 
+// Chuyển đổi qua lại giữa chế độ Quay Tên và Random Số
+function switchWheelMode(mode) {
+    currentWheelMode = mode;
+    const nameBtn = document.getElementById("mode-name-btn");
+    const numBtn = document.getElementById("mode-number-btn");
+    const nameConfig = document.getElementById("wheel-name-config");
+    const numConfig = document.getElementById("wheel-number-config");
+
+    if (mode === 'name') {
+        nameBtn.style.background = "var(--purple)";
+        nameBtn.style.color = "#fff";
+        numBtn.style.background = "transparent";
+        numBtn.style.color = "var(--muted)";
+        nameConfig.classList.remove("hidden");
+        numConfig.classList.add("hidden");
+        initWheelDefault();
+    } else {
+        numBtn.style.background = "var(--purple)";
+        numBtn.style.color = "#fff";
+        nameBtn.style.background = "transparent";
+        nameBtn.style.color = "var(--muted)";
+        numConfig.classList.remove("hidden");
+        nameConfig.classList.add("hidden");
+        generateNumberWheel(); // Tự động tạo danh sách số khi chuyển sang chế độ số
+    }
+}
+
+// Tạo danh sách số dựa trên khoảng người dùng nhập vào
+function generateNumberWheel() {
+    const fromVal = parseInt(document.getElementById("num-from").value);
+    const toVal = parseInt(document.getElementById("num-to").value);
+
+    if (isNaN(fromVal) || isNaN(toVal)) {
+        return alert("Vui lòng nhập đầy đủ khoảng số hợp lệ!");
+    }
+    if (fromVal > toVal) {
+        return alert("Số bắt đầu phải nhỏ hơn hoặc bằng số kết thúc!");
+    }
+    if ((toVal - fromVal + 1) > 100) {
+        return alert("Khoảng số quá lớn (tối đa 100 số) để hiển thị trên bánh xe!");
+    }
+
+    wheelItems = [];
+    for (let i = fromVal; i <= toVal; i++) {
+        wheelItems.push({ name: String(i), active: true });
+    }
+    currentAngle = 0;
+    drawWheel(0);
+}
+
 function loadClassMembersToWheel() {
     if (!members || members.length === 0) return alert("Chưa có thành viên nào trong lớp!");
+    currentWheelMode = 'name';
+    document.getElementById("mode-name-btn").click();
     wheelItems = members.map(m => ({ name: m.name, active: true }));
     renderWheelList();
     drawWheel(0);
@@ -660,6 +730,8 @@ function getActiveWheelItems() {
 }
 
 function renderWheelList() {
+    if (currentWheelMode === 'number') return; // Nếu đang ở chế độ số thì không cần render list tên chi tiết phía dưới
+    
     const container = document.getElementById("wheel-items-list");
     const countLbl = document.getElementById("wheel-count-lbl");
     if (!container) return;
@@ -679,14 +751,13 @@ function renderWheelList() {
         const div = document.createElement("div");
         div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:8px 12px; border-radius:8px; font-size:14px; transition:0.2s;";
         
-        // Hiển thị số thứ tự (index + 1) kèm theo checkbox và tên
         div.innerHTML = `
             <div style="display:flex; align-items:center; gap:10px; flex:1; overflow:hidden;">
                 <span style="color:var(--muted); font-size:12px; font-weight:700; min-width:24px;">#${index + 1}</span>
                 <input type="checkbox" ${item.active ? 'checked' : ''} onchange="toggleItemActive(${index})" style="width:16px; height:16px; cursor:pointer; accent-color:var(--purple);">
                 <span style="font-weight:500; word-break:break-word; opacity:${item.active ? '1' : '0.4'}; text-decoration:${item.active ? 'none' : 'line-through'};">${escapeHtml(item.name)}</span>
             </div>
-            <button onclick="removeWheelItem(${index})" title="Xóa" style="background:transparent; border:none; color:var(--muted); width:28px; height:28px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='rgba(255,107,107,0.2)'; this.style.color='var(--danger)';" onmouseout="this.style.background='transparent'; this.style.color='var(--muted)';">
+            <button onclick="removeWheelItem(${index})" title="Xóa" type="button" style="background:transparent; border:none; color:var(--muted); width:28px; height:28px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='rgba(255,107,107,0.2)'; this.style.color='var(--danger)';" onmouseout="this.style.background='transparent'; this.style.color='var(--muted)';">
                 🗑️
             </button>
         `;
@@ -727,7 +798,6 @@ function clearWheelList() {
     }
 }
 
-// Điều chỉnh thời gian quay (+/- đơn vị 0.2s)
 function adjustDuration(amount) {
     const input = document.getElementById("wheel-duration-input");
     let val = parseFloat(input.value) || 5.0;
@@ -755,7 +825,7 @@ function drawWheel(angle) {
         ctx.fillStyle = "#8c8fab";
         ctx.font = "14px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("Chưa chọn thành viên nào để quay", pusatX, pusatY);
+        ctx.fillText("Chưa có dữ liệu để quay", pusatX, pusatY);
         return;
     }
 
@@ -789,12 +859,13 @@ function drawWheel(angle) {
 function startWheel() {
     const currentActiveItems = getActiveWheelItems();
     if (isSpinning || currentActiveItems.length === 0) {
-        if(currentActiveItems.length === 0) alert("Vui lòng tích chọn ít nhất một thành viên trong danh sách để quay!");
+        if(currentActiveItems.length === 0) alert("Danh sách quay đang trống!");
         return;
     }
     isSpinning = true;
 
-    let durationInput = parseFloat(document.getElementById("wheel-duration-input").value);
+    // Ở chế độ random số, có thể fix cứng thời gian quay hoặc dùng chung ô input thời gian
+    let durationInput = parseFloat(document.getElementById("wheel-duration-input")?.value || 5.0);
     let duration = (isNaN(durationInput) || durationInput <= 0) ? 5000 : durationInput * 1000;
 
     let spinAngle = Math.random() * 2500 + 4000; 
@@ -835,18 +906,19 @@ function startWheel() {
 }
 
 function showWinnerModal(winnerName) {
+    const labelTitle = currentWheelMode === 'number' ? 'Số may mắn được chọn là:' : 'Người may mắn được gọi tên là:';
     showModal(`
         <div style="text-align:center; padding: 10px;">
             <div style="font-size: 55px; margin-bottom: 5px;">🎉</div>
-            <h3 style="color:var(--deep); font-size:18px; margin-bottom:5px;">Chúc mừng người chiến thắng!</h3>
-            <p style="font-size:14px; color:var(--muted); margin-bottom:8px;">Người may mắn được gọi tên là:</p>
-            <div style="font-size:26px; font-weight:800; color:var(--purple); background:var(--chip); padding:12px; border-radius:12px; margin-bottom:20px; border:1px solid var(--line); word-break:break-word;">
+            <h3 style="color:var(--deep); font-size:18px; margin-bottom:5px;">Chúc mừng kết quả!</h3>
+            <p style="font-size:14px; color:var(--muted); margin-bottom:8px;">${labelTitle}</p>
+            <div style="font-size:32px; font-weight:800; color:var(--purple); background:var(--chip); padding:12px; border-radius:12px; margin-bottom:20px; border:1px solid var(--line); word-break:break-word;">
                 ${escapeHtml(winnerName)} 🎁
             </div>
             
             <div style="display:flex; gap:10px;">
-                <button class="btn-cancel" onclick="closeModal()" style="flex:1; padding:11px; font-weight:700; cursor:pointer;">Giữ nguyên</button>
-                <button class="btn-submit" onclick="removeWinnerAndClose()" style="flex:1; padding:11px; background:var(--danger); font-weight:700; cursor:pointer;">Xóa tên này</button>
+                <button class="btn-cancel" onclick="closeModal()" style="flex:1; padding:11px; font-weight:700; cursor:pointer;" type="button">Đóng</button>
+                ${currentWheelMode === 'name' ? `<button class="btn-submit" onclick="removeWinnerAndClose()" style="flex:1; padding:11px; background:var(--danger); font-weight:700; cursor:pointer;" type="button">Xóa tên này</button>` : ``}
             </div>
         </div>
     `);
