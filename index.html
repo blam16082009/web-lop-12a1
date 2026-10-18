@@ -1345,7 +1345,14 @@ function renderTeachers(keyword=""){
 
         tr.innerHTML=`
             <td>${index+1}</td>
-            <td>${avatar}<strong>${escapeHtml(t.name)}</strong>${roleBadge}</td>
+            <td>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:220px;">
+                    <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                        ${avatar}<strong>${escapeHtml(t.name)}</strong>
+                    </div>
+                    <div style="flex-shrink:0;">${roleBadge}</div>
+                </div>
+            </td>
             <td><strong style="color:var(--deep);">${escapeHtml(t.subject || "Chưa cập nhật")}</strong></td>
             <td>${formatBirthday(t.birthday)}</td>
             <td>${escapeHtml(t.gender||"Chưa cập nhật")}</td>
@@ -1374,7 +1381,8 @@ function openTeacherModal(index=-1){
                 <option value="GVCN" ${t.role==="GVCN"?"selected":""}>Giáo viên chủ nhiệm (GVCN)</option>
             </select>
         </div>
-        <div class="form-group"><label>Bộ môn giảng dạy</label><input type="text" id="t-subject" placeholder="VD: Toán, Ngữ Văn, Tiếng Anh..." value="${escapeHtml(t.subject||"")}"></div>
+        <!-- Thêm style text-transform:uppercase để giao diện tự chuyển hoa khi gõ -->
+        <div class="form-group"><label>Bộ môn giảng dạy</label><input type="text" id="t-subject" placeholder="VD: TOÁN, NGỮ VĂN..." value="${escapeHtml(t.subject||"")}" style="text-transform:uppercase;"></div>
         <div class="form-group"><label>Giới tính</label>
             <select id="t-gender"><option value="">-- Chọn --</option><option value="Nam" ${t.gender==="Nam"?"selected":""}>Nam</option><option value="Nữ" ${t.gender==="Nữ"?"selected":""}>Nữ</option></select>
         </div>
@@ -1389,7 +1397,8 @@ function openTeacherModal(index=-1){
 async function submitTeacher(index){
     const name=document.getElementById("t-name").value.trim(), 
         role=document.getElementById("t-role").value,
-        subject=document.getElementById("t-subject").value.trim(),
+        // Ép kiểu chữ hoa cho bộ môn
+        subject=document.getElementById("t-subject").value.trim().toLocaleUpperCase("vi"),
         gender=document.getElementById("t-gender").value,
         birthday=document.getElementById("t-dob").value, 
         phone=document.getElementById("t-phone").value.trim(),
