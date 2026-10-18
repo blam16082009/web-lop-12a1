@@ -521,11 +521,13 @@ body {
     <!-- THỜI KHÓA BIỂU LƯỚI -->
     <section id="schedule-page" class="page hidden">
         <div class="full-page-card">
-            <div class="schedule-hero">
-                <span class="tag">CLASS SCHEDULE</span>
-                <h1>Thời khóa biểu <span>lớp mình</span></h1>
-            </div>
-            <div class="tkb-container">
+        <div class="schedule-hero">
+            <span class="tag">CLASS SCHEDULE</span>
+            <h1>Thời khóa biểu <span>lớp mình</span></h1>
+            <!-- Thêm nút nhập nhanh TKB dành riêng cho Admin ở đây -->
+            <button class="primary-btn admin-only" style="margin-top:15px; background:var(--success);" onclick="importDefaultTKB()">📥 Nhập nhanh TKB 12A1</button>
+        </div>
+        <div class="tkb-container">
                 <table class="tkb-table">
                     <thead>
                         <tr>
@@ -2170,6 +2172,42 @@ async function importDefaultMembers() {
     if (success) {
         renderMembers();
         alert("🎉 Đã nhập thành công 45 thành viên lên hệ thống Firebase!");
+    }
+}
+async function importDefaultTKB() {
+    if (!confirm("Bạn có chắc chắn muốn nạp dữ liệu Thời khóa biểu 12A1 (đã lược bỏ tên giáo viên) không?")) return;
+
+    scheduleData = {
+        "Thứ 2": { 
+            1: "Hoá", 2: "Văn", 3: "Văn", 4: "Lí", 5: "",
+            7: "Hoá", 8: "Tin", 9: "Văn"
+        },
+        "Thứ 3": { 
+            1: "Toán", 2: "HĐTN", 3: "NNgữ", 4: "Hoá", 5: "Sinh",
+            7: "HT: Hoá", 8: "HT: Hoá", 9: "HT: Sinh", 10: "HT: Sinh"
+        },
+        "Thứ 4": { 
+            1: "GDTC", 2: "QP", 3: "Sử", 4: "NNgữ", 5: "",
+            7: "Lí", 8: "GDĐP", 9: "GDĐP"
+        },
+        "Thứ 5": { 
+            1: "Tin", 2: "HĐTN", 3: "Sử", 4: "Toán", 5: "Toán",
+            7: "BDHSG", 8: "BDHSG", 9: "QPAN", 10: "QPAN"
+        },
+        "Thứ 6": { 
+            1: "Sinh", 2: "GDTC", 3: "NNgữ", 4: "Lí", 5: "Toán"
+        },
+        "Thứ 7": { 
+            1: "Khảo sát HSG", 2: "Khảo sát HSG", 3: "Khảo sát HSG", 4: "Khảo sát HSG",
+            7: "HT: Lí", 8: "HT: Lí", 9: "HT: Toán", 10: "HT: Toán"
+        },
+        "Chủ Nhật": {}
+    };
+
+    const success = await saveData();
+    if (success) {
+        renderTKB();
+        alert("🎉 Đã cập nhật thành công Thời khóa biểu rút gọn của lớp 12A1 lên Firebase!");
     }
 }
 </script>
