@@ -1049,23 +1049,28 @@ async function submitAddMedia() {
     if (files.length === 0) return alert("Chọn file!");
     const folder = memoryFolders.find(f => f.id === currentFolderId);
     if (!folder) return;
+    
+    // Hiển thị thông báo đang tải lên để người dùng biết
+    alert("Đang tải file lên hệ thống, vui lòng chờ trong giây lát...");
+
     for (const file of files) {
         try {
             if (file.type.startsWith('image/')) {
                 const src = await compressImage(file, 1200, 0.7);
                 folder.media.push({ id: Date.now() + Math.random(), src, type: 'image' });
             } else if (file.type.startsWith('video/')) {
-                const src = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = e => resolve(e.target.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
+                // Sửa lại: Dùng hàm compressImage/upload lên Cloudinary thay vì đọc FileReader base64
+                const src = await compressImage(file, 1200, 0.7);
                 folder.media.push({ id: Date.now() + Math.random(), src, type: 'video' });
             }
-        } catch (e) { console.error("Lỗi:", e); }
+        } catch (e) { 
+            console.error("Lỗi:", e); 
+            alert("Lỗi khi tải file lên: " + e);
+        }
     }
-    await saveData(); renderMedia(); closeModal();
+    await saveData(); 
+    renderMedia(); 
+    closeModal();
 }
 async function deleteMedia(id) {
     if (!confirm("Xóa file này?")) return;
