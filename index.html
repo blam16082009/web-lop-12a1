@@ -439,9 +439,9 @@ body {
             </div>
             
             <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:40px; padding:30px 5%;">
-                <!-- Khung chứa Vòng quay Canvas (Đã phóng to lên 420px) -->
+                <!-- Khung chứa Vòng quay Canvas (420px) -->
                 <div style="position:relative; width:420px; height:420px;">
-                    <!-- Mũi tên chỉ hướng quay xuống dưới nằm ở đỉnh -->
+                    <!-- Mũi tên chỉ hướng quay xuống dưới -->
                     <div style="position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:32px solid var(--danger); z-index:10; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));"></div>
                     
                     <canvas id="wheel-canvas" width="420" height="420" style="width:100%; height:100%; border-radius:50%; box-shadow:0 10px 30px rgba(0,0,0,0.5); border:6px solid var(--purple);"></canvas>
@@ -449,9 +449,16 @@ body {
                     <button onclick="startWheel()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background:var(--purple); color:#fff; border:none; font-weight:800; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:5;">QUAY</button>
                 </div>
 
-                <!-- Bảng cài đặt/nhập danh sách tên -->
+                <!-- Bảng cài đặt & Điều chỉnh thời gian quay -->
                 <div style="flex:1; min-width:280px; max-width:400px; background:var(--card2); padding:20px; border-radius:16px; border:1px solid var(--line); text-align:left;">
-                    <h3 style="margin-bottom:12px; color:var(--deep); font-size:16px;">⚙️ Cài đặt danh sách quay</h3>
+                    <h3 style="margin-bottom:12px; color:var(--deep); font-size:16px;">⚙️ Cài đặt vòng quay</h3>
+                    
+                    <!-- Ô điều chỉnh thời gian quay -->
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Thời gian quay (giây):</label>
+                        <input type="number" id="wheel-duration-input" value="5.2" step="0.5" min="1" max="15" style="width:100%; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none;">
+                    </div>
+
                     <div style="display:flex; gap:8px; margin-bottom:12px;">
                         <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." style="flex:1; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none;">
                         <button class="primary-btn" style="margin:0; padding:8px 14px; font-size:13px;" onclick="addWheelItem()">Thêm</button>
@@ -460,7 +467,7 @@ body {
                         <button class="mini-btn" style="padding:6px 12px; background:var(--chip);" onclick="loadClassMembersToWheel()">📥 Lấy tên từ lớp</button>
                         <button class="mini-btn danger" style="padding:6px 12px;" onclick="clearWheelList()">🗑️ Xóa hết</button>
                     </div>
-                    <div style="max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:8px; background:#0f0f12; display:flex; flex-direction:column; gap:6px;" id="wheel-items-list">
+                    <div style="max-height:180px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:8px; background:#0f0f12; display:flex; flex-direction:column; gap:6px;" id="wheel-items-list">
                         <!-- Danh sách tên -->
                     </div>
                 </div>
@@ -724,9 +731,12 @@ function startWheel() {
     if (isSpinning || wheelItems.length === 0) return;
     isSpinning = true;
 
+    // Lấy thời gian giây người dùng nhập vào (mặc định 5.2 giây nếu để trống)
+    let durationInput = parseFloat(document.getElementById("wheel-duration-input").value);
+    let duration = (isNaN(durationInput) || durationInput <= 0) ? 5200 : durationInput * 1000;
+
     let spinAngle = Math.random() * 2500 + 4000; 
     let startTime = null;
-    const duration = 5200; // Tăng thời gian quay lên 5.2 giây (thêm 1.2s)
 
     function animateSpin(timestamp) {
         if (!startTime) startTime = timestamp;
@@ -744,7 +754,6 @@ function startWheel() {
             isSpinning = false;
             currentAngle = currentRot % (2 * Math.PI);
 
-            // Tính toán chính xác vị trí kim chỉ ở phía trên (góc -Math.PI / 2 tương đương 12 giờ)
             const sliceAngle = (2 * Math.PI) / wheelItems.length;
             let normalizedAngle = (1.5 * Math.PI - currentAngle) % (2 * Math.PI);
             if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
@@ -761,14 +770,17 @@ function startWheel() {
     requestAnimationFrame(animateSpin);
 }
 
-// Hiển thị bảng thông báo trúng giải đẹp mắt trên web thay vì alert()
+// Bảng thông báo trúng giải: Tên người trúng được tách dòng riêng và làm to nổi bật
 function showWinnerModal(winnerName) {
     showModal(`
         <div style="text-align:center; padding: 10px;">
-            <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
-            <h3 style="color:var(--deep); font-size:20px; margin-bottom:8px;">Chúc mừng trúng thưởng!</h3>
-            <p style="font-size:16px; color:var(--text); margin-bottom:20px;">Người may mắn được chọn là: <b style="color:var(--purple); font-size:18px;">${escapeHtml(winnerName)}</b> 🎁</p>
-            <button class="btn-submit" onclick="closeModal()" style="width:100%; padding: 10px; font-size:15px;">Tuyệt vời! 🥳</button>
+            <div style="font-size: 55px; margin-bottom: 5px;">🎉</div>
+            <h3 style="color:var(--deep); font-size:18px; margin-bottom:5px;">Chúc mừng người chiến thắng!</h3>
+            <p style="font-size:14px; color:var(--muted); margin-bottom:12px;">Người may mắn được gọi tên là:</p>
+            <div style="font-size:26px; font-weight:800; color:var(--purple); background:var(--chip); padding:12px; border-radius:12px; margin-bottom:20px; border:1px solid var(--line); word-break:break-word;">
+                ${escapeHtml(winnerName)} 🎁
+            </div>
+            <button class="btn-submit" onclick="closeModal()" style="width:100%; padding: 11px; font-size:15px;">Tuyệt vời! 🥳</button>
         </div>
     `);
 }
