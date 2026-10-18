@@ -540,20 +540,12 @@ body {
 <section id="clock-page" class="page hidden">
     <div class="full-page-card">
         <div class="achieve-hero">
-            <span class="tag">CLOCK & TIMER</span>
-            <h1>Đồng hồ <span>của lớp mình</span></h1>
-            <p>Xem giờ thực và hẹn giờ đếm ngược có chuông báo.</p>
+            <span class="tag">TIMER</span>
+            <h1>Hẹn giờ <span>đếm ngược</span></h1>
+            <p>Nhập Giờ / Phút / Giây — hết giờ sẽ có chuông báo.</p>
         </div>
 
         <div style="display:flex; flex-wrap:wrap; gap:28px; padding:30px 5%; justify-content:center;">
-
-            <!-- ĐỒNG HỒ THỰC -->
-            <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
-                <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">🕒 Giờ hiện tại</h2>
-                <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Đồng hồ thời gian thực</p>
-                <div id="live-clock-time" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00:00</div>
-                <div id="live-clock-date" style="color:var(--muted); font-size:14px; margin-top:10px;">—</div>
-            </div>
 
             <!-- ĐỒNG HỒ HẸN GIỜ -->
             <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
@@ -800,7 +792,10 @@ let specialEvents = [];
 let teachers = []; // Thêm danh sách thầy cô
 let achievements = [];
 let posts = [];
-let myLikes = JSON.parse(localStorage.getItem('class_my_likes')) || {};
+let myLikes = (() => {
+    try { return JSON.parse(localStorage.getItem('class_my_likes')) || {}; }
+    catch (e) { return {}; }
+})();
 let bdayData = {};
 let memoryFolders = [];
 let currentFolderId = null;
@@ -1205,7 +1200,7 @@ function showPage(page){
     if(page==="schedule"){ renderTKB(); }
     if(page==="achieve") renderAchievements();
     if(page==="memory"){ document.getElementById('folder-view').classList.remove('hidden'); document.getElementById('folder-detail').classList.add('hidden'); renderFolders(); }
-    if(page==="clock"){ ensureLiveClock(); updateTimerDisplay(); }   // ← Thêm dòng này
+    if(page==="clock"){ updateTimerDisplay(); }  // ← Thêm dòng này
 }
 
 /* ADMIN */
@@ -1847,6 +1842,14 @@ function renderMedia() {
         `;
         grid.appendChild(item);
     });
+}
+async function deleteMedia(id) {
+    if (!confirm("Xóa file này khỏi thư mục?")) return;
+    const folder = memoryFolders.find(f => f.id === currentFolderId);
+    if (!folder) return;
+    folder.media = folder.media.filter(m => m.id !== id);
+    await saveData();
+    renderMedia();
 }
 function openAddFolderModal() {
     showModal(`
@@ -2679,30 +2682,10 @@ function startNumberRandom() {
     step();
 }
 /* ===== ĐỒNG HỒ ===== */
-let clockInterval = null;
 let timerInterval = null;
 let timerRemaining = 0;
 let timerRunning = false;
 let timerEndTime = 0;
-
-// --- Đồng hồ thực ---
-function tickLiveClock() {
-    const now = new Date();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mm = String(now.getMinutes()).padStart(2, '0');
-    const ss = String(now.getSeconds()).padStart(2, '0');
-    const el = document.getElementById('live-clock-time');
-    const elDate = document.getElementById('live-clock-date');
-    if (el) el.textContent = `${hh}:${mm}:${ss}`;
-    if (elDate) {
-        const thu = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'][now.getDay()];
-        elDate.textContent = `${thu}, ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
-    }
-}
-function ensureLiveClock() {
-    tickLiveClock();
-    if (!clockInterval) clockInterval = setInterval(tickLiveClock, 1000);
-}
 
 // --- Đồng hồ hẹn giờ ---
 function updateTimerDisplay() {
@@ -2803,12 +2786,6 @@ function playTimerBell() {
         }
     } catch (e) { /* bỏ qua lỗi âm thanh */ }
 }
-
-// Khi chuyển sang trang đồng hồ thì khởi động đồng hồ thực
-document.addEventListener('DOMContentLoaded', () => {
-    // Đảm bảo đồng hồ thực chạy ngay khi vào trang
-    ensureLiveClock();
-});
 </script>
 </body>
 </html>
