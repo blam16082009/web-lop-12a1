@@ -8,6 +8,33 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* Thu gọn cột Gmail ở bảng Thành viên (cột thứ 7) */
+#members-page table th:nth-child(7), #members-page table td:nth-child(7) {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Thu gọn cột Gmail ở bảng Thầy cô (cột thứ 8) */
+#teachers-page table th:nth-child(8), #teachers-page table td:nth-child(8) {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Hiệu ứng làm mờ Gmail */
+.teacher-gmail-blur, .gmail-blur {
+    filter: blur(5px);
+    user-select: none;
+    transition: .2s;
+}
+body.admin-mode .teacher-gmail-blur, 
+body.admin-mode .gmail-blur {
+    filter: none;
+    user-select: auto;
+}
 /* Giới hạn chiều rộng tối đa và cho phép thu gọn cột Gmail */
 table th:nth-child(7), table td:nth-child(7) {
     max-width: 160px;
@@ -437,6 +464,7 @@ body {
                             <th>Giới tính</th>
                             <th>Số điện thoại</th>
                             <th>Liên hệ</th>
+                            <th>Gmail</th>
                             <th class="admin-only">Thao tác</th>
                         </tr>
                     </thead>
@@ -1358,7 +1386,8 @@ function renderTeachers(keyword=""){
     list.innerHTML="";
     const filtered=teachers.filter(t=> (t.name || "").toLowerCase().includes(keyword.toLowerCase()) || (t.subject || "").toLowerCase().includes(keyword.toLowerCase()));
     count.textContent=`${filtered.length} thầy cô`;
-    if(filtered.length===0){list.innerHTML=`<tr><td colspan="8" style="text-align:center;">Không tìm thấy thầy cô.</td></tr>`;return;}
+    if(filtered.length===0){list.innerHTML=`<tr><td colspan="9" style="text-align:center;">Không tìm thấy thầy cô.</td></tr>`;return;}
+    
     filtered.forEach((t,index)=>{
         const realIndex=teachers.indexOf(t);
         const tr=document.createElement("tr");
@@ -1373,6 +1402,15 @@ function renderTeachers(keyword=""){
                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook
                </a>` 
             : `<span style="color:var(--muted);font-size:12px;">--</span>`;
+
+        // Xử lý hiển thị làm mờ Gmail
+        let gmailDisplay = "--";
+        if (t.gmail) {
+            const parts = t.gmail.split("@");
+            const userPart = parts[0] || "";
+            const domainPart = parts[1] || "gmail.com";
+            gmailDisplay = `<span class="teacher-gmail-blur">${escapeHtml(userPart)}</span>@${escapeHtml(domainPart)}`;
+        }
 
         tr.innerHTML=`
             <td>${index+1}</td>
@@ -1389,6 +1427,7 @@ function renderTeachers(keyword=""){
             <td>${escapeHtml(t.gender||"Chưa cập nhật")}</td>
             <td><span class="phone-blur">${escapeHtml(t.phone||"")}</span></td>
             <td>${fbBtn}</td>
+            <td>${gmailDisplay}</td>
             <td class="admin-only">
                 <button class="mini-btn" onclick="openTeacherModal(${realIndex})">Sửa</button>
                 <button class="mini-btn danger" onclick="deleteTeacher(${realIndex})">Xóa</button>
@@ -1402,7 +1441,7 @@ function openAddTeacherModal(){
 }
 
 function openTeacherModal(index=-1){
-    const t=index>=0?teachers[index]:{name:"",role:"GVBM",subject:"",gender:"",birthday:"",phone:"",facebook:""};
+    const t=index>=0?teachers[index]:{name:"",role:"GVBM",subject:"",gender:"",birthday:"",phone:"",gmail:"",facebook:""};
     showModal(`
         <h3>${index>=0?"Sửa thông tin thầy cô":"Thêm thầy cô"}</h3>
         <div class="form-group"><label>Họ và tên</label><input type="text" id="t-name" value="${escapeHtml(t.name)}"></div>
@@ -1412,13 +1451,13 @@ function openTeacherModal(index=-1){
                 <option value="GVCN" ${t.role==="GVCN"?"selected":""}>Giáo viên chủ nhiệm (GVCN)</option>
             </select>
         </div>
-        <!-- Thêm style text-transform:uppercase để giao diện tự chuyển hoa khi gõ -->
         <div class="form-group"><label>Bộ môn giảng dạy</label><input type="text" id="t-subject" placeholder="VD: TOÁN, NGỮ VĂN..." value="${escapeHtml(t.subject||"")}" style="text-transform:uppercase;"></div>
         <div class="form-group"><label>Giới tính</label>
             <select id="t-gender"><option value="">-- Chọn --</option><option value="Nam" ${t.gender==="Nam"?"selected":""}>Nam</option><option value="Nữ" ${t.gender==="Nữ"?"selected":""}>Nữ</option></select>
         </div>
         <div class="form-group"><label>Ngày sinh</label><input type="date" id="t-dob" value="${t.birthday||""}"></div>
         <div class="form-group"><label>Số điện thoại</label><input type="text" id="t-phone" value="${escapeHtml(t.phone||"")}"></div>
+        <div class="form-group"><label>Gmail</label><input type="email" id="t-gmail" placeholder="vd: abc@gmail.com" value="${escapeHtml(t.gmail||"")}"></div>
         <div class="form-group"><label>Link Facebook</label><input type="url" id="t-facebook" placeholder="https://facebook.com/..." value="${escapeHtml(t.facebook||"")}"></div>
         <div class="form-group"><label>Ảnh đại diện</label><input type="file" id="t-photo" accept="image/*"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitTeacher(${index})">Lưu</button></div>
@@ -1428,11 +1467,11 @@ function openTeacherModal(index=-1){
 async function submitTeacher(index){
     const name=document.getElementById("t-name").value.trim(), 
         role=document.getElementById("t-role").value,
-        // Ép kiểu chữ hoa cho bộ môn
         subject=document.getElementById("t-subject").value.trim().toLocaleUpperCase("vi"),
         gender=document.getElementById("t-gender").value,
         birthday=document.getElementById("t-dob").value, 
         phone=document.getElementById("t-phone").value.trim(),
+        gmail=document.getElementById("t-gmail").value.trim(),
         facebook=document.getElementById("t-facebook").value.trim(),
         file=document.getElementById("t-photo").files[0];
         
@@ -1442,7 +1481,7 @@ async function submitTeacher(index){
     let photo=index>=0?(teachers[index].photo||""):"";
     if(file){try{photo=await compressImage(file,400,0.75);}catch(e){return alert("Lỗi ảnh!");}}
     
-    const data={name,role,subject,gender,birthday,phone,facebook,photo};
+    const data={name,role,subject,gender,birthday,phone,gmail,facebook,photo};
     if(index>=0) teachers[index]=data; else teachers.push(data);
     
     await saveData();
@@ -2228,14 +2267,14 @@ async function importDefaultTeachers() {
         { name: "Vũ Thị Xim", subject: "QUỐC PHÒNG", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "vuthixim1979@gmail.com", role: "GVBM" }
     ];
 
-    if (!confirm("Bạn có chắc chắn muốn nạp toàn bộ danh sách thầy cô này lên hệ thống không?")) return;
+    if (!confirm("Bạn có chắc chắn muốn nạp toàn bộ danh sách thầy cô kèm Gmail lên hệ thống không?")) return;
 
     teachers = defaultTeacherData;
 
     const success = await saveData();
     if (success) {
         renderTeachers();
-        alert("🎉 Đã nhập thành công danh sách thầy cô lên hệ thống Firebase!");
+        alert("🎉 Đã nhập thành công danh sách thầy cô kèm Gmail lên Firebase!");
     }
 }
 </script>
