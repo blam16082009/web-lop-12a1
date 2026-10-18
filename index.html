@@ -438,7 +438,7 @@ body {
                 <p>Quay tên chọn ngẫu nhiên các thành viên trong lớp!</p>
             </div>
             
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:30px; padding:30px 5%;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:35px; padding:30px 4%;">
                 <!-- Khung chứa Vòng quay Canvas (420px) -->
                 <div style="position:relative; width:420px; height:420px; flex-shrink:0;">
                     <!-- Mũi tên chỉ hướng quay xuống dưới -->
@@ -450,32 +450,36 @@ body {
                 </div>
 
                 <!-- Bảng cài đặt & Danh sách to rộng hơn -->
-                <div style="flex:1; min-width:320px; max-width:480px; background:var(--card2); padding:20px; border-radius:16px; border:1px solid var(--line); text-align:left;">
+                <div style="flex:1; min-width:340px; max-width:520px; background:var(--card2); padding:22px; border-radius:18px; border:1px solid var(--line); text-align:left;">
                     <h3 style="margin-bottom:12px; color:var(--deep); font-size:16px;">⚙️ Cài đặt vòng quay</h3>
                     
-                    <!-- Ô điều chỉnh thời gian quay có nút + / - đơn vị 0.2s -->
-                    <div class="form-group" style="margin-bottom:12px;">
+                    <!-- Ô điều chỉnh thời gian quay kiểu mới (+ / - và hiển thị số 5.0) -->
+                    <div class="form-group" style="margin-bottom:14px;">
                         <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Thời gian quay (giây):</label>
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <button onclick="adjustDuration(-0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:36px; height:36px; border-radius:8px; font-weight:bold; font-size:16px; cursor:pointer;">-</button>
-                            <input type="number" id="wheel-duration-input" value="5.2" step="0.2" min="0.5" max="30" style="flex:1; text-align:center; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none; font-weight:bold;">
-                            <button onclick="adjustDuration(0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:36px; height:36px; border-radius:8px; font-weight:bold; font-size:16px; cursor:pointer;">+</button>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <button onclick="adjustDuration(-0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:38px; height:38px; border-radius:10px; font-weight:bold; font-size:18px; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='var(--purple)'; this.style.color='#fff';" onmouseout="this.style.background='var(--chip)'; this.style.color='var(--deep)';">-</button>
+                            <input type="text" id="wheel-duration-input" value="5.0" readonly style="flex:1; text-align:center; padding:9px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; font-weight:bold; font-size:15px;">
+                            <button onclick="adjustDuration(0.2)" style="background:var(--chip); color:var(--deep); border:1px solid var(--line); width:38px; height:38px; border-radius:10px; font-weight:bold; font-size:18px; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='var(--purple)'; this.style.color='#fff';" onmouseout="this.style.background='var(--chip)'; this.style.color='var(--deep)';">+</button>
                         </div>
                     </div>
 
                     <div style="display:flex; gap:8px; margin-bottom:12px;">
-                        <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." style="flex:1; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#0f0f12; color:var(--text); outline:none;">
-                        <button class="primary-btn" style="margin:0; padding:8px 14px; font-size:13px;" onclick="addWheelItem()">Thêm</button>
+                        <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." style="flex:1; padding:9px 12px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none;">
+                        <button class="primary-btn" style="margin:0; padding:9px 16px; font-size:13px;" onclick="addWheelItem()">Thêm</button>
                     </div>
                     
-                    <div style="display:flex; gap:8px; margin-bottom:12px;">
-                        <button class="mini-btn" style="padding:6px 12px; background:var(--chip);" onclick="loadClassMembersToWheel()">📥 Lấy tên từ lớp</button>
-                        <button class="mini-btn danger" style="padding:6px 12px;" onclick="clearWheelList()">🗑️ Xóa hết</button>
+                    <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                        <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="loadClassMembersToWheel()">📥 Lấy tên từ lớp</button>
+                        <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="toggleSelectAll(true)">☑️ Chọn tất cả</button>
+                        <button class="mini-btn" style="padding:7px 12px; background:var(--chip);" onclick="toggleSelectAll(false)">☒ Bỏ chọn hết</button>
+                        <button class="mini-btn danger" style="padding:7px 12px;" onclick="clearWheelList()">🗑️ Xóa hết</button>
                     </div>
 
-                    <!-- Danh sách tên được làm to rộng, thoáng đãng hơn -->
-                    <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Danh sách tham gia (<span id="wheel-count-lbl">0</span>):</label>
-                    <div style="max-height:240px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:10px; background:#0f0f12; display:flex; flex-direction:column; gap:8px;" id="wheel-items-list">
+                    <!-- Danh sách tham gia to rộng, có checkbox đánh dấu -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <label style="font-size:12px; font-weight:700; color:var(--muted);">Danh sách tham gia (<span id="wheel-count-lbl">0</span> người được chọn):</label>
+                    </div>
+                    <div style="max-height:260px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:10px; background:#0f0f12; display:flex; flex-direction:column; gap:8px;" id="wheel-items-list">
                         <!-- Danh sách tên -->
                     </div>
                 </div>
@@ -621,16 +625,23 @@ const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
 const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
 
 /* ===== VÒNG QUAY MAY MẮN ===== */
-let wheelItems = [];
-let lastWinnerIndex = null; // Lưu vị trí người vừa trúng để hỗ trợ xóa nhanh
+let wheelItems = []; // Lưu trữ đối tượng: { name: "...", active: true }
+let lastWinnerIndex = null; 
+let currentAngle = 0;
+let isSpinning = false;
 const wheelColors = ["#8dbaf5", "#a99af4", "#ff6b6b", "#51cf66", "#fcc419", "#ff922b", "#cc5de8", "#20c997"];
 
 function initWheelDefault() {
     if (wheelItems.length === 0) {
         if (members && members.length > 0) {
-            wheelItems = members.map(m => m.name);
+            wheelItems = members.map(m => ({ name: m.name, active: true }));
         } else {
-            wheelItems = ["Nguyễn Văn A", "Trần Thị B", "Lê Văn C", "Phạm Thị D"];
+            wheelItems = [
+                { name: "Nguyễn Văn A", active: true },
+                { name: "Trần Thị B", active: true },
+                { name: "Lê Văn C", active: true },
+                { name: "Phạm Thị D", active: true }
+            ];
         }
     }
     renderWheelList();
@@ -639,9 +650,14 @@ function initWheelDefault() {
 
 function loadClassMembersToWheel() {
     if (!members || members.length === 0) return alert("Chưa có thành viên nào trong lớp!");
-    wheelItems = members.map(m => m.name);
+    wheelItems = members.map(m => ({ name: m.name, active: true }));
     renderWheelList();
     drawWheel(0);
+}
+
+// Lấy danh sách những người đang được bật checkbox để đưa lên vòng quay
+function getActiveWheelItems() {
+    return wheelItems.filter(item => item.active).map(item => item.name);
 }
 
 function renderWheelList() {
@@ -649,61 +665,74 @@ function renderWheelList() {
     const countLbl = document.getElementById("wheel-count-lbl");
     if (!container) return;
     
-    if(countLbl) countLbl.textContent = wheelItems.length;
+    const activeCount = wheelItems.filter(i => i.active).length;
+    if(countLbl) countLbl.textContent = activeCount;
+    
     container.innerHTML = "";
     
     if (wheelItems.length === 0) {
-        container.innerHTML = `<span style="color:var(--muted); font-size:13px; text-align:center; padding:10px;">Danh sách trống</span>`;
+        container.innerHTML = `<span style="color:var(--muted); font-size:13px; text-align:center; padding:15px;">Danh sách trống</span>`;
+        drawWheel(0);
         return;
     }
     
     wheelItems.forEach((item, index) => {
         const div = document.createElement("div");
-        div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:8px 12px; border-radius:8px; font-size:14px;";
+        div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:8px 12px; border-radius:8px; font-size:14px; transition:0.2s;";
         
-        // Nút dấu x được làm to, rõ và đẹp mắt hơn khi hover
         div.innerHTML = `
-            <span style="font-weight:500;">${escapeHtml(item)}</span> 
-            <button onclick="removeWheelItem(${index})" style="background:transparent; border:none; color:var(--muted); width:26px; height:26px; border-radius:50%; font-size:16px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='rgba(255,107,107,0.2)'; this.style.color='var(--danger)';" onmouseout="this.style.background='transparent'; this.style.color='var(--muted)';">×</button>
+            <div style="display:flex; align-items:center; gap:10px; flex:1; overflow:hidden;">
+                <input type="checkbox" ${item.active ? 'checked' : ''} onchange="toggleItemActive(${index})" style="width:16px; height:16px; cursor:pointer; accent-color:var(--purple);">
+                <span style="font-weight:500; word-break:break-word; opacity:${item.active ? '1' : '0.4'}; text-decoration:${item.active ? 'none' : 'line-through'};">${escapeHtml(item.name)}</span>
+            </div>
+            <button onclick="removeWheelItem(${index})" title="Xóa" style="background:transparent; border:none; color:var(--muted); width:28px; height:28px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='rgba(255,107,107,0.2)'; this.style.color='var(--danger)';" onmouseout="this.style.background='transparent'; this.style.color='var(--muted)';">
+                🗑️
+            </button>
         `;
         container.appendChild(div);
     });
+    
+    drawWheel(currentAngle);
+}
+
+function toggleItemActive(index) {
+    wheelItems[index].active = !wheelItems[index].active;
+    renderWheelList();
+}
+
+function toggleSelectAll(status) {
+    wheelItems.forEach(i => i.active = status);
+    renderWheelList();
 }
 
 function addWheelItem() {
     const input = document.getElementById("wheel-input-name");
     const name = input.value.trim();
     if (!name) return;
-    wheelItems.push(name);
+    wheelItems.push({ name, active: true });
     input.value = "";
     renderWheelList();
-    drawWheel(0);
 }
 
 function removeWheelItem(index) {
     wheelItems.splice(index, 1);
     renderWheelList();
-    drawWheel(0);
 }
 
 function clearWheelList() {
     if(confirm("Xóa toàn bộ danh sách quay?")) {
         wheelItems = [];
         renderWheelList();
-        drawWheel(0);
     }
 }
 
-// Hàm tăng/giảm thời gian quay theo đơn vị 0.2s
+// Điều chỉnh thời gian quay (+/- đơn vị 0.2s)
 function adjustDuration(amount) {
     const input = document.getElementById("wheel-duration-input");
-    let val = parseFloat(input.value) || 5.2;
+    let val = parseFloat(input.value) || 5.0;
     val = Math.max(0.5, Math.min(30, val + amount));
     input.value = val.toFixed(1);
 }
-
-let currentAngle = 0;
-let isSpinning = false;
 
 function drawWheel(angle) {
     const canvas = document.getElementById("wheel-canvas");
@@ -715,7 +744,9 @@ function drawWheel(angle) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (wheelItems.length === 0) {
+    const currentActiveItems = getActiveWheelItems();
+
+    if (currentActiveItems.length === 0) {
         ctx.beginPath();
         ctx.arc(pusatX, pusatY, radius, 0, 2 * Math.PI);
         ctx.fillStyle = "#17171c";
@@ -723,13 +754,13 @@ function drawWheel(angle) {
         ctx.fillStyle = "#8c8fab";
         ctx.font = "14px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("Chưa có tên trong vòng quay", pusatX, pusatY);
+        ctx.fillText("Chưa chọn thành viên nào để quay", pusatX, pusatY);
         return;
     }
 
-    const sliceAngle = (2 * Math.PI) / wheelItems.length;
+    const sliceAngle = (2 * Math.PI) / currentActiveItems.length;
 
-    wheelItems.forEach((item, i) => {
+    currentActiveItems.forEach((item, i) => {
         const startAngle = angle + i * sliceAngle;
         const endAngle = startAngle + sliceAngle;
 
@@ -755,11 +786,15 @@ function drawWheel(angle) {
 }
 
 function startWheel() {
-    if (isSpinning || wheelItems.length === 0) return;
+    const currentActiveItems = getActiveWheelItems();
+    if (isSpinning || currentActiveItems.length === 0) {
+        if(currentActiveItems.length === 0) alert("Vui lòng tích chọn ít nhất một thành viên trong danh sách để quay!");
+        return;
+    }
     isSpinning = true;
 
     let durationInput = parseFloat(document.getElementById("wheel-duration-input").value);
-    let duration = (isNaN(durationInput) || durationInput <= 0) ? 5200 : durationInput * 1000;
+    let duration = (isNaN(durationInput) || durationInput <= 0) ? 5000 : durationInput * 1000;
 
     let spinAngle = Math.random() * 2500 + 4000; 
     let startTime = null;
@@ -780,15 +815,18 @@ function startWheel() {
             isSpinning = false;
             currentAngle = currentRot % (2 * Math.PI);
 
-            const sliceAngle = (2 * Math.PI) / wheelItems.length;
+            const sliceAngle = (2 * Math.PI) / currentActiveItems.length;
             let normalizedAngle = (1.5 * Math.PI - currentAngle) % (2 * Math.PI);
             if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
             
-            lastWinnerIndex = Math.floor(normalizedAngle / sliceAngle) % wheelItems.length;
-            const winner = wheelItems[lastWinnerIndex];
+            const winningSubIndex = Math.floor(normalizedAngle / sliceAngle) % currentActiveItems.length;
+            const winnerName = currentActiveItems[winningSubIndex];
+
+            // Tìm vị trí gốc trong mảng toàn bộ wheelItems để xử lý xóa nếu cần
+            lastWinnerIndex = wheelItems.findIndex(i => i.name === winnerName && i.active);
 
             setTimeout(() => {
-                showWinnerModal(winner);
+                showWinnerModal(winnerName);
             }, 100);
         }
     }
@@ -796,7 +834,7 @@ function startWheel() {
     requestAnimationFrame(animateSpin);
 }
 
-// Hiển thị bảng thông báo với 2 lựa chọn: Giữ nguyên hoặc Xóa người vừa trúng
+// Bảng thông báo kết quả với 2 lựa chọn rõ ràng: Giữ nguyên hoặc Xóa tên này
 function showWinnerModal(winnerName) {
     showModal(`
         <div style="text-align:center; padding: 10px;">
@@ -808,18 +846,17 @@ function showWinnerModal(winnerName) {
             </div>
             
             <div style="display:flex; gap:10px;">
-                <button class="btn-cancel" onclick="closeModal()" style="flex:1; padding:11px; font-weight:700;">Giữ nguyên</button>
-                <button class="btn-submit" onclick="removeWinnerAndClose()" style="flex:1; padding:11px; background:var(--danger); font-weight:700;">Xóa tên này</button>
+                <button class="btn-cancel" onclick="closeModal()" style="flex:1; padding:11px; font-weight:700; cursor:pointer;">Giữ nguyên</button>
+                <button class="btn-submit" onclick="removeWinnerAndClose()" style="flex:1; padding:11px; background:var(--danger); font-weight:700; cursor:pointer;">Xóa tên này</button>
             </div>
         </div>
     `);
 }
 
 function removeWinnerAndClose() {
-    if (lastWinnerIndex !== null && lastWinnerIndex < wheelItems.length) {
+    if (lastWinnerIndex !== null && lastWinnerIndex >= 0 && lastWinnerIndex < wheelItems.length) {
         wheelItems.splice(lastWinnerIndex, 1);
         renderWheelList();
-        drawWheel(currentAngle);
     }
     closeModal();
 }
