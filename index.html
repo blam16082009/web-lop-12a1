@@ -546,7 +546,25 @@ body {
             
             <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:35px; padding:30px 4%;">
                 <!-- Khung chứa Vòng quay Canvas (420px) -->
-                <div style="position:relative; width:420px; height:420px; flex-shrink:0;">
+                <!-- Khu vực hiển thị bên trái (Thay đổi linh hoạt giữa Vòng quay Tên và Lưới Ô Số) -->
+                <div style="position:relative; width:420px; min-height:420px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    
+                    <!-- 1. KHUNG VÒNG QUAY (Dành cho Quay Tên) -->
+                    <div id="wheel-canvas-container" style="position:relative; width:420px; height:420px;">
+                        <div style="position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:32px solid var(--danger); z-index:10; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));"></div>
+                        <canvas id="wheel-canvas" width="420" height="420" style="width:100%; height:100%; border-radius:50%; box-shadow:0 10px 30px rgba(0,0,0,0.5); border:6px solid var(--purple);"></canvas>
+                        <button onclick="startWheel()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background:var(--purple); color:#fff; border:none; font-weight:800; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:5;">QUAY</button>
+                    </div>
+
+                    <!-- 2. KHUNG LƯỚI Ô SỐ (Dành cho Random Số) -->
+                    <div id="number-grid-container" class="hidden" style="width:100%; height:420px; background:var(--card2); border:1px solid var(--line); border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:20px;">
+                        <div id="number-cells-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; width:100%; max-height:310px; overflow-y:auto; padding:5px; scrollbar-width:thin;">
+                            <!-- Các ô số sẽ tự động render ở đây -->
+                        </div>
+                        <button class="primary-btn" onclick="startNumberRandom()" style="width:100%; max-width:220px; padding:12px; font-size:16px; font-weight:800; margin:0;">QUAY SỐ</button>
+                    </div>
+
+                </div>
                     <!-- Mũi tên chỉ hướng quay xuống dưới -->
                     <div style="position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:32px solid var(--danger); z-index:10; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));"></div>
                     
@@ -782,6 +800,8 @@ function switchWheelMode(mode) {
     const numBtn = document.getElementById("mode-number-btn");
     const nameConfig = document.getElementById("wheel-name-config");
     const numConfig = document.getElementById("wheel-number-config");
+    const canvasContainer = document.getElementById("wheel-canvas-container");
+    const numberGridContainer = document.getElementById("number-grid-container");
 
     if (mode === 'name') {
         nameBtn.style.background = "var(--purple)";
@@ -790,6 +810,8 @@ function switchWheelMode(mode) {
         numBtn.style.color = "var(--muted)";
         nameConfig.classList.remove("hidden");
         numConfig.classList.add("hidden");
+        canvasContainer.classList.remove("hidden");
+        numberGridContainer.classList.add("hidden");
         initWheelDefault();
     } else {
         numBtn.style.background = "var(--purple)";
@@ -798,7 +820,9 @@ function switchWheelMode(mode) {
         nameBtn.style.color = "var(--muted)";
         numConfig.classList.remove("hidden");
         nameConfig.classList.add("hidden");
-        generateNumberWheel(); // Tự động tạo danh sách số khi chuyển sang chế độ số
+        canvasContainer.classList.add("hidden");
+        numberGridContainer.classList.remove("hidden");
+        generateNumberGrid(); // Tạo lưới ô số tự động khi chuyển sang chế độ số
     }
 }
 
@@ -2498,6 +2522,90 @@ async function deleteSpecialEvent(index) {
         await saveData();
         renderSpecialEvents();
     }
+}
+/* ===== XỬ LÝ LƯỚI Ô SỐ RANDOM ===== */
+let numberGridItems = [];
+let isNumberSpinning = false;
+
+function generateNumberGrid() {
+    const fromVal = parseInt(document.getElementById("num-from").value);
+    const toVal = parseInt(document.getElementById("num-to").value);
+
+    if (isNaN(fromVal) || isNaN(toVal)) {
+        return alert("Vui lòng nhập đầy đủ khoảng số hợp lệ!");
+    }
+    if (fromVal > toVal) {
+        return alert("Số bắt đầu phải nhỏ hơn hoặc bằng số kết thúc!");
+    }
+    if ((toVal - fromVal + 1) > 100) {
+        return alert("Khoảng số quá lớn (tối đa 100 số để hiển thị lưới)!");
+    }
+
+    numberGridItems = [];
+    for (let i = fromVal; i <= toVal; i++) {
+        numberGridItems.push(i);
+    }
+    renderNumberGridCells(-1);
+}
+
+function renderNumberGridCells(activeIndex) {
+    const grid = document.getElementById("number-cells-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    numberGridItems.forEach((num, index) => {
+        const cell = document.createElement("div");
+        const isActive = index === activeIndex;
+        cell.style.cssText = `
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: ${isActive ? 'var(--purple)' : 'var(--card)'};
+            color: ${isActive ? '#fff' : 'var(--text)'};
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 12px;
+            border: 2px solid ${isActive ? 'var(--blue)' : 'var(--line)'};
+            box-shadow: ${isActive ? '0 0 15px rgba(169,154,244,0.6)' : 'none'};
+            transform: ${isActive ? 'scale(1.08)' : 'scale(1)'};
+            transition: all 0.12s ease;
+        `;
+        cell.textContent = num;
+        grid.appendChild(cell);
+    });
+}
+
+function startNumberRandom() {
+    if (isNumberSpinning || numberGridItems.length === 0) {
+        if (numberGridItems.length === 0) generateNumberGrid();
+        return;
+    }
+    isNumberSpinning = true;
+
+    let currentIndex = 0;
+    let totalSteps = Math.floor(Math.random() * 20) + 30; // Số bước chạy qua các ô
+    let currentStep = 0;
+    let speed = 40; // Tốc độ chạy ban đầu (ms)
+
+    function step() {
+        currentIndex = (currentIndex + 1) % numberGridItems.length;
+        renderNumberGridCells(currentIndex);
+        currentStep++;
+
+        if (currentStep < totalSteps) {
+            speed += 12; // Tăng dần thời gian để hiệu ứng chậm dần đều và dừng lại
+            setTimeout(step, speed);
+        } else {
+            isNumberSpinning = false;
+            const winningNumber = numberGridItems[currentIndex];
+            setTimeout(() => {
+                showWinnerModal(winningNumber);
+            }, 150);
+        }
+    }
+
+    step();
 }
 </script>
 </body>
