@@ -373,6 +373,9 @@ body {
                 <input id="search-member" type="search" placeholder="🔎 Tìm theo tên thành viên...">
                 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                     <span id="member-count">0 thành viên</span>
+                    <!-- Thêm nút này vào đây -->
+                    <button class="primary-btn" style="margin:0;padding:8px 14px;font-size:12px;background:var(--success);" onclick="importDefaultMembers()">📥 Nhập nhanh 45 thành viên</button>
+                    
                     <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;" onclick="openAddMemberModal()">+ Thêm thành viên</button>
                 </div>
             </div>
@@ -2090,6 +2093,78 @@ setInterval(()=>{
     renderBirthdays(); 
 }, 1000);
 showPage("home");
+async function importDefaultMembers() {
+    const defaultData = [
+        { "STT": 1, "Lop": "12A1", "HoVaTen": "Nguyễn Quốc An", "NgaySinh": "17/01/2009", "GioiTinh": "Nam", "SoDienThoai": "034675179", "Gmail": "quocan170109@gmail.com" },
+        { "STT": 2, "Lop": "12A1", "HoVaTen": "Cao Thị Lan Anh", "NgaySinh": "02/01/2009", "GioiTinh": "Nữ", "SoDienThoai": "0866517683", "Gmail": "caolananh0201@gmail.com" },
+        { "STT": 3, "Lop": "12A1", "HoVaTen": "Đinh Tuấn Anh", "NgaySinh": "12/01/2009", "GioiTinh": "Nam", "SoDienThoai": "0867468766", "Gmail": "anhmastersniper@gmail.com" },
+        { "STT": 4, "Lop": "12A1", "HoVaTen": "Nguyễn Ngọc Anh", "NgaySinh": "20/09/2009", "GioiTinh": "Nữ", "SoDienThoai": "0963159209", "Gmail": "ngocanhnguyen20092009@gmail.com" },
+        { "STT": 5, "Lop": "12A1", "HoVaTen": "Hoàng Gia Bảo", "NgaySinh": "29/09/2009", "GioiTinh": "Nam", "SoDienThoai": "0912746001", "Gmail": "hoangbao2992009@gmail.com" },
+        { "STT": 6, "Lop": "12A1", "HoVaTen": "Nguyễn Tuấn Châu", "NgaySinh": "15/12/2009", "GioiTinh": "Nam", "SoDienThoai": "0338122888", "Gmail": "chaunguyentuan2@gmail.com" },
+        { "STT": 7, "Lop": "12A1", "HoVaTen": "Hà Ngọc Vân Dung", "NgaySinh": "29/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0866205093", "Gmail": "zeduring209@gmail.com" },
+        { "STT": 8, "Lop": "12A1", "HoVaTen": "Nguyễn Minh Dũng", "NgaySinh": "23/02/2009", "GioiTinh": "Nam", "SoDienThoai": "0377118892", "Gmail": "nguyenminhdung6b2009@gmail.com" },
+        { "STT": 9, "Lop": "12A1", "HoVaTen": "Trần Đình Đăng", "NgaySinh": "06/08/2009", "GioiTinh": "Nam", "SoDienThoai": "0355068391", "Gmail": "trandinhdang6809@gmail.com" },
+        { "STT": 10, "Lop": "12A1", "HoVaTen": "Đặng Quang Hào", "NgaySinh": "16/12/2009", "GioiTinh": "Nam", "SoDienThoai": "0977885936", "Gmail": "dangquanghao1612@gmail.com" },
+        { "STT": 11, "Lop": "12A1", "HoVaTen": "Hà Thị Hồng Hải", "NgaySinh": "03/06/2009", "GioiTinh": "Nữ", "SoDienThoai": "0787431471", "Gmail": "hahonghai0306@gmail.com" },
+        { "STT": 12, "Lop": "12A1", "HoVaTen": "Đặng Đình Hạnh", "NgaySinh": "19/05/2009", "GioiTinh": "Nam", "SoDienThoai": "0869950968", "Gmail": "thuyhaidbp@gmail.com" },
+        { "STT": 13, "Lop": "12A1", "HoVaTen": "Chu Minh Hiếu", "NgaySinh": "03/03/2009", "GioiTinh": "Nam", "SoDienThoai": "0375656916", "Gmail": "anhtraihiphop123456789@gmail.com" },
+        { "STT": 14, "Lop": "12A1", "HoVaTen": "Nguyễn Bích Hồng", "NgaySinh": "03/12/2009", "GioiTinh": "Nữ", "SoDienThoai": "0862181309", "Gmail": "nguyenbichhong1239@gmail.com" },
+        { "STT": 15, "Lop": "12A1", "HoVaTen": "Phạm Lâm Hồng", "NgaySinh": "22/12/2009", "GioiTinh": "Nam", "SoDienThoai": "0353958365", "Gmail": "mostbua1t@gmail.com" },
+        { "STT": 16, "Lop": "12A1", "HoVaTen": "Cao Hoàng Huy", "NgaySinh": "07/10/2009", "GioiTinh": "Nam", "SoDienThoai": "0969750229", "Gmail": "caohuy12011992@gmail.com" },
+        { "STT": 17, "Lop": "12A1", "HoVaTen": "Lương Thu Hương", "NgaySinh": "20/04/2009", "GioiTinh": "Nữ", "SoDienThoai": "0374645209", "Gmail": "thuhuong20042009@gmail.com" },
+        { "STT": 18, "Lop": "12A1", "HoVaTen": "Nguyễn Khắc Mai Hương", "NgaySinh": "15/02/2009", "GioiTinh": "Nữ", "SoDienThoai": "0329002648", "Gmail": "lengatn2017@gmail.com" },
+        { "STT": 19, "Lop": "12A1", "HoVaTen": "Lê Du Kỳ", "NgaySinh": "30/05/2009", "GioiTinh": "Nam", "SoDienThoai": "0345744882", "Gmail": "leky30052009@gmail.com" },
+        { "STT": 20, "Lop": "12A1", "HoVaTen": "Lương Đức Khang", "NgaySinh": "02/08/2009", "GioiTinh": "Nam", "SoDienThoai": "0975681498", "Gmail": "duckhang.no1@gmail.com" },
+        { "STT": 21, "Lop": "12A1", "HoVaTen": "Phan Trọng Khôi", "NgaySinh": "17/05/2009", "GioiTinh": "Nam", "SoDienThoai": "0369430720", "Gmail": "khoi17052009@gmail.com" },
+        { "STT": 22, "Lop": "12A1", "HoVaTen": "Đinh Bảo Lâm", "NgaySinh": "16/08/2009", "GioiTinh": "Nam", "SoDienThoai": "0358650255", "Gmail": "baolam1608.vanxuan2009@gmail.com" },
+        { "STT": 23, "Lop": "12A1", "HoVaTen": "Mai Thùy Linh", "NgaySinh": "02/05/2009", "GioiTinh": "Nữ", "SoDienThoai": "0948436748", "Gmail": "maithuylinh02052009@gmail.com" },
+        { "STT": 24, "Lop": "12A1", "HoVaTen": "Nguyễn Khánh Linh", "NgaySinh": "21/11/2009", "GioiTinh": "Nữ", "SoDienThoai": "0334220136", "Gmail": "linhmanhthoa@gmail.com" },
+        { "STT": 25, "Lop": "12A1", "HoVaTen": "Trần Khánh Ly", "NgaySinh": "23/11/2009", "GioiTinh": "Nữ", "SoDienThoai": "0379742386", "Gmail": "lykhanhtran58@gmail.com" },
+        { "STT": 26, "Lop": "12A1", "HoVaTen": "Trần Đức Mạnh", "NgaySinh": "24/04/2009", "GioiTinh": "Nam", "SoDienThoai": "0862809912", "Gmail": "tmanh240409@gmail.com" },
+        { "STT": 27, "Lop": "12A1", "HoVaTen": "Phan Quang Minh", "NgaySinh": "03/10/2009", "GioiTinh": "Nam", "SoDienThoai": "0983463313", "Gmail": "mingnqb@gmail.com" },
+        { "STT": 28, "Lop": "12A1", "HoVaTen": "Nguyễn Hà My", "NgaySinh": "20/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0338570270", "Gmail": "nguyenhamy28062009@gmail.com" },
+        { "STT": 29, "Lop": "12A1", "HoVaTen": "Đỗ Hoàng An Na", "NgaySinh": "08/01/2009", "GioiTinh": "Nữ", "SoDienThoai": "0965189509", "Gmail": "ngalytamnong@gmail.com" },
+        { "STT": 30, "Lop": "12A1", "HoVaTen": "Hồ Thị Kim Ngân", "NgaySinh": "01/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0365437693", "Gmail": "hongan123phutho@gmail.com" },
+        { "STT": 31, "Lop": "12A1", "HoVaTen": "Lê Huyền Ngọc", "NgaySinh": "21/10/2009", "GioiTinh": "Nữ", "SoDienThoai": "0913342512", "Gmail": "lehngoc211009@gmail.com" },
+        { "STT": 32, "Lop": "12A1", "HoVaTen": "Hoàng Cao Phong", "NgaySinh": "28/01/2009", "GioiTinh": "Nam", "SoDienThoai": "0943108168", "Gmail": "Caophong2912k9@gmail.com" },
+        { "STT": 33, "Lop": "12A1", "HoVaTen": "Hán Ngọc Minh Phương", "NgaySinh": "30/10/2009", "GioiTinh": "Nữ", "SoDienThoai": "0335886098", "Gmail": "hanngocminhphuong@gmail.com" },
+        { "STT": 34, "Lop": "12A1", "HoVaTen": "Chu Tiến Thành", "NgaySinh": "26/11/2009", "GioiTinh": "Nam", "SoDienThoai": "0984281869", "Gmail": "" },
+        { "STT": 35, "Lop": "12A1", "HoVaTen": "Bùi Thanh Thảo", "NgaySinh": "14/09/2009", "GioiTinh": "Nữ", "SoDienThoai": "0382869216", "Gmail": "thanhthao1492009@gmail.com" },
+        { "STT": 36, "Lop": "12A1", "HoVaTen": "Nguyễn Phương Thảo", "NgaySinh": "10/09/2009", "GioiTinh": "Nữ", "SoDienThoai": "0378903109", "Gmail": "ptjs03011995@gmail.com" },
+        { "STT": 37, "Lop": "12A1", "HoVaTen": "Phạm Thị Thu Thảo", "NgaySinh": "06/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0835886886", "Gmail": "phamthao682009@gmail.com" },
+        { "STT": 38, "Lop": "12A1", "HoVaTen": "Đặng Huyền Trang", "NgaySinh": "13/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0373606349", "Gmail": "dangtragn813@gmail.com" },
+        { "STT": 39, "Lop": "12A1", "HoVaTen": "Lý Đắc Quang Trung", "NgaySinh": "11/08/2009", "GioiTinh": "Nam", "SoDienThoai": "0987123448", "Gmail": "lydacquangtrung@gmail.com" },
+        { "STT": 40, "Lop": "12A1", "HoVaTen": "Đỗ Quốc Việt", "NgaySinh": "15/03/2009", "GioiTinh": "Nam", "SoDienThoai": "0364966283", "Gmail": "doquocvietnek@gmail.com" },
+        { "STT": 41, "Lop": "12A1", "HoVaTen": "Nguyễn Bá Việt", "NgaySinh": "07/03/2009", "GioiTinh": "Nam", "SoDienThoai": "0966070309", "Gmail": "Kotlo.nbv@gmail.com" },
+        { "STT": 42, "Lop": "12A1", "HoVaTen": "Trần Minh Vương", "NgaySinh": "30/01/2009", "GioiTinh": "Nam", "SoDienThoai": "0349108018", "Gmail": "tranminhvuong2930@gmail.com" },
+        { "STT": 43, "Lop": "12A1", "HoVaTen": "Đinh Hữu Vượng", "NgaySinh": "29/06/2009", "GioiTinh": "Nam", "SoDienThoai": "0356852817", "Gmail": "huuvuongdinh2009@gmail.com" },
+        { "STT": 44, "Lop": "12A1", "HoVaTen": "Lại Thị Hải Yến", "NgaySinh": "25/12/2009", "GioiTinh": "Nữ", "SoDienThoai": "0972191966", "Gmail": "quanda4612@gmail.com" },
+        { "STT": 45, "Lop": "12A1", "HoVaTen": "Nguyễn Đặng Hải Yến", "NgaySinh": "07/12/2009", "GioiTinh": "Nữ", "SoDienThoai": "0333283076", "Gmail": "Yen828342@gamil.com" }
+    ];
+
+    if (!confirm("Bạn có chắc chắn muốn nạp toàn bộ 45 thành viên này lên hệ thống không?")) return;
+
+    members = defaultData.map(item => {
+        let parts = item.NgaySinh.split("/");
+        let formattedDob = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : "";
+        
+        return {
+            name: item.HoVaTen,
+            gender: item.GioiTinh,
+            birthday: formattedDob,
+            phone: item.SoDienThoai,
+            gmail: item.Gmail,
+            facebook: "",
+            photo: ""
+        };
+    });
+
+    const success = await saveData();
+    if (success) {
+        renderMembers();
+        alert("🎉 Đã nhập thành công 45 thành viên lên hệ thống Firebase!");
+    }
+}
 </script>
 </body>
 </html>
