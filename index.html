@@ -335,7 +335,9 @@ body {
                     </div>
                     <div id="post-preview" class="post-preview"></div>
                     <div class="composer-actions">
-                        <label class="photo-pick">🖼️ Thêm ảnh<input type="file" id="post-files" accept="image/*" multiple hidden onchange="previewPostFiles()"></label>
+                        <label class="photo-pick">🖼️ Thêm ảnh/video
+                            <input type="file" id="post-files" accept="image/*,video/*" multiple hidden onchange="previewPostFiles()">
+                        </label>
                         <button class="primary-btn" style="margin:0;padding:9px 22px;" onclick="submitPost()">Đăng</button>
                     </div>
                 </div>
@@ -1206,28 +1208,50 @@ async function submitAddMedia() {
     }
 }
 
-/* ===== BẢNG TIN ===== */
+/* ===== BẢNG TIN HỖ TRỢ CẢ VIDEO & NHIỀU MEDIA ===== */
 function previewPostFiles(){
-    const files=[...document.getElementById("post-files").files];
-    document.getElementById("post-preview").innerHTML=files.map(f=>`<img src="${URL.createObjectURL(f)}" alt="">`).join("");
+    const files = [...document.getElementById("post-files").files];
+    document.getElementById("post-preview").innerHTML = files.map(f => {
+        if (f.type.startsWith('video/')) {
+            return `<video src="${URL.createObjectURL(f)}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;"></video>`;
+        }
+        return `<img src="${URL.createObjectURL(f)}" alt="" style="width:60px;height:60px;border-radius:8px;object-fit:cover;">`;
+    }).join("");
 }
+
 async function submitPost(){
-    const text=document.getElementById("post-text").value.trim();
-    const files=[...document.getElementById("post-files").files].slice(0,12);
-    if(!text&&files.length===0) return alert("Hãy viết gì đó hoặc chọn ảnh nhé!");
+    const text = document.getElementById("post-text").value.trim();
+    const files = [...document.getElementById("post-files").files].slice(0, 12);
+    if (!text && files.length === 0) return alert("Hãy viết gì đó hoặc chọn ảnh/video nhé!");
     
-    let images=[]; 
-    try{
-        images=await Promise.all(files.map(f=>compressImage(f,1000,0.65)));
-    }catch(e){
-        return alert(e); // Hiển thị đúng lỗi ra màn hình
+    // Hiển thị tiến trình tải file
+    alert("Đang đăng bài viết, vui lòng chờ trong giây lát...");
+
+    let mediaList = []; 
+    try {
+        for (const f of files) {
+            // Tải lên Cloudinary thông qua hàm đã tích hợp
+            const url = await uploadToCloudinaryWithProgress(f, () => {});
+            const type = f.type.startsWith('video/') ? 'video' : 'image';
+            mediaList.push({ url, type });
+        }
+    } catch(e) {
+        return alert("Lỗi tải file lên: " + e);
     }
     
-    posts.unshift({id:Date.now(),text,images,time:Date.now(),likes:0,comments:[]});
+    posts.unshift({
+        id: Date.now(),
+        text,
+        images: mediaList, // Lưu danh sách chứa cả URL và loại tệp (image/video)
+        time: Date.now(),
+        likes: 0,
+        comments: []
+    });
+
     await saveData();
-    document.getElementById("post-text").value="";
-    document.getElementById("post-files").value="";
-    document.getElementById("post-preview").innerHTML="";
+    document.getElementById("post-text").value = "";
+    document.getElementById("post-files").value = "";
+    document.getElementById("post-preview").innerHTML = "";
     renderPosts();
 }
 function timeAgo(ts){
@@ -1239,18 +1263,38 @@ function timeAgo(ts){
     return new Date(ts).toLocaleDateString("vi-VN");
 }
 function postHtml(p){
-    const n=p.images.length;
-    const grid=n?`<div class="post-grid n${Math.min(n,4)}">${p.images.slice(0,4).map((src,i)=>
-        `<div class="pg-cell" onclick="openPostImage(${p.id},${i})"><img src="${src}" alt="">${i===3&&n>4?`<div class="pg-more">+${n-4}</div>`:""}</div>`).join("")}</div>`:"";
+    const n = p.images ? p.images.length : 0;
     
-    const comments=p.comments.map((c,i)=>{
+    // Hàm hiển thị từng ô phương tiện (ảnh hoặc video)
+    const renderMediaCell = (item, i) => {
+        // Tương thích với dữ liệu cũ (chỉ lưu chuỗi URL ảnh) hoặc dữ liệu mới (đối tượng {url, type})
+        const isObject = typeof item === 'object';
+        const url = isObject ? item.url : item;
+        const type = isObject ? item.type : 'image';
+
+        if (type === 'video') {
+            return `<div class="pg-cell">
+                        <video src="${url}" controls style="width:100%;height:100%;object-fit:cover;"></video>
+                        ${i === 3 && n > 4 ? `<div class="pg-more">+${n-4}</div>` : ""}
+                    </div>`;
+        } else {
+            return `<div class="pg-cell" onclick="openPostImage(${p.id},${i})">
+                        <img src="${url}" alt="">
+                        ${i === 3 && n > 4 ? `<div class="pg-more">+${n-4}</div>` : ""}
+                    </div>`;
+        }
+    };
+
+    const grid = n ? `<div class="post-grid n${Math.min(n, 4)}">${p.images.slice(0, 4).map((item, i) => renderMediaCell(item, i)).join("")}</div>` : "";
+    
+    const comments = p.comments.map((c, i) => {
         const isAdminComment = c.name === "Admin";
         return `
         <div class="cmt">
-            <div class="cmt-avatar" style="${isAdminComment?'background:#0f2a22;color:#38d9a9;':''}">${escapeHtml((c.name||"?").trim().charAt(0).toUpperCase())}</div>
+            <div class="cmt-avatar" style="${isAdminComment ? 'background:#0f2a22;color:#38d9a9;' : ''}">${escapeHtml((c.name || "?").trim().charAt(0).toUpperCase())}</div>
             <div>
                 <div class="cmt-bubble">
-                    <strong class="${isAdminComment?'is-admin':''}">${escapeHtml(c.name)}</strong>
+                    <strong class="${isAdminComment ? 'is-admin' : ''}">${escapeHtml(c.name)}</strong>
                     <p>${escapeHtml(c.text)}</p>
                 </div>
                 <div class="cmt-meta">${timeAgo(c.time)}<button class="admin-only cmt-del" onclick="deleteComment(${p.id},${i})">Xóa</button></div>
@@ -1258,7 +1302,7 @@ function postHtml(p){
         </div>`;
     }).join("");
 
-    const savedName = isAdmin ? "Admin" : escapeHtml(localStorage.getItem('class_visitor')||"");
+    const savedName = isAdmin ? "Admin" : escapeHtml(localStorage.getItem('class_visitor') || "");
     const readonly = isAdmin ? 'readonly style="background:#1f2e28;color:#38d9a9;font-weight:700;"' : '';
 
     return `
@@ -1267,11 +1311,11 @@ function postHtml(p){
             <div><strong>Admin · 12A1-k59</strong><div class="post-time">${timeAgo(p.time)} · 🌐</div></div>
             <button class="admin-only post-del" onclick="deletePost(${p.id})" title="Xóa bài">🗑</button>
         </div>
-        ${p.text?`<p class="post-text">${escapeHtml(p.text)}</p>`:""}
+        ${p.text ? `<p class="post-text">${escapeHtml(p.text)}</p>` : ""}
         ${grid}
         <div class="post-stats"><span>❤️ ${p.likes} lượt thả tim</span><span>${p.comments.length} bình luận</span></div>
         <div class="post-actions">
-            <button class="${myLikes[p.id]?"on":""}" onclick="toggleLike(${p.id})"><span class="heart-icon">${myLikes[p.id]?"❤️":"🤍"}</span> Thả tim</button>
+            <button class="${myLikes[p.id] ? "on" : ""}" onclick="toggleLike(${p.id})"><span class="heart-icon">${myLikes[p.id] ? "❤️" : "🤍"}</span> Thả tim</button>
             <button onclick="document.getElementById('c-text-${p.id}').focus()">💬 Bình luận</button>
         </div>
         <div class="cmt-list">${comments}</div>
