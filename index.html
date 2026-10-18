@@ -1040,7 +1040,7 @@ function openAddMediaModal() {
     showModal(`
         <h3>Thêm ảnh/video</h3>
         <div class="form-group"><label>Chọn file (có thể chọn nhiều)</label><input type="file" id="media-files" accept="image/*,video/*" multiple></div>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">* Lưu ý: Video nên chọn file siêu ngắn (< 2s) để không bị đầy bộ nhớ!</p>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">* Lưu ý: Video nên chọn file siêu ngắn để không bị đầy bộ nhớ!</p>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAddMedia()">Tải lên</button></div>
     `);
 }
