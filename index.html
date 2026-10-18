@@ -8,6 +8,50 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* TRANG SỰ KIỆN VIDEO */
+.event-post-card {
+    background: var(--card2);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+.event-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.event-post-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--deep);
+}
+.event-post-date {
+    font-size: 12px;
+    color: var(--muted);
+}
+.event-video-container {
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    margin: 15px 0;
+    max-height: 520px;
+}
+.event-video-container video, .event-video-container iframe {
+    width: 100%;
+    max-height: 520px;
+    display: block;
+    aspect-ratio: 16/9;
+}
+.event-post-desc {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
 /* Thu gọn cột Gmail ở bảng Thành viên (cột thứ 7) */
 #members-page table th:nth-child(7), #members-page table td:nth-child(7) {
     max-width: 160px;
@@ -347,6 +391,7 @@ body {
         <button class="nav-link active" id="nav-home" onclick="showPage('home')">Trang chủ</button>
         <button class="nav-link" id="nav-members" onclick="showPage('members')">Thành viên</button>
         <button class="nav-link" id="nav-teachers" onclick="showPage('teachers')">Thầy cô</button>
+        <button class="nav-link" id="nav-events" onclick="showPage('events')">🎉 Sự kiện</button> <!-- Thêm dòng này -->
         <button class="nav-link" id="nav-wheel" onclick="showPage('wheel')">Vòng quay</button>
         <button class="nav-link" id="nav-schedule" onclick="showPage('schedule')">Thời khóa biểu</button>
         <button class="nav-link" id="nav-achieve" onclick="showPage('achieve')">Thành tích</button>
@@ -433,7 +478,22 @@ body {
             <p class="privacy-note">♡ Hãy xin phép các bạn trước khi chia sẻ thông tin cá nhân.</p>
         </div>
     </section>
+        <!-- TRANG SỰ KIỆN -->
+    <section id="events-page" class="page hidden">
+        <div class="full-page-card">
+            <div class="achieve-hero">
+                <span class="tag">SPECIAL EVENTS</span>
+                <h1>Sự kiện <span>nổi bật của lớp</span></h1>
+                <p>Trình chiếu video, hình ảnh mừng các ngày lễ đặc biệt (20/10, 20/11, Tri ân,...)</p>
+                <button class="primary-btn admin-only" style="margin-top:15px;" onclick="openAddEventVideoModal()">+ Thêm sự kiện / Video</button>
+            </div>
 
+            <!-- Danh sách bài trình chiếu sự kiện -->
+            <div id="events-feed" style="padding: 25px 5%; display: flex; flex-direction: column; gap: 30px;">
+                <!-- Video & nội dung sự kiện sẽ tự động render ở đây -->
+            </div>
+        </div>
+    </section>
     <!-- THẦY CÔ -->
 <section id="teachers-page" class="page hidden">
     <div class="full-page-card">
@@ -673,6 +733,7 @@ window.firebaseReady = true;
 /* ===== STATE ===== */
 let isAdmin = false;
 let members = [];
+let specialEvents = [];
 let teachers = []; // Thêm danh sách thầy cô
 let achievements = [];
 let posts = [];
@@ -998,6 +1059,7 @@ async function loadDataFromFirebase() {
                 memoryFolders = data.memoryFolders || [];
                 countdownEvents = data.countdownEvents || [];
                 scheduleData = data.scheduleData || {};
+                specialEvents = data.specialEvents || [];
             } else {
                 members = [
                     { name: "Nguyễn Văn A", gender: "Nam", birthday: "2008-01-15", phone: "0912 345 678" }
@@ -1026,6 +1088,7 @@ async function loadDataFromFirebase() {
             renderFolders();
             renderCountdowns();
             renderHeartBubbles();
+            renderSpecialEvents();
             if (currentFolderId) renderMedia();
         }, (error) => {
             console.error("Lỗi lắng nghe dữ liệu realtime:", error);
@@ -1042,12 +1105,14 @@ async function saveData() {
     try {
         const docRef = window.fbDoc(window.db, "class_data", "main");
         await window.fbSetDoc(docRef, {
-            members, teachers, achievements, posts, bdayData, memoryFolders, countdownEvents, scheduleData
+            members, teachers, achievements, posts, bdayData, memoryFolders, countdownEvents, scheduleData,
+            specialEvents 
+            
         });
         localStorage.setItem('class_my_likes', JSON.stringify(myLikes));
         return true;
     } catch (e) {
-        alert("Lỗi khi lưu dữ liệu lên Firebase! Có thể do mất mạng.");
+        alert("Lỗi khi lưu dữ liệu lên Firebase!");
         return false;
     }
 }
@@ -1068,14 +1133,15 @@ function showProgressModal(title) {
 function closeModal(){document.getElementById("modal-container").innerHTML="";}
 
 function showPage(page){
-    ["home","members","teachers","wheel","schedule","achieve","memory"].forEach(p=>{
+    ["home","members","teachers","events","wheel","schedule","achieve","memory"].forEach(p=>{
         const el=document.getElementById(p+"-page"); if(el) el.classList.toggle("hidden",page!==p);
         const nav=document.getElementById("nav-"+p); if(nav) nav.classList.toggle("active",page===p);
     });
     window.scrollTo({top:0,behavior:"smooth"});
     if(page==="members"){ renderMembers(document.getElementById("search-member").value.trim()); renderHeartBubbles(); }
     if(page==="teachers"){ renderTeachers(document.getElementById("search-teacher").value.trim()); }
-    if(page==="wheel"){ initWheelDefault(); } // Khởi tạo vòng quay khi chuyển sang trang Vòng quay
+    if(page==="events"){ renderSpecialEvents(); } // Thêm dòng này
+    if(page==="wheel"){ initWheelDefault(); }
     if(page==="schedule"){ renderTKB(); }
     if(page==="achieve") renderAchievements();
     if(page==="memory"){ document.getElementById('folder-view').classList.remove('hidden'); document.getElementById('folder-detail').classList.add('hidden'); renderFolders(); }
@@ -2275,6 +2341,162 @@ async function importDefaultTeachers() {
     if (success) {
         renderTeachers();
         alert("🎉 Đã nhập thành công danh sách thầy cô kèm Gmail lên Firebase!");
+    }
+}
+/* ===== QUẢN LÝ SỰ KIỆN / VIDEO TRÌNH CHIẾU ===== */
+function renderSpecialEvents() {
+    const feed = document.getElementById("events-feed");
+    if (!feed) return;
+    feed.innerHTML = "";
+
+    if (specialEvents.length === 0) {
+        feed.innerHTML = `<p class="empty-achieve">Chưa có sự kiện nào. Admin hãy đăng video/hình ảnh sự kiện nhé ♡</p>`;
+        return;
+    }
+
+    specialEvents.forEach((ev, index) => {
+        const card = document.createElement("article");
+        card.className = "event-post-card";
+        
+        let mediaHtml = "";
+        if (ev.videoUrl) {
+            // Kiểm tra nếu là link YouTube Embed
+            if (ev.videoUrl.includes("youtube.com") || ev.videoUrl.includes("youtu.be")) {
+                let embedUrl = ev.videoUrl;
+                if (ev.videoUrl.includes("watch?v=")) {
+                    embedUrl = ev.videoUrl.replace("watch?v=", "embed/");
+                } else if (ev.videoUrl.includes("youtu.be/")) {
+                    embedUrl = ev.videoUrl.replace("youtu.be/", "www.youtube.com/embed/");
+                }
+                mediaHtml = `<div class="event-video-container"><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+            } else {
+                mediaHtml = `<div class="event-video-container"><video src="${ev.videoUrl}" controls preload="metadata"></video></div>`;
+            }
+        }
+
+        card.innerHTML = `
+            <div class="event-post-header">
+                <div>
+                    <div class="event-post-title">🎉 ${escapeHtml(ev.title)}</div>
+                    <div class="event-post-date">📅 ${ev.date ? ev.date.split('-').reverse().join('/') : 'Sự kiện đặc biệt'}</div>
+                </div>
+                <div class="admin-only">
+                    <button class="mini-btn danger" onclick="deleteSpecialEvent(${index})">Xóa sự kiện</button>
+                </div>
+            </div>
+            ${mediaHtml}
+            ${ev.desc ? `<p class="event-post-desc">${escapeHtml(ev.desc)}</p>` : ""}
+        `;
+        feed.appendChild(card);
+    });
+}
+
+function openAddEventVideoModal() {
+    showModal(`
+        <h3>🎉 Đăng sự kiện / Video trình chiếu</h3>
+        <div class="form-group">
+            <label>Tên sự kiện</label>
+            <input type="text" id="se-title" placeholder="VD: Mừng ngày Phụ Nữ Việt Nam 20/10">
+        </div>
+        <div class="form-group">
+            <label>Ngày diễn ra</label>
+            <input type="date" id="se-date">
+        </div>
+        <div class="form-group">
+            <label>Cách chọn Video trình chiếu:</label>
+            <select id="se-video-type" onchange="toggleVideoInputType(this.value)">
+                <option value="file">Tải video từ máy tính/điện thoại</option>
+                <option value="link">Dán link YouTube / Link Cloud</option>
+            </select>
+        </div>
+        <div class="form-group" id="se-file-group">
+            <label>Chọn tệp Video (*.mp4, *.webm)</label>
+            <input type="file" id="se-video-file" accept="video/*">
+        </div>
+        <div class="form-group hidden" id="se-link-group">
+            <label>Link Video (YouTube hoặc MP4 link)</label>
+            <input type="url" id="se-video-link" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="form-group">
+            <label>Lời chúc / Lời giới thiệu sự kiện</label>
+            <textarea id="se-desc" placeholder="Viết những lời chúc tốt đẹp gửi đến thầy cô hoặc các bạn..."></textarea>
+        </div>
+
+        <div class="upload-progress-container" id="se-progress-container" style="display:none;">
+            <div class="upload-progress-bar" id="se-progress-bar"></div>
+        </div>
+        <div class="upload-progress-text" id="se-progress-text"></div>
+
+        <div class="modal-actions" id="se-modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-submit" onclick="submitSpecialEvent()">Đăng sự kiện</button>
+        </div>
+    `);
+}
+
+function toggleVideoInputType(type) {
+    if (type === 'file') {
+        document.getElementById('se-file-group').classList.remove('hidden');
+        document.getElementById('se-link-group').classList.add('hidden');
+    } else {
+        document.getElementById('se-file-group').classList.add('hidden');
+        document.getElementById('se-link-group').classList.remove('hidden');
+    }
+}
+
+async function submitSpecialEvent() {
+    const title = document.getElementById('se-title').value.trim();
+    const date = document.getElementById('se-date').value;
+    const videoType = document.getElementById('se-video-type').value;
+    const desc = document.getElementById('se-desc').value.trim();
+    const videoFile = document.getElementById('se-video-file').files[0];
+    const videoLink = document.getElementById('se-video-link').value.trim();
+
+    if (!title) return alert("Vui lòng nhập tên sự kiện!");
+
+    let finalVideoUrl = "";
+
+    if (videoType === 'link') {
+        finalVideoUrl = videoLink;
+    } else if (videoFile) {
+        const progressContainer = document.getElementById('se-progress-container');
+        const progressBar = document.getElementById('se-progress-bar');
+        const progressText = document.getElementById('se-progress-text');
+        const modalActions = document.getElementById('se-modal-actions');
+
+        if (progressContainer) progressContainer.style.display = 'block';
+        if (modalActions) modalActions.style.display = 'none';
+
+        try {
+            finalVideoUrl = await uploadToCloudinaryWithProgress(videoFile, (percent) => {
+                if (progressBar) progressBar.style.width = percent + '%';
+                if (progressText) progressText.textContent = `Đang tải video lên server (${percent}%)...`;
+            });
+        } catch (e) {
+            alert("Lỗi tải video: " + e);
+            if (modalActions) modalActions.style.display = 'flex';
+            return;
+        }
+    }
+
+    specialEvents.unshift({
+        id: Date.now(),
+        title,
+        date,
+        videoUrl: finalVideoUrl,
+        desc
+    });
+
+    await saveData();
+    renderSpecialEvents();
+    closeModal();
+}
+
+async function deleteSpecialEvent(index) {
+    if (confirm("Xóa bài trình chiếu sự kiện này?")) {
+        specialEvents.splice(index, 1);
+        await saveData();
+        renderSpecialEvents();
     }
 }
 </script>
