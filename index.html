@@ -381,6 +381,7 @@ body {
                             <th>Ngày sinh</th>
                             <th>Giới tính</th>
                             <th>Số điện thoại</th>
+                            <th>Liên hệ</th>
                             <th class="admin-only">Thao tác</th>
                         </tr>
                     </thead>
@@ -825,7 +826,7 @@ function renderMembers(keyword=""){
     list.innerHTML="";
     const filtered=members.filter(m=>m.name.toLowerCase().includes(keyword.toLowerCase()));
     count.textContent=`${filtered.length} thành viên`;
-    if(filtered.length===0){list.innerHTML=`<tr><td colspan="6" style="text-align:center;">Không tìm thấy thành viên.</td></tr>`;return;}
+    if(filtered.length===0){list.innerHTML=`<tr><td colspan="7" style="text-align:center;">Không tìm thấy thành viên.</td></tr>`;return;}
     filtered.forEach((m,index)=>{
         const realIndex=members.indexOf(m);
         const tr=document.createElement("tr");
@@ -836,6 +837,14 @@ function renderMembers(keyword=""){
             if(nb.days===0){isBday=true; bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂 </span>`; bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;}
             else if(nb.days<=7){isBday=true; bdayBadge=`<span class="bday-badge">🎂 Còn ${nb.days} ngày</span>`; bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;}
         }
+        
+        // Tạo nút Facebook nếu thành viên có điền link
+        const fbBtn = m.facebook 
+            ? `<a href="${escapeHtml(m.facebook)}" target="_blank" style="color:var(--fb-color);text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
+                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook
+               </a>` 
+            : `<span style="color:var(--muted);font-size:12px;">--</span>`;
+
         tr.className=isBday?"bday-row":"";
         tr.innerHTML=`
             <td>${index+1}</td>
@@ -843,6 +852,7 @@ function renderMembers(keyword=""){
             <td>${formatBirthday(m.birthday)}</td>
             <td>${escapeHtml(m.gender||"Chưa cập nhật")}</td>
             <td><span class="phone-blur">${escapeHtml(m.phone||"")}</span></td>
+            <td>${fbBtn}</td>
             <td class="admin-only">
                 <button class="mini-btn" onclick="openMemberModal(${realIndex})">Sửa</button>
                 <button class="mini-btn danger" onclick="deleteMember(${realIndex})">Xóa</button>
@@ -863,7 +873,7 @@ async function deleteMember(index){
 }
 function openAddMemberModal(){openMemberModal(-1);}
 function openMemberModal(index=-1){
-    const m=index>=0?members[index]:{name:"",gender:"",birthday:"",phone:""};
+    const m=index>=0?members[index]:{name:"",gender:"",birthday:"",phone:"",facebook:""};
     showModal(`
         <h3>${index>=0?"Sửa thành viên":"Thêm thành viên"}</h3>
         <div class="form-group"><label>Họ và tên</label><input type="text" id="m-name" value="${escapeHtml(m.name)}"></div>
@@ -872,23 +882,33 @@ function openMemberModal(index=-1){
         </div>
         <div class="form-group"><label>Ngày sinh</label><input type="date" id="m-dob" value="${m.birthday||""}"></div>
         <div class="form-group"><label>Số điện thoại</label><input type="text" id="m-phone" value="${escapeHtml(m.phone||"")}"></div>
+        <div class="form-group"><label>Link Facebook</label><input type="url" id="m-facebook" placeholder="https://facebook.com/..." value="${escapeHtml(m.facebook||"")}"></div>
         <div class="form-group"><label>Ảnh đại diện</label><input type="file" id="m-photo" accept="image/*"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitMember(${index})">Lưu</button></div>
     `);
 }
+
 async function submitMember(index){
-    const name=document.getElementById("m-name").value.trim(), gender=document.getElementById("m-gender").value,
-        birthday=document.getElementById("m-dob").value, phone=document.getElementById("m-phone").value.trim(),
+    const name=document.getElementById("m-name").value.trim(), 
+        gender=document.getElementById("m-gender").value,
+        birthday=document.getElementById("m-dob").value, 
+        phone=document.getElementById("m-phone").value.trim(),
+        facebook=document.getElementById("m-facebook").value.trim(),
         file=document.getElementById("m-photo").files[0];
-    if(!name) return alert("Nhập tên!"); if(!gender) return alert("Chọn giới tính!");
+        
+    if(!name) return alert("Nhập tên!"); 
+    if(!gender) return alert("Chọn giới tính!");
+    
     let photo=index>=0?(members[index].photo||""):"";
     if(file){try{photo=await compressImage(file,400,0.75);}catch(e){return alert("Lỗi ảnh!");}}
-    const data={name,gender,birthday,phone,photo};
+    
+    const data={name,gender,birthday,phone,facebook,photo};
     if(index>=0) members[index]=data; else members.push(data);
     
     await saveData();
     renderMembers(document.getElementById("search-member").value.trim());
-    renderHeartBubbles(); closeModal();
+    renderHeartBubbles(); 
+    closeModal();
 }
 
 function compressImage(file, maxSize = 900, quality = 0.7, onProgress = null) {
