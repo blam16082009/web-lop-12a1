@@ -291,6 +291,13 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
     color: var(--muted);
     margin-top: 6px;
 }
+/* Ép video hiển thị gọn gàng theo khung dọc trên web */
+video {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    /* Nếu video bị xoay ngang, bạn có thể dùng thuộc tính transform để ép xoay lại (nếu cần thiết) */
+}
 </style>
 </head>
 <body>
