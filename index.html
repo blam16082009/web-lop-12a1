@@ -537,46 +537,57 @@ body {
     </section>
         
     <!-- ĐỒNG HỒ -->
-    <section id="clock-page" class="page hidden">
-        <div class="full-page-card">
-            <div class="achieve-hero">
-                <span class="tag">CLOCK & TIMER</span>
-                <h1>Đồng hồ <span>của lớp mình</span></h1>
-                <p>Xem giờ thực và hẹn giờ đếm ngược có chuông báo.</p>
+<section id="clock-page" class="page hidden">
+    <div class="full-page-card">
+        <div class="achieve-hero">
+            <span class="tag">CLOCK & TIMER</span>
+            <h1>Đồng hồ <span>của lớp mình</span></h1>
+            <p>Xem giờ thực và hẹn giờ đếm ngược có chuông báo.</p>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:28px; padding:30px 5%; justify-content:center;">
+
+            <!-- ĐỒNG HỒ THỰC -->
+            <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
+                <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">🕒 Giờ hiện tại</h2>
+                <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Đồng hồ thời gian thực</p>
+                <div id="live-clock-time" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00:00</div>
+                <div id="live-clock-date" style="color:var(--muted); font-size:14px; margin-top:10px;">—</div>
             </div>
 
-            <div style="display:flex; flex-wrap:wrap; gap:28px; padding:30px 5%; justify-content:center;">
+            <!-- ĐỒNG HỒ HẸN GIỜ -->
+            <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
+                <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">⏳ Hẹn giờ đếm ngược</h2>
+                <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Nhập Giờ / Phút / Giây rồi bấm Bắt đầu</p>
 
-                <!-- ĐỒNG HỒ THỰC -->
-                <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
-                    <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">🕒 Giờ hiện tại</h2>
-                    <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Đồng hồ thời gian thực</p>
-                    <div id="live-clock-time" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00:00</div>
-                    <div id="live-clock-date" style="color:var(--muted); font-size:14px; margin-top:10px;">—</div>
+                <div id="timer-display" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00:00</div>
+
+                <div style="display:flex; gap:6px; justify-content:center; align-items:flex-start; margin:18px 0;">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                        <input type="number" id="timer-hour" min="0" max="99" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
+                        <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Giờ</span>
+                    </div>
+                    <span style="color:var(--muted); font-size:22px; font-weight:700; margin-top:8px;">:</span>
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                        <input type="number" id="timer-min" min="0" max="59" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
+                        <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Phút</span>
+                    </div>
+                    <span style="color:var(--muted); font-size:22px; font-weight:700; margin-top:8px;">:</span>
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                        <input type="number" id="timer-sec" min="0" max="59" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
+                        <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Giây</span>
+                    </div>
                 </div>
 
-                <!-- ĐỒNG HỒ HẸN GIỜ -->
-                <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
-                    <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">⏳ Hẹn giờ đếm ngược</h2>
-                    <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Nhập số phút/giây rồi bấm Bắt đầu</p>
-
-                    <div id="timer-display" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00</div>
-
-                    <div style="display:flex; gap:8px; justify-content:center; align-items:center; margin:18px 0; flex-wrap:wrap;">
-                        <input type="number" id="timer-min" min="0" max="99" placeholder="Phút" style="width:88px; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center;">
-                        <span style="color:var(--muted);">:</span>
-                        <input type="number" id="timer-sec" min="0" max="59" placeholder="Giây" style="width:88px; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center;">
-                    </div>
-
-                    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-                        <button class="primary-btn" style="margin:0; padding:11px 24px;" onclick="startTimer()">▶ Bắt đầu</button>
-                        <button class="primary-btn" style="margin:0; padding:11px 24px; background:#2a2a33;" onclick="pauseTimer()">⏸ Tạm dừng</button>
-                        <button class="primary-btn" style="margin:0; padding:11px 24px; background:#3a1f25; color:#ff8787;" onclick="resetTimer()">⟲ Đặt lại</button>
-                    </div>
+                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                    <button class="primary-btn" style="margin:0; padding:11px 24px;" onclick="startTimer()">▶ Bắt đầu</button>
+                    <button class="primary-btn" style="margin:0; padding:11px 24px; background:#2a2a33;" onclick="pauseTimer()">⏸ Tạm dừng</button>
+                    <button class="primary-btn" style="margin:0; padding:11px 24px; background:#3a1f25; color:#ff8787;" onclick="resetTimer()">⟲ Đặt lại</button>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- VÒNG QUAY MAY MẮN -->
     <section id="wheel-page" class="page hidden">
@@ -2670,12 +2681,11 @@ function startNumberRandom() {
 /* ===== ĐỒNG HỒ ===== */
 let clockInterval = null;
 let timerInterval = null;
-let timerRemaining = 0;      // giây còn lại
-let timerTotal = 0;          // tổng giây ban đầu
+let timerRemaining = 0;
 let timerRunning = false;
-let timerEndTime = 0;        // timestamp khi hết giờ
+let timerEndTime = 0;
 
-// Cập nhật đồng hồ thực mỗi giây
+// --- Đồng hồ thực ---
 function tickLiveClock() {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
@@ -2689,46 +2699,35 @@ function tickLiveClock() {
         elDate.textContent = `${thu}, ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
     }
 }
-
-// Bắt đầu chạy đồng hồ thực (chỉ chạy 1 lần)
 function ensureLiveClock() {
     tickLiveClock();
-    if (!clockInterval) {
-        clockInterval = setInterval(tickLiveClock, 1000);
-    }
+    if (!clockInterval) clockInterval = setInterval(tickLiveClock, 1000);
 }
 
-// Định dạng giây -> MM:SS (hoặc HH:MM:SS nếu >= 1 giờ)
-function formatTimer(seconds) {
-    seconds = Math.max(0, Math.floor(seconds));
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) {
-        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    }
-    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-}
-
+// --- Đồng hồ hẹn giờ ---
 function updateTimerDisplay() {
     const el = document.getElementById('timer-display');
-    if (el) el.textContent = formatTimer(timerRemaining);
+    if (!el) return;
+    const s = Math.max(0, Math.floor(timerRemaining));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
 }
 
-// Bắt đầu / tiếp tục đếm ngược
 function startTimer() {
     if (timerRunning) return;
 
-    // Nếu chưa có thời gian đếm, đọc từ input
     if (timerRemaining <= 0) {
-        const min = parseInt(document.getElementById('timer-min').value) || 0;
-        const sec = parseInt(document.getElementById('timer-sec').value) || 0;
-        const total = min * 60 + sec;
-        if (total <= 0) {
-            alert('Vui lòng nhập thời gian lớn hơn 0!');
-            return;
-        }
-        timerTotal = total;
+        const hourVal = parseInt(document.getElementById('timer-hour').value) || 0;
+        const minVal  = parseInt(document.getElementById('timer-min').value)  || 0;
+        const secVal  = parseInt(document.getElementById('timer-sec').value)  || 0;
+
+        if (minVal > 59 || secVal > 59) return alert('Phút và Giây phải nhỏ hơn 60!');
+        if (hourVal > 99) return alert('Giờ tối đa là 99!');
+
+        const total = hourVal * 3600 + minVal * 60 + secVal;
+        if (total <= 0) return alert('Vui lòng nhập thời gian lớn hơn 0!');
         timerRemaining = total;
         updateTimerDisplay();
     }
@@ -2758,7 +2757,6 @@ function pauseTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
     timerRunning = false;
-    // cập nhật lại thời gian còn lại chính xác
     timerRemaining = Math.max(0, Math.round((timerEndTime - Date.now()) / 1000));
     updateTimerDisplay();
 }
@@ -2768,11 +2766,14 @@ function resetTimer() {
     timerInterval = null;
     timerRunning = false;
     timerRemaining = 0;
-    timerTotal = 0;
     updateTimerDisplay();
+    ['timer-hour','timer-min','timer-sec'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = 0;
+    });
 }
 
-// Tiếng chuông báo khi hết giờ
+// --- Tiếng chuông báo ---
 function playTimerBell() {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -2794,7 +2795,6 @@ function playTimerBell() {
             osc.stop(startAt + dur + 0.05);
         };
 
-        // Chuông 3 hồi, mỗi hồi 2 nốt
         const now = ctx.currentTime;
         for (let i = 0; i < 3; i++) {
             const t = now + i * 1.0;
