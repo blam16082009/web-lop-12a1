@@ -392,6 +392,7 @@ body {
         <button class="nav-link" id="nav-members" onclick="showPage('members')">Thành viên</button>
         <button class="nav-link" id="nav-teachers" onclick="showPage('teachers')">Thầy cô</button>
         <button class="nav-link" id="nav-events" onclick="showPage('events')">🎉 Sự kiện</button> <!-- Thêm dòng này -->
+        <button class="nav-link" id="nav-clock" onclick="showPage('clock')">⏰ Đồng hồ</button>
         <button class="nav-link" id="nav-wheel" onclick="showPage('wheel')">Vòng quay</button>
         <button class="nav-link" id="nav-schedule" onclick="showPage('schedule')">Thời khóa biểu</button>
         <button class="nav-link" id="nav-achieve" onclick="showPage('achieve')">Thành tích</button>
@@ -532,6 +533,48 @@ body {
                 </table>
             </div>
             <p class="privacy-note">♡ Kính trọng và biết ơn thầy cô giáo.</p>
+        </div>
+    </section>
+        
+    <!-- ĐỒNG HỒ -->
+    <section id="clock-page" class="page hidden">
+        <div class="full-page-card">
+            <div class="achieve-hero">
+                <span class="tag">CLOCK & TIMER</span>
+                <h1>Đồng hồ <span>của lớp mình</span></h1>
+                <p>Xem giờ thực và hẹn giờ đếm ngược có chuông báo.</p>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:28px; padding:30px 5%; justify-content:center;">
+
+                <!-- ĐỒNG HỒ THỰC -->
+                <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
+                    <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">🕒 Giờ hiện tại</h2>
+                    <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Đồng hồ thời gian thực</p>
+                    <div id="live-clock-time" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00:00</div>
+                    <div id="live-clock-date" style="color:var(--muted); font-size:14px; margin-top:10px;">—</div>
+                </div>
+
+                <!-- ĐỒNG HỒ HẸN GIỜ -->
+                <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
+                    <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">⏳ Hẹn giờ đếm ngược</h2>
+                    <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Nhập số phút/giây rồi bấm Bắt đầu</p>
+
+                    <div id="timer-display" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00</div>
+
+                    <div style="display:flex; gap:8px; justify-content:center; align-items:center; margin:18px 0; flex-wrap:wrap;">
+                        <input type="number" id="timer-min" min="0" max="99" placeholder="Phút" style="width:88px; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center;">
+                        <span style="color:var(--muted);">:</span>
+                        <input type="number" id="timer-sec" min="0" max="59" placeholder="Giây" style="width:88px; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center;">
+                    </div>
+
+                    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                        <button class="primary-btn" style="margin:0; padding:11px 24px;" onclick="startTimer()">▶ Bắt đầu</button>
+                        <button class="primary-btn" style="margin:0; padding:11px 24px; background:#2a2a33;" onclick="pauseTimer()">⏸ Tạm dừng</button>
+                        <button class="primary-btn" style="margin:0; padding:11px 24px; background:#3a1f25; color:#ff8787;" onclick="resetTimer()">⟲ Đặt lại</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -1139,18 +1182,19 @@ function showProgressModal(title) {
 function closeModal(){document.getElementById("modal-container").innerHTML="";}
 
 function showPage(page){
-    ["home","members","teachers","events","wheel","schedule","achieve","memory"].forEach(p=>{
+    ["home","members","teachers","events","wheel","schedule","achieve","memory","clock"].forEach(p=>{
         const el=document.getElementById(p+"-page"); if(el) el.classList.toggle("hidden",page!==p);
         const nav=document.getElementById("nav-"+p); if(nav) nav.classList.toggle("active",page===p);
     });
     window.scrollTo({top:0,behavior:"smooth"});
     if(page==="members"){ renderMembers(document.getElementById("search-member").value.trim()); renderHeartBubbles(); }
     if(page==="teachers"){ renderTeachers(document.getElementById("search-teacher").value.trim()); }
-    if(page==="events"){ renderSpecialEvents(); } // Thêm dòng này
+    if(page==="events"){ renderSpecialEvents(); }
     if(page==="wheel"){ initWheelDefault(); }
     if(page==="schedule"){ renderTKB(); }
     if(page==="achieve") renderAchievements();
     if(page==="memory"){ document.getElementById('folder-view').classList.remove('hidden'); document.getElementById('folder-detail').classList.add('hidden'); renderFolders(); }
+    if(page==="clock"){ ensureLiveClock(); updateTimerDisplay(); }   // ← Thêm dòng này
 }
 
 /* ADMIN */
@@ -2623,6 +2667,148 @@ function startNumberRandom() {
 
     step();
 }
+/* ===== ĐỒNG HỒ ===== */
+let clockInterval = null;
+let timerInterval = null;
+let timerRemaining = 0;      // giây còn lại
+let timerTotal = 0;          // tổng giây ban đầu
+let timerRunning = false;
+let timerEndTime = 0;        // timestamp khi hết giờ
+
+// Cập nhật đồng hồ thực mỗi giây
+function tickLiveClock() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    const el = document.getElementById('live-clock-time');
+    const elDate = document.getElementById('live-clock-date');
+    if (el) el.textContent = `${hh}:${mm}:${ss}`;
+    if (elDate) {
+        const thu = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'][now.getDay()];
+        elDate.textContent = `${thu}, ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+    }
+}
+
+// Bắt đầu chạy đồng hồ thực (chỉ chạy 1 lần)
+function ensureLiveClock() {
+    tickLiveClock();
+    if (!clockInterval) {
+        clockInterval = setInterval(tickLiveClock, 1000);
+    }
+}
+
+// Định dạng giây -> MM:SS (hoặc HH:MM:SS nếu >= 1 giờ)
+function formatTimer(seconds) {
+    seconds = Math.max(0, Math.floor(seconds));
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) {
+        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function updateTimerDisplay() {
+    const el = document.getElementById('timer-display');
+    if (el) el.textContent = formatTimer(timerRemaining);
+}
+
+// Bắt đầu / tiếp tục đếm ngược
+function startTimer() {
+    if (timerRunning) return;
+
+    // Nếu chưa có thời gian đếm, đọc từ input
+    if (timerRemaining <= 0) {
+        const min = parseInt(document.getElementById('timer-min').value) || 0;
+        const sec = parseInt(document.getElementById('timer-sec').value) || 0;
+        const total = min * 60 + sec;
+        if (total <= 0) {
+            alert('Vui lòng nhập thời gian lớn hơn 0!');
+            return;
+        }
+        timerTotal = total;
+        timerRemaining = total;
+        updateTimerDisplay();
+    }
+
+    timerRunning = true;
+    timerEndTime = Date.now() + timerRemaining * 1000;
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        const left = Math.round((timerEndTime - Date.now()) / 1000);
+        timerRemaining = left;
+        updateTimerDisplay();
+
+        if (left <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timerRunning = false;
+            timerRemaining = 0;
+            updateTimerDisplay();
+            playTimerBell();
+        }
+    }, 200);
+}
+
+function pauseTimer() {
+    if (!timerRunning) return;
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timerRunning = false;
+    // cập nhật lại thời gian còn lại chính xác
+    timerRemaining = Math.max(0, Math.round((timerEndTime - Date.now()) / 1000));
+    updateTimerDisplay();
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timerRunning = false;
+    timerRemaining = 0;
+    timerTotal = 0;
+    updateTimerDisplay();
+}
+
+// Tiếng chuông báo khi hết giờ
+function playTimerBell() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        if (ctx.state === 'suspended') ctx.resume();
+
+        const ring = (startAt, freq, dur, vol) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, startAt);
+            gain.gain.setValueAtTime(0.0001, startAt);
+            gain.gain.exponentialRampToValueAtTime(vol, startAt + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startAt + dur);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(startAt);
+            osc.stop(startAt + dur + 0.05);
+        };
+
+        // Chuông 3 hồi, mỗi hồi 2 nốt
+        const now = ctx.currentTime;
+        for (let i = 0; i < 3; i++) {
+            const t = now + i * 1.0;
+            ring(t, 880, 0.35, 0.25);
+            ring(t + 0.4, 660, 0.45, 0.2);
+        }
+    } catch (e) { /* bỏ qua lỗi âm thanh */ }
+}
+
+// Khi chuyển sang trang đồng hồ thì khởi động đồng hồ thực
+document.addEventListener('DOMContentLoaded', () => {
+    // Đảm bảo đồng hồ thực chạy ngay khi vào trang
+    ensureLiveClock();
+});
 </script>
 </body>
 </html>
