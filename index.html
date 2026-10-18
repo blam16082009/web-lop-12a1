@@ -1333,7 +1333,6 @@ function renderTeachers(keyword=""){
         const tr=document.createElement("tr");
         const avatar=t.photo?`<img src="${t.photo}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;">`:"";
         
-        // Thẻ hiển thị Chức vụ (GVCN hay GVBM)
         const roleBadge = t.role === "GVCN" 
             ? `<span style="display:inline-block; margin-left:6px; padding:2px 8px; border-radius:10px; background:var(--purple); color:#fff; font-size:10px; font-weight:800;">GVCN</span>`
             : `<span style="display:inline-block; margin-left:6px; padding:2px 8px; border-radius:10px; background:var(--chip); color:var(--muted); font-size:10px; font-weight:700;">GVBM</span>`;
@@ -1358,6 +1357,10 @@ function renderTeachers(keyword=""){
             </td>`;
         list.appendChild(tr);
     });
+}
+
+function openAddTeacherModal(){ 
+    openTeacherModal(-1); 
 }
 
 function openTeacherModal(index=-1){
@@ -1405,6 +1408,14 @@ async function submitTeacher(index){
     await saveData();
     renderTeachers(document.getElementById("search-teacher").value.trim());
     closeModal();
+}
+
+async function deleteTeacher(index){
+    if(confirm("Xóa thông tin thầy cô này?")){
+        teachers.splice(index,1);
+        await saveData();
+        renderTeachers(document.getElementById("search-teacher").value.trim());
+    }
 }
 
 function compressImage(file, maxSize = 900, quality = 0.7, onProgress = null) {
