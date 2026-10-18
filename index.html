@@ -545,7 +545,6 @@ body {
             </div>
             
             <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:35px; padding:30px 4%;">
-                <!-- Khung chứa Vòng quay Canvas (420px) -->
                 <!-- Khu vực hiển thị bên trái (Thay đổi linh hoạt giữa Vòng quay Tên và Lưới Ô Số) -->
                 <div style="position:relative; width:420px; min-height:420px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                     
@@ -565,14 +564,6 @@ body {
                     </div>
 
                 </div>
-                    <!-- Mũi tên chỉ hướng quay xuống dưới -->
-                    <div style="position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:32px solid var(--danger); z-index:10; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));"></div>
-                    
-                    <canvas id="wheel-canvas" width="420" height="420" style="width:100%; height:100%; border-radius:50%; box-shadow:0 10px 30px rgba(0,0,0,0.5); border:6px solid var(--purple);"></canvas>
-                    
-                    <button onclick="startWheel()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background:var(--purple); color:#fff; border:none; font-weight:800; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:5;">QUAY</button>
-                </div>
-
                 <!-- Bảng cài đặt & Chuyển đổi tính năng -->
                 <div style="flex:1; min-width:340px; max-width:520px; background:var(--card2); padding:22px; border-radius:18px; border:1px solid var(--line); text-align:left;">
                     
