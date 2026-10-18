@@ -270,6 +270,27 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
 .wish-photo{display:block;width:150px;height:150px;margin:0 auto;border-radius:50%;object-fit:cover;border:4px solid var(--purple);box-shadow:0 0 30px rgba(169,154,244,.4)}
 .wish-photo-empty{display:flex;align-items:center;justify-content:center;font-size:60px;background:var(--chip)}
 .wish-text{color:var(--text);font-size:15px;line-height:1.7}
+/* Giao diện thanh tiến trình tải lên */
+.upload-progress-container {
+    width: 100%;
+    background: #2a2a36;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 15px;
+    display: none;
+}
+.upload-progress-bar {
+    width: 0%;
+    height: 12px;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    transition: width 0.1s ease;
+}
+.upload-progress-text {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+}
 </style>
 </head>
 <body>
@@ -852,28 +873,49 @@ async function submitMember(index){
     renderHeartBubbles(); closeModal();
 }
 
-function compressImage(file, maxSize = 900, quality = 0.7) {
+function compressImage(file, maxSize = 900, quality = 0.7, onProgress = null) {
     return new Promise((resolve, reject) => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "lop12a1"); 
 
-        // Tự động nhận diện ảnh hay video
-        let uploadUrl = "https://api.cloudinary.com/v1_1/trtlu8uw/auto/upload";
+        const xhr = new XMLHttpRequest();
+        const uploadUrl = "https://api.cloudinary.com/v1_1/trtlu8uw/auto/upload";
 
-        fetch(uploadUrl, {
-            method: "POST",
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.secure_url) {
-                resolve(data.secure_url);
+        xhr.open("POST", uploadUrl, true);
+
+        // Chỉ chạy progress nếu tham số truyền vào là một hàm
+        if (typeof onProgress === 'function') {
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    onProgress(percentComplete);
+                }
+            };
+        }
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                try {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.secure_url) {
+                        resolve(data.secure_url);
+                    } else {
+                        reject("Lỗi Cloudinary: " + (data.error?.message || "Không xác định"));
+                    }
+                } catch (err) {
+                    reject("Lỗi phân tích phản hồi từ máy chủ.");
+                }
             } else {
-                reject("Lỗi Cloudinary: " + (data.error?.message || "Không xác định"));
+                reject("Lỗi tải lên, mã lỗi HTTP: " + xhr.status);
             }
-        })
-        .catch(err => reject("Lỗi mạng: " + err.message));
+        };
+
+        xhr.onerror = function() {
+            reject("Lỗi kết nối mạng.");
+        };
+
+        xhr.send(formData);
     });
 }
 
@@ -1040,8 +1082,18 @@ function openAddMediaModal() {
     showModal(`
         <h3>Thêm ảnh/video</h3>
         <div class="form-group"><label>Chọn file (có thể chọn nhiều)</label><input type="file" id="media-files" accept="image/*,video/*" multiple></div>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">* Lưu ý: Video nên chọn file siêu ngắn để không bị đầy bộ nhớ</p>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAddMedia()">Tải lên</button></div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">* Lưu ý: Video nên chọn dung lượng vừa phải để tải lên nhanh hơn!</p>
+        
+        <!-- Khung hiển thị thanh phần trăm -->
+        <div class="upload-progress-container" id="progress-container">
+            <div class="upload-progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="upload-progress-text" id="progress-text"></div>
+
+        <div class="modal-actions" id="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-submit" onclick="submitAddMedia()">Tải lên</button>
+        </div>
     `);
 }
 async function submitAddMedia() {
@@ -1049,43 +1101,47 @@ async function submitAddMedia() {
     if (files.length === 0) return alert("Chọn file!");
     const folder = memoryFolders.find(f => f.id === currentFolderId);
     if (!folder) return;
-    
-    alert("Đang tải file lên hệ thống, vui lòng chờ trong giây lát...");
 
-    for (const file of files) {
+    // Hiển thị thanh tiến trình, ẩn nút bấm đi để tránh bấm nhiều lần
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const modalActions = document.getElementById('modal-actions');
+
+    if(progressContainer) progressContainer.style.display = 'block';
+    if(modalActions) modalActions.style.display = 'none';
+
+    let totalFiles = files.length;
+
+    for (let i = 0; i < totalFiles; i++) {
+        const file = files[i];
         try {
-            if (file.type.startsWith('image/')) {
-                const src = await compressImage(file, 1200, 0.7);
-                folder.media.push({ id: Date.now() + Math.random(), src, type: 'image' });
-            } else if (file.type.startsWith('video/')) {
-                // Kiểm tra dung lượng video trước khi gửi (Ví dụ giới hạn dưới 15MB cho tài khoản miễn phí)
-                if (file.size > 15 * 1024 * 1024) {
-                    alert(`Video "${file.name}" quá lớn (>15MB). Vui lòng chọn video ngắn hơn để tránh lỗi!`);
-                    continue;
-                }
-                const src = await compressImage(file, 1200, 0.7);
-                folder.media.push({ id: Date.now() + Math.random(), src, type: 'video' });
-            }
+            if(progressText) progressText.textContent = `Đang tải file ${i + 1}/${totalFiles}: ${file.name} (0%)`;
+
+            // Gọi hàm upload có kèm theo callback cập nhật phần trăm
+            const src = await uploadToCloudinaryWithProgress(file, (percent) => {
+                if(progressBar) progressBar.style.width = percent + '%';
+                if(progressText) progressText.textContent = `Đang tải file ${i + 1}/${totalFiles}: ${file.name} (${percent}%)`;
+            });
+
+            const type = file.type.startsWith('video/') ? 'video' : 'image';
+            folder.media.push({ id: Date.now() + Math.random(), src, type });
+
         } catch (e) { 
             console.error("Lỗi:", e); 
             alert("Lỗi tải file: " + e);
-            return; // Dừng lại nếu có lỗi để tránh lưu dữ liệu hỏng
+            if(modalActions) modalActions.style.display = 'flex';
+            return; 
         }
     }
-    
-    // Thử lưu lên Firebase, nếu dữ liệu quá lớn sẽ báo rõ cho bạn biết
+
+    if(progressText) progressText.textContent = "Đang lưu lên hệ thống...";
     const success = await saveData();
     if(success) {
         renderMedia(); 
         closeModal();
-    }
-}
-async function deleteMedia(id) {
-    if (!confirm("Xóa file này?")) return;
-    const folder = memoryFolders.find(f => f.id === currentFolderId);
-    if (folder) {
-        folder.media = folder.media.filter(m => m.id !== id);
-        await saveData(); renderMedia();
+    } else {
+        if(modalActions) modalActions.style.display = 'flex';
     }
 }
 
