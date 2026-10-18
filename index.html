@@ -815,7 +815,7 @@ function renderMembers(keyword=""){
         let isBday=false, bdayTxt="", bdayBadge="";
         if(m.birthday){
             const nb=nextBirthday(m.birthday);
-            if(nb.days===0){isBday=true; bdayBadge=`<span class="bday-badge">🎂 Hôm nay</span>`; bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;}
+            if(nb.days===0){isBday=true; bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂 </span>`; bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;}
             else if(nb.days<=7){isBday=true; bdayBadge=`<span class="bday-badge">🎂 Còn ${nb.days} ngày</span>`; bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;}
         }
         tr.className=isBday?"bday-row":"";
