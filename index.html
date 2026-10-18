@@ -408,20 +408,24 @@ body {
     </section>
 
     <!-- THẦY CÔ -->
-    <section id="teachers-page" class="page hidden">
-        <div class="full-page-card">
-            <div class="teachers-hero">
-                <span class="tag">OUR TEACHERS</span>
-                <h1>Thầy cô <span>của lớp mình</span></h1>
-                <p>Những người lái đò thầm lặng dẫn dắt chúng ta đến bến bờ thành công.</p>
+<section id="teachers-page" class="page hidden">
+    <div class="full-page-card">
+        <div class="teachers-hero">
+            <span class="tag">OUR TEACHERS</span>
+            <h1>Thầy cô <span>của lớp mình</span></h1>
+            <p>Những người lái đò thầm lặng dẫn dắt chúng ta đến bến bờ thành công.</p>
+        </div>
+        <div class="member-toolbar">
+            <input id="search-teacher" type="search" placeholder="🔎 Tìm theo tên thầy cô...">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <span id="teacher-count">0 thầy cô</span>
+                
+                <!-- Thêm nút Nhập nhanh thầy cô ở đây -->
+                <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;background:var(--success);" onclick="importDefaultTeachers()">📥 Nhập nhanh thầy cô</button>
+                
+                <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;" onclick="openAddTeacherModal()">+ Thêm thầy cô</button>
             </div>
-            <div class="member-toolbar">
-                <input id="search-teacher" type="search" placeholder="🔎 Tìm theo tên thầy cô...">
-                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                    <span id="teacher-count">0 thầy cô</span>
-                    <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;" onclick="openAddTeacherModal()">+ Thêm thầy cô</button>
-                </div>
-            </div>
+        </div>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -2208,6 +2212,30 @@ async function importDefaultTKB() {
     if (success) {
         renderTKB();
         alert("🎉 Đã cập nhật thành công Thời khóa biểu rút gọn của lớp 12A1 lên Firebase!");
+    }
+}
+async function importDefaultTeachers() {
+    const defaultTeacherData = [
+        { name: "Bùi Văn Hiếu", subject: "TOÁN HỌC", gender: "Nam", facebook: "", phone: "", birthday: "", gmail: "hieuhuyen.PT15@gmail.com", role: "GVCN" },
+        { name: "Tô Thị Thắm", subject: "HÓA HỌC", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "totham76@gmail.com", role: "GVBM" },
+        { name: "Lê Thị Dương", subject: "TIN HỌC", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "leduong.hvu@gmail.com", role: "GVBM" },
+        { name: "Bùi Thị Tuyết Lan", subject: "VẬT LÝ", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "tuyetlansp83@gmail.com", role: "GVBM" },
+        { name: "Nguyễn Thị Thanh Bình", subject: "SINH HỌC", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "thanhbinhtamnong@gmail.com", role: "GVBM" },
+        { name: "Nguyễn Thị Thu Hường", subject: "LỊCH SỬ", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "nguyenthithuhuongtn1977@gmail.com", role: "GVBM" },
+        { name: "Nguyễn Thị Hạnh", subject: "TIẾNG ANH", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "nguyenhanh86ta@gmail.com", role: "GVBM" },
+        { name: "Nguyễn Bích Thuỷ", subject: "NGỮ VĂN", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "nguyenbichthuyvantn@gmail.com", role: "GVBM" },
+        { name: "Đỗ Thị Minh", subject: "THỂ DỤC", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "Dominh220182@gmail.com", role: "GVBM" },
+        { name: "Vũ Thị Xim", subject: "QUỐC PHÒNG", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "vuthixim1979@gmail.com", role: "GVBM" }
+    ];
+
+    if (!confirm("Bạn có chắc chắn muốn nạp toàn bộ danh sách thầy cô này lên hệ thống không?")) return;
+
+    teachers = defaultTeacherData;
+
+    const success = await saveData();
+    if (success) {
+        renderTeachers();
+        alert("🎉 Đã nhập thành công danh sách thầy cô lên hệ thống Firebase!");
     }
 }
 </script>
