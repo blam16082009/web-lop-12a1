@@ -8,6 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* Hiệu ứng cuộn mượt mà */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
 /* TRANG SỰ KIỆN VIDEO */
 .event-post-card {
     background: var(--card2);
@@ -87,6 +97,30 @@ table th:nth-child(7), table td:nth-child(7) {
     white-space: nowrap;
 }
 :root{color-scheme:dark;--blue:#8dbaf5;--purple:#a99af4;--deep:#b8adff;--text:#ecebf7;--muted:#8c8fab;--bg:#0e0e11;--card:#111114;--card2:#17171c;--line:#2a2a36;--chip:#25233b;--shadow:0 12px 35px rgba(0,0,0,.45);--danger:#ff6b6b;--success:#51cf66;--fb-color:#1877f2;--heart:#ff4d6d}
+/* Chế độ Sáng */
+body.light-mode {
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --card2: #ffffff;
+    --text: #333333;
+    --muted: #666666;
+    --line: #e0e0e0;
+    --chip: #eef1f6;
+    --deep: #4a3b86;
+    --blue: #1877f2;
+    --purple: #7a5cc7;
+    --shadow: 0 8px 25px rgba(0,0,0,0.08);
+    --heart: #ff4d6d;
+}
+body.light-mode .navbar { background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid var(--line); }
+body.light-mode .modal-card { background: #fff; color: #333; }
+body.light-mode .form-group input, body.light-mode .form-group select, body.light-mode .form-group textarea { background: #f9f9f9; color: #333; border-color: #ccc; }
+body.light-mode .post-card, body.light-mode .composer, body.light-mode .countdown-card { background: #fff; }
+body.light-mode .sidebar { background: #fff; border-color: #e0e0e0; }
+body.light-mode .cmt-bubble { background: #f0f2f5; color: #333; }
+body.light-mode .tkb-table td { background: #fff; color: #333; }
+body.light-mode .tkb-table th { background: #eef1f6; color: var(--purple); }
+body.light-mode footer { background: rgba(255, 255, 255, 0.96); color: #666; }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Be Vietnam Pro',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding-bottom:52px}
@@ -399,6 +433,7 @@ body {
         <button class="nav-link" id="nav-memory" onclick="showPage('memory')">Kỷ niệm</button>
     </nav>
     <div class="nav-right">
+        <button class="admin-btn" id="theme-toggle-btn" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text); padding:5px; font-size:18px;" title="Chuyển chế độ sáng/tối">🌙</button>
         <button class="admin-btn admin-only" onclick="downloadClassBackup()" style="padding:7px 10px;" title="Tải bản sao lưu">⬇ Backup</button>
         <button class="admin-btn admin-only" onclick="triggerBackupRestore()" style="padding:7px 10px;" title="Khôi phục từ file sao lưu">⬆ Khôi phục</button>
         <input type="file" id="class-backup-file" accept="application/json,.json" style="display:none" onchange="handleBackupFile(event)">
@@ -761,7 +796,24 @@ body {
 </div>
 
 <div id="modal-container"></div>
+<!-- KHUNG CHAT TRỰC TUYẾN -->
+<div id="chat-widget" style="position:fixed; bottom:60px; right:20px; width:320px; height:450px; background:var(--card2); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); z-index:999; display:flex; flex-direction:column; transition:transform 0.3s; transform:translateY(120%);">
+    <div style="padding:12px; background:var(--purple); color:#fff; border-radius:16px 16px 0 0; display:flex; justify-content:space-between; align-items:center;">
+        <strong>💬 Chat lớp 12A1</strong>
+        <button onclick="document.getElementById('chat-widget').style.transform='translateY(120%)'; document.getElementById('chat-toggle-btn').style.display='flex';" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">×</button>
+    </div>
+    <div id="chat-messages" style="flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+        <!-- Tin nhắn sẽ hiện ở đây -->
+    </div>
+    <div style="padding:10px; border-top:1px solid var(--line); display:flex; gap:8px;">
+        <input type="text" id="chat-name-input" placeholder="Tên bạn..." style="width:80px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:12px;" maxlength="15">
+        <input type="text" id="chat-text-input" placeholder="Nhắn tin..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text);" onkeydown="if(event.key==='Enter') sendChatMessage()">
+        <button onclick="sendChatMessage()" style="background:var(--purple); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:bold;">Gửi</button>
+    </div>
+</div>
 
+<!-- Nút bong bóng Chat -->
+<button id="chat-toggle-btn" onclick="document.getElementById('chat-widget').style.transform='translateY(0)'; this.style.display='none';" style="position:fixed; bottom:20px; right:20px; width:55px; height:55px; border-radius:50%; background:var(--purple); color:#fff; border:none; box-shadow:0 4px 15px rgba(0,0,0,0.3); font-size:24px; cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center;">💬</button>
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -2993,6 +3045,120 @@ function playTimerBell() {
         }
     } catch (e) { /* bỏ qua lỗi âm thanh */ }
 }
+// ===== CHẾ ĐỘ SÁNG/TỐI =====
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    document.getElementById('theme-toggle-btn').innerText = isLight ? '☀️' : '🌙';
+    localStorage.setItem('class_theme', isLight ? 'light' : 'dark');
+}
+// Tự động load theme khi mở web
+if (localStorage.getItem('class_theme') === 'light') {
+    document.body.classList.add('light-mode');
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('theme-toggle-btn');
+        if(btn) btn.innerText = '☀️';
+    });
+}
+// ===== HIỆU ỨNG CUỘN MƯỢT MÀ (TỰ ĐỘNG) =====
+let scrollObserver = null;
+
+function initScrollReveal() {
+    // Nếu đã có observer cũ, hủy đi để tránh rò rỉ bộ nhớ
+    if (scrollObserver) scrollObserver.disconnect();
+
+    const elementsToReveal = document.querySelectorAll('.post-card, .achieve-card, .folder-card, .countdown-card, .event-post-card');
+    
+    // Khởi tạo IntersectionObserver
+    scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                scrollObserver.unobserve(entry.target); // Chỉ chạy 1 lần cho mỗi phần tử
+            }
+        });
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+    elementsToReveal.forEach(el => {
+        // Chỉ thêm class 'reveal' nếu phần tử đó chưa từng được hiển thị
+        if (!el.classList.contains('reveal') && !el.classList.contains('active')) {
+            el.classList.add('reveal');
+            scrollObserver.observe(el);
+        }
+    });
+}
+
+// Tự động chạy hiệu ứng sau khi web tải dữ liệu xong
+setTimeout(initScrollReveal, 1000);
+
+// Tự động theo dõi nếu có dữ liệu mới được render (bài viết mới, bình luận mới...)
+const observeDOMChanges = () => {
+    const feed = document.getElementById('post-feed');
+    const achieveGrid = document.getElementById('achieve-grid');
+    const folders = document.getElementById('folders-grid');
+    
+    const mutationObserver = new MutationObserver(() => {
+        // Khi có thẻ mới được thêm vào, khởi động lại bộ lắng nghe
+        initScrollReveal();
+    });
+
+    if (feed) mutationObserver.observe(feed, { childList: true });
+    if (achieveGrid) mutationObserver.observe(achieveGrid, { childList: true });
+    if (folders) mutationObserver.observe(folders, { childList: true });
+};
+setTimeout(observeDOMChanges, 1500);
+// ===== CHAT TRỰC TUYẾN (LOCALSTORAGE) =====
+let chatMessages = JSON.parse(localStorage.getItem('class_chat_messages')) || [];
+
+function renderChatMessages() {
+    const box = document.getElementById('chat-messages');
+    if (!box) return;
+    box.innerHTML = '';
+    chatMessages.forEach((msg, idx) => {
+        const isMe = msg.name === (isAdmin ? "Admin" : localStorage.getItem('class_visitor'));
+        box.innerHTML += `
+            <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 80%;">
+                <div style="font-size:10px; color:var(--muted); margin-bottom:2px; text-align:${isMe ? 'right' : 'left'};">${escapeHtml(msg.name)}</div>
+                <div style="background:${isMe ? 'var(--purple)' : 'var(--chip)'}; color:${isMe ? '#fff' : 'var(--text)'}; padding:8px 12px; border-radius:12px; font-size:13px; word-break:break-word;">${escapeHtml(msg.text)}</div>
+            </div>
+        `;
+    });
+    box.scrollTop = box.scrollHeight;
+}
+
+function sendChatMessage() {
+    const nameInput = document.getElementById('chat-name-input');
+    const textInput = document.getElementById('chat-text-input');
+    let name = nameInput.value.trim();
+    const text = textInput.value.trim();
+
+    if(!name) {
+        if(isAdmin) name = "Admin";
+        else return alert("Vui lòng nhập tên của bạn!");
+    } else {
+        localStorage.setItem('class_visitor', name);
+    }
+
+    if(!text) return;
+
+    chatMessages.push({ name, text, time: Date.now() });
+    if (chatMessages.length > 100) chatMessages.shift(); 
+    localStorage.setItem('class_chat_messages', JSON.stringify(chatMessages));
+    
+    textInput.value = '';
+    renderChatMessages();
+}
+
+// Tự động làm mới chat mỗi 2 giây
+setInterval(() => {
+    chatMessages = JSON.parse(localStorage.getItem('class_chat_messages')) || [];
+    const box = document.getElementById('chat-messages');
+    if (box && document.getElementById('chat-widget').style.transform === 'translateY(0px)') {
+        renderChatMessages();
+    }
+}, 2000);
+
+setTimeout(renderChatMessages, 1000);
 </script>
 </body>
 </html>
