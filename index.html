@@ -8,6 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+.event-post-card img {
+    transition: transform 0.3s ease;
+}
+.event-post-card div:hover img {
+    transform: scale(1.02);
+}
 /* Hiệu ứng cuộn mượt mà */
 .reveal {
     opacity: 0;
@@ -2688,20 +2694,19 @@ function renderSpecialEvents() {
         const card = document.createElement("article");
         card.className = "event-post-card";
         
-        let mediaHtml = "";
-        if (ev.videoUrl) {
-            // Kiểm tra nếu là link YouTube Embed
-            if (ev.videoUrl.includes("youtube.com") || ev.videoUrl.includes("youtu.be")) {
-                let embedUrl = ev.videoUrl;
-                if (ev.videoUrl.includes("watch?v=")) {
-                    embedUrl = ev.videoUrl.replace("watch?v=", "embed/");
-                } else if (ev.videoUrl.includes("youtu.be/")) {
-                    embedUrl = ev.videoUrl.replace("youtu.be/", "www.youtube.com/embed/");
-                }
-                mediaHtml = `<div class="event-video-container"><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
-            } else {
-                mediaHtml = `<div class="event-video-container"><video src="${ev.videoUrl}" controls preload="metadata"></video></div>`;
-            }
+        // Tạo HTML cho ảnh Thumbnail
+        const thumbSrc = ev.thumbnail || "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E";
+        
+        let actionHtml = "";
+        let clickAttr = "";
+
+        if (ev.mediaType === 'youtube') {
+            clickAttr = `onclick="window.open('${escapeHtml(ev.mediaUrl)}', '_blank')"`;
+        } else if (ev.mediaType === 'video') {
+             // Nếu là video tự tải lên, mở lightbox hoặc cửa sổ mới. Ở đây tôi để mở tab mới cho tiện.
+            clickAttr = `onclick="window.open('${escapeHtml(ev.mediaUrl)}', '_blank')"`;
+        } else if (ev.mediaType === 'image') {
+            clickAttr = `onclick="openLightbox(['${escapeHtml(ev.mediaUrl)}'], 0, '${escapeHtml(ev.title)}')"`;
         }
 
         card.innerHTML = `
@@ -2714,16 +2719,27 @@ function renderSpecialEvents() {
                     <button class="mini-btn danger" onclick="deleteSpecialEvent(${index})">Xóa sự kiện</button>
                 </div>
             </div>
-            ${mediaHtml}
+
+            <!-- Khung hiển thị ảnh Thumbnail To Đùng -->
+            <div style="position:relative; width:100%; border-radius:14px; overflow:hidden; cursor:pointer; margin:15px 0;" ${clickAttr}>
+                <img src="${thumbSrc}" style="width:100%; display:block; aspect-ratio:16/9; object-fit:cover;">
+                
+                <!-- Nút Play giả lập nếu là video/youtube -->
+                ${(ev.mediaType === 'youtube' || ev.mediaType === 'video') ? `
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(255,0,0,0.9); width:70px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,0,0,0.5);">
+                    <div style="width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-left:20px solid #fff; margin-left:5px;"></div>
+                </div>
+                ` : ''}
+            </div>
+
             ${ev.desc ? `<p class="event-post-desc">${escapeHtml(ev.desc)}</p>` : ""}
         `;
         feed.appendChild(card);
     });
 }
-
 function openAddEventVideoModal() {
     showModal(`
-        <h3>🎉 Đăng sự kiện / Video trình chiếu</h3>
+        <h3>🎉 Đăng sự kiện / Video</h3>
         <div class="form-group">
             <label>Tên sự kiện</label>
             <input type="text" id="se-title" placeholder="VD: Mừng ngày Phụ Nữ Việt Nam 20/10">
@@ -2732,24 +2748,36 @@ function openAddEventVideoModal() {
             <label>Ngày diễn ra</label>
             <input type="date" id="se-date">
         </div>
+        
         <div class="form-group">
-            <label>Cách chọn Video trình chiếu:</label>
-            <select id="se-video-type" onchange="toggleVideoInputType(this.value)">
-                <option value="file">Tải video từ máy tính/điện thoại</option>
-                <option value="link">Dán link YouTube / Link Cloud</option>
+            <label>Ảnh Thumbnail (Bắt buộc - Hiển thị to ở ngoài)</label>
+            <input type="file" id="se-thumbnail" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label>Loại nội dung:</label>
+            <select id="se-media-type" onchange="toggleEventMediaType(this.value)">
+                <option value="image">Tải lên ảnh (Mở to khi bấm vào)</option>
+                <option value="youtube">Link YouTube (Chuyển sang YouTube khi bấm)</option>
+                <option value="video">Tải lên video (Mở trình phát khi bấm)</option>
             </select>
         </div>
+
+        <!-- Khu vực chọn file ảnh/video -->
         <div class="form-group" id="se-file-group">
-            <label>Chọn tệp Video (*.mp4, *.webm)</label>
-            <input type="file" id="se-video-file" accept="video/*">
+            <label>Chọn tệp (Ảnh hoặc Video)</label>
+            <input type="file" id="se-file" accept="image/*,video/*">
         </div>
+
+        <!-- Khu vực dán link YouTube -->
         <div class="form-group hidden" id="se-link-group">
-            <label>Link Video (YouTube hoặc MP4 link)</label>
+            <label>Link YouTube</label>
             <input type="url" id="se-video-link" placeholder="https://www.youtube.com/watch?v=...">
         </div>
+
         <div class="form-group">
-            <label>Lời chúc / Lời giới thiệu sự kiện</label>
-            <textarea id="se-desc" placeholder="Viết những lời chúc tốt đẹp gửi đến thầy cô hoặc các bạn..."></textarea>
+            <label>Lời chúc / Mô tả sự kiện</label>
+            <textarea id="se-desc" placeholder="Viết những lời chúc tốt đẹp..."></textarea>
         </div>
 
         <div class="upload-progress-container" id="se-progress-container" style="display:none;">
@@ -2764,69 +2792,76 @@ function openAddEventVideoModal() {
     `);
 }
 
-function toggleVideoInputType(type) {
-    if (type === 'file') {
-        document.getElementById('se-file-group').classList.remove('hidden');
-        document.getElementById('se-link-group').classList.add('hidden');
-    } else {
+function toggleEventMediaType(type) {
+    if (type === 'youtube') {
         document.getElementById('se-file-group').classList.add('hidden');
         document.getElementById('se-link-group').classList.remove('hidden');
+    } else {
+        document.getElementById('se-file-group').classList.remove('hidden');
+        document.getElementById('se-link-group').classList.add('hidden');
     }
 }
 
 async function submitSpecialEvent() {
     const title = document.getElementById('se-title').value.trim();
     const date = document.getElementById('se-date').value;
-    const videoType = document.getElementById('se-video-type').value;
+    const mediaType = document.getElementById('se-media-type').value;
     const desc = document.getElementById('se-desc').value.trim();
-    const videoFile = document.getElementById('se-video-file').files[0];
+    const thumbFile = document.getElementById('se-thumbnail').files[0];
+    const contentFile = document.getElementById('se-file').files[0];
     const videoLink = document.getElementById('se-video-link').value.trim();
 
     if (!title) return alert("Vui lòng nhập tên sự kiện!");
+    if (!thumbFile) return alert("Vui lòng chọn ảnh Thumbnail!");
 
-    let finalVideoUrl = "";
+    const progressContainer = document.getElementById('se-progress-container');
+    const progressBar = document.getElementById('se-progress-bar');
+    const progressText = document.getElementById('se-progress-text');
+    const modalActions = document.getElementById('se-modal-actions');
 
-    if (videoType === 'link') {
-        finalVideoUrl = videoLink;
-    } else if (videoFile) {
-        const progressContainer = document.getElementById('se-progress-container');
-        const progressBar = document.getElementById('se-progress-bar');
-        const progressText = document.getElementById('se-progress-text');
-        const modalActions = document.getElementById('se-modal-actions');
+    if (progressContainer) progressContainer.style.display = 'block';
+    if (modalActions) modalActions.style.display = 'none';
 
-        if (progressContainer) progressContainer.style.display = 'block';
-        if (modalActions) modalActions.style.display = 'none';
+    try {
+        // 1. Tải ảnh Thumbnail
+        if(progressText) progressText.textContent = "Đang tải ảnh Thumbnail...";
+        const thumbUrl = await uploadToCloudinaryWithProgress(thumbFile, (percent) => {
+            if (progressBar) progressBar.style.width = percent + '%';
+        });
 
-        try {
-            finalVideoUrl = await uploadToCloudinaryWithProgress(videoFile, (percent) => {
+        // 2. Xử lý nội dung (Ảnh, Video hoặc Link Youtube)
+        let contentUrl = "";
+        let finalMediaType = mediaType;
+
+        if (mediaType === 'youtube') {
+            contentUrl = videoLink;
+        } else if (contentFile) {
+            if(progressText) progressText.textContent = "Đang tải nội dung...";
+            contentUrl = await uploadToCloudinaryWithProgress(contentFile, (percent) => {
                 if (progressBar) progressBar.style.width = percent + '%';
-                if (progressText) progressText.textContent = `Đang tải video lên server (${percent}%)...`;
             });
-        } catch (e) {
-            alert("Lỗi tải video: " + e);
-            if (modalActions) modalActions.style.display = 'flex';
-            return;
+            // Nếu là ảnh, đánh dấu là 'image', nếu là video đánh dấu là 'video'
+            if (contentFile.type.startsWith('image/')) finalMediaType = 'image';
+            if (contentFile.type.startsWith('video/')) finalMediaType = 'video';
         }
-    }
 
-    specialEvents.unshift({
-        id: Date.now(),
-        title,
-        date,
-        videoUrl: finalVideoUrl,
-        desc
-    });
+        specialEvents.unshift({
+            id: Date.now(),
+            title,
+            date,
+            thumbnail: thumbUrl,
+            mediaUrl: contentUrl,
+            mediaType: finalMediaType,
+            desc
+        });
 
-    await saveData();
-    renderSpecialEvents();
-    closeModal();
-}
-
-async function deleteSpecialEvent(index) {
-    if (confirm("Xóa bài trình chiếu sự kiện này?")) {
-        specialEvents.splice(index, 1);
         await saveData();
         renderSpecialEvents();
+        closeModal();
+
+    } catch (e) {
+        alert("Lỗi khi đăng sự kiện: " + e);
+        if (modalActions) modalActions.style.display = 'flex';
     }
 }
 /* ===== XỬ LÝ LƯỚI Ô SỐ RANDOM ===== */
