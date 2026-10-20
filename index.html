@@ -2864,6 +2864,13 @@ async function submitSpecialEvent() {
         if (modalActions) modalActions.style.display = 'flex';
     }
 }
+async function deleteSpecialEvent(index) {
+    if (confirm("Xóa bài trình chiếu sự kiện này?")) {
+        specialEvents.splice(index, 1);
+        await saveData();
+        renderSpecialEvents();
+    }
+}
 /* ===== XỬ LÝ LƯỚI Ô SỐ RANDOM ===== */
 let numberGridItems = [];
 let isNumberSpinning = false;
