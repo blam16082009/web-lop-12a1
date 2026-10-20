@@ -482,21 +482,6 @@ body {
                 </div>
                 <div id="countdown-list" class="countdown-grid"></div>
                 
-                <!-- DÁN KHUNG CHAT VÀO ĐÂY -->
-                <div id="chat-widget" style="display:flex; flex-direction:column; background:var(--card2); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); height:400px; margin-top:24px;">
-                    <div style="padding:12px; background:var(--purple); color:#fff; border-radius:16px 16px 0 0; display:flex; justify-content:space-between; align-items:center;">
-                        <strong>💬 Chat lớp 12A1</strong>
-                        <span style="font-size:11px; opacity:0.8;">(Lưu trên máy)</span>
-                    </div>
-                    <div id="chat-messages" style="flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-                        <!-- Tin nhắn sẽ hiện ở đây -->
-                    </div>
-                    <div style="padding:10px; border-top:1px solid var(--line); display:flex; gap:8px; flex-wrap:wrap;">
-                        <input type="text" id="chat-name-input" placeholder="Tên bạn..." style="width:80px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:12px;" maxlength="15">
-                        <input type="text" id="chat-text-input" placeholder="Nhắn tin..." style="flex:1; min-width:120px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text);" onkeydown="if(event.key==='Enter') sendChatMessage()">
-                        <button onclick="sendChatMessage()" style="background:var(--purple); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">Gửi</button>
-                    </div>
-                </div>
             </aside>
         </div>
     </section>
@@ -824,7 +809,6 @@ body {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 window.fbOnSnapshot = onSnapshot;
 
 const firebaseConfig = {
@@ -838,14 +822,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-const rtdb = getDatabase(app);
-window.fbRef = ref;
-window.fbPush = push;
-window.fbOnChildAdded = onChildAdded;
-window.fbQuery = query;
-window.fbLimitToLast = limitToLast;
-window.rtdb = rtdb;
 
 window.fbDoc = doc;
 window.fbGetDoc = getDoc;
@@ -3213,98 +3189,6 @@ const observeDOMChanges = () => {
     if (folders) mutationObserver.observe(folders, { childList: true });
 };
 setTimeout(observeDOMChanges, 1500);
-let chatMessages = [];
-let isChatInitialized = false;
-
-function initChat() {
-    if (isChatInitialized) return;
-    
-    // Lắng nghe tin nhắn mới từ Firebase (chỉ lấy 50 tin nhắn gần nhất)
-    const chatRef = window.fbRef(window.rtdb, 'chat_messages');
-    const chatQuery = window.fbQuery(chatRef, window.fbLimitToLast(50));
-
-    window.fbOnChildAdded(chatQuery, (snapshot) => {
-        const msg = snapshot.val();
-        if (msg) {
-            // Nếu là tin nhắn mới, thêm vào mảng
-            if (!chatMessages.find(m => m.id === snapshot.key)) {
-                chatMessages.push({ id: snapshot.key, ...msg });
-                renderChatMessages();
-            }
-        }
-    });
-    
-    isChatInitialized = true;
-}
-
-function renderChatMessages() {
-    const box = document.getElementById('chat-messages');
-    if (!box) return;
-    
-    box.innerHTML = '';
-    const myName = isAdmin ? "Admin" : (localStorage.getItem('class_visitor') || "");
-
-    if (chatMessages.length === 0) {
-        box.innerHTML = `<div style="text-align:center; color:var(--muted); font-size:12px; margin-top:20px;">Chưa có tin nhắn nào. Hãy là người đầu tiên! 💬</div>`;
-        return;
-    }
-
-    chatMessages.forEach((msg) => {
-        const isMe = msg.name === myName;
-        const timeStr = new Date(msg.time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-        
-        box.innerHTML += `
-            <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 85%; margin-bottom: 8px;">
-                <div style="font-size:10px; color:var(--muted); margin-bottom:2px; text-align:${isMe ? 'right' : 'left'}; padding: 0 4px;">
-                    ${escapeHtml(msg.name)} • ${timeStr}
-                </div>
-                <div style="background:${isMe ? 'var(--purple)' : 'var(--chip)'}; color:${isMe ? '#fff' : 'var(--text)'}; padding:8px 12px; border-radius:12px; font-size:13px; word-break:break-word; display:inline-block;">
-                    ${escapeHtml(msg.text)}
-                </div>
-            </div>
-        `;
-    });
-    
-    // Tự động cuộn xuống tin nhắn mới nhất
-    box.scrollTop = box.scrollHeight;
-}
-
-async function sendChatMessage() {
-    const nameInput = document.getElementById('chat-name-input');
-    const textInput = document.getElementById('chat-text-input');
-    let name = nameInput.value.trim();
-    const text = textInput.value.trim();
-
-    if(!name) {
-        if(isAdmin) name = "Admin";
-        else return alert("Vui lòng nhập tên của bạn trước khi chat!");
-    } else {
-        localStorage.setItem('class_visitor', name);
-    }
-
-    if(!text) return;
-
-    // Gửi tin nhắn lên Firebase
-    try {
-        const chatRef = window.fbRef(window.rtdb, 'chat_messages');
-        await window.fbPush(chatRef, {
-            name: name,
-            text: text,
-            time: Date.now()
-        });
-        
-        textInput.value = ''; // Xóa ô nhập
-    } catch (e) {
-        console.error("Lỗi gửi tin nhắn:", e);
-        alert("Không thể gửi tin nhắn. Vui lòng kiểm tra mạng!");
-    }
-}
-
-// Khởi động chat sau khi web tải xong
-setTimeout(() => {
-    initChat();
-    renderChatMessages();
-}, 1500);
 </script>
 </body>
 </html>
