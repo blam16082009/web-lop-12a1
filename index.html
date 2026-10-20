@@ -432,12 +432,17 @@ body {
         <button class="nav-link" id="nav-achieve" onclick="showPage('achieve')">Thành tích</button>
         <button class="nav-link" id="nav-memory" onclick="showPage('memory')">Kỷ niệm</button>
     </nav>
-    <div class="nav-right">
+       <div class="nav-right">
         <button class="admin-btn" id="theme-toggle-btn" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text); padding:5px; font-size:18px;" title="Chuyển chế độ sáng/tối">🌙</button>
         <button class="admin-btn admin-only" onclick="downloadClassBackup()" style="padding:7px 10px;" title="Tải bản sao lưu">⬇ Backup</button>
         <button class="admin-btn admin-only" onclick="triggerBackupRestore()" style="padding:7px 10px;" title="Khôi phục từ file sao lưu">⬆ Khôi phục</button>
         <input type="file" id="class-backup-file" accept="application/json,.json" style="display:none" onchange="handleBackupFile(event)">
+        
+        <!-- Nút Admin (dấu chấm) -->
         <button class="admin-btn" id="admin-toggle-btn" onclick="openAdminModal()" style="background:transparent; border:none; color:var(--muted); opacity:0.3; padding:5px;" title="System">·</button>
+        
+        <!-- Nút Cài đặt mới thêm vào đây (chỉ hiện khi đăng nhập Admin) -->
+        <button class="admin-btn admin-only" onclick="openSettingsModal()" style="padding:7px 10px; background:var(--chip); color:var(--deep); border:none;" title="Cài đặt hệ thống">⚙️ Cài đặt</button>
     </div>
 </header>
 
@@ -464,8 +469,9 @@ body {
                 <div id="post-feed"></div>
             </div>
 
-            <!-- CỘT PHẢI: ĐẾM NGƯỢC -->
+                        <!-- CỘT PHẢI: ĐẾM NGƯỢC & CHAT -->
             <aside class="sidebar">
+                <!-- Phần đếm ngược cũ -->
                 <div class="sidebar-header">
                     <div class="sidebar-heading">
                         <span class="tag">COUNTDOWN</span>
@@ -475,6 +481,22 @@ body {
                     <button class="primary-btn admin-only" style="padding:5px 10px;font-size:11px;margin:0;" onclick="openAddEventModal()">+ Thêm</button>
                 </div>
                 <div id="countdown-list" class="countdown-grid"></div>
+                
+                <!-- DÁN KHUNG CHAT VÀO ĐÂY -->
+                <div id="chat-widget" style="display:flex; flex-direction:column; background:var(--card2); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); height:400px; margin-top:24px;">
+                    <div style="padding:12px; background:var(--purple); color:#fff; border-radius:16px 16px 0 0; display:flex; justify-content:space-between; align-items:center;">
+                        <strong>💬 Chat lớp 12A1</strong>
+                        <span style="font-size:11px; opacity:0.8;">(Lưu trên máy)</span>
+                    </div>
+                    <div id="chat-messages" style="flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+                        <!-- Tin nhắn sẽ hiện ở đây -->
+                    </div>
+                    <div style="padding:10px; border-top:1px solid var(--line); display:flex; gap:8px; flex-wrap:wrap;">
+                        <input type="text" id="chat-name-input" placeholder="Tên bạn..." style="width:80px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:12px;" maxlength="15">
+                        <input type="text" id="chat-text-input" placeholder="Nhắn tin..." style="flex:1; min-width:120px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text);" onkeydown="if(event.key==='Enter') sendChatMessage()">
+                        <button onclick="sendChatMessage()" style="background:var(--purple); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">Gửi</button>
+                    </div>
+                </div>
             </aside>
         </div>
     </section>
@@ -796,29 +818,13 @@ body {
 </div>
 
 <div id="modal-container"></div>
-<!-- KHUNG CHAT TRỰC TUYẾN -->
-<div id="chat-widget" style="position:fixed; bottom:60px; right:20px; width:320px; height:450px; background:var(--card2); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); z-index:999; display:flex; flex-direction:column; transition:transform 0.3s; transform:translateY(120%);">
-    <div style="padding:12px; background:var(--purple); color:#fff; border-radius:16px 16px 0 0; display:flex; justify-content:space-between; align-items:center;">
-        <strong>💬 Chat lớp 12A1</strong>
-        <button onclick="document.getElementById('chat-widget').style.transform='translateY(120%)'; document.getElementById('chat-toggle-btn').style.display='flex';" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">×</button>
-    </div>
-    <div id="chat-messages" style="flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-        <!-- Tin nhắn sẽ hiện ở đây -->
-    </div>
-    <div style="padding:10px; border-top:1px solid var(--line); display:flex; gap:8px;">
-        <input type="text" id="chat-name-input" placeholder="Tên bạn..." style="width:80px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:12px;" maxlength="15">
-        <input type="text" id="chat-text-input" placeholder="Nhắn tin..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text);" onkeydown="if(event.key==='Enter') sendChatMessage()">
-        <button onclick="sendChatMessage()" style="background:var(--purple); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:bold;">Gửi</button>
-    </div>
-</div>
 
-<!-- Nút bong bóng Chat -->
-<button id="chat-toggle-btn" onclick="document.getElementById('chat-widget').style.transform='translateY(0)'; this.style.display='none';" style="position:fixed; bottom:20px; right:20px; width:55px; height:55px; border-radius:50%; background:var(--purple); color:#fff; border:none; box-shadow:0 4px 15px rgba(0,0,0,0.3); font-size:24px; cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center;">💬</button>
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 window.fbOnSnapshot = onSnapshot;
 
 const firebaseConfig = {
@@ -832,6 +838,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+const rtdb = getDatabase(app);
+window.fbRef = ref;
+window.fbPush = push;
+window.fbOnChildAdded = onChildAdded;
+window.fbQuery = query;
+window.fbLimitToLast = limitToLast;
+window.rtdb = rtdb;
 
 window.fbDoc = doc;
 window.fbGetDoc = getDoc;
@@ -1169,7 +1183,7 @@ let saveQueue = Promise.resolve();
 function getClassDataPayload() {
     return {
         members, teachers, achievements, posts, bdayData, memoryFolders,
-        countdownEvents, scheduleData, specialEvents
+        countdownEvents, scheduleData, specialEvents, adminCredentials // <-- Thêm vào đây
     };
 }
 
@@ -1204,6 +1218,7 @@ function applyClassData(data) {
     countdownEvents = Array.isArray(data.countdownEvents) ? data.countdownEvents : [];
     scheduleData = data.scheduleData && typeof data.scheduleData === 'object' ? data.scheduleData : {};
     specialEvents = Array.isArray(data.specialEvents) ? data.specialEvents : [];
+    adminCredentials = data.adminCredentials && typeof data.adminCredentials === 'object' ? data.adminCredentials : { username: "admin", passwordHash: "" };
 }
 
 function renderAllClassData() {
@@ -1388,6 +1403,8 @@ function showPage(page){
 }
 
 /* ADMIN */
+let adminCredentials = { username: "admin", passwordHash: "" }; // Sẽ được load từ Firebase
+
 function openAdminModal(){
     if(isAdmin){
         isAdmin=false; document.body.classList.remove("admin-mode");
@@ -1402,11 +1419,25 @@ function openAdminModal(){
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAdminLogin()">Đăng nhập</button></div>
     `);
 }
-function submitAdminLogin(){
+
+async function submitAdminLogin(){
     const u=document.getElementById("admin-user").value.trim();
     const p=document.getElementById("admin-pass").value.trim();
-    const passHash = btoa(p); 
-    if(u === "admin" && passHash === "MTIzNDU2"){
+    
+    if(!u || !p) return alert("Vui lòng nhập đầy đủ thông tin!");
+
+    // Hash mật khẩu người dùng vừa nhập để so sánh với mật khẩu đã lưu trên Firebase
+    const inputHash = await hashPassword(p);
+
+    // Kiểm tra xem mật khẩu đã được thiết lập trên Firebase chưa
+    if (!adminCredentials.passwordHash) {
+        // Nếu chưa có (lần đầu chạy), lấy mật khẩu mặc định là "123456"
+        const defaultHash = await hashPassword("123456");
+        adminCredentials = { username: "admin", passwordHash: defaultHash };
+        await saveData(); // Lưu mật khẩu mặc định lên Firebase
+    }
+
+    if(u === adminCredentials.username && inputHash === adminCredentials.passwordHash){
         isAdmin=true; document.body.classList.add("admin-mode");
         const btn=document.getElementById("admin-toggle-btn"); 
         btn.classList.add("logged-in"); 
@@ -3045,6 +3076,81 @@ function playTimerBell() {
         }
     } catch (e) { /* bỏ qua lỗi âm thanh */ }
 }
+// ===== BẢO MẬT: HÀM MÃ HÓA & ĐỔI MẬT KHẨU =====
+// Hàm băm mật khẩu bằng SHA-256 (chuẩn bảo mật, không thể dịch ngược)
+async function hashPassword(password) {
+    const msgBuffer = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+function openSettingsModal() {
+    if(!isAdmin) return alert("Bạn không có quyền truy cập!");
+    
+    showModal(`
+        <h3>⚙️ Cài đặt Quản trị viên</h3>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Thay đổi tài khoản và mật khẩu đăng nhập. Mật khẩu sẽ được mã hóa an toàn.</p>
+        
+        <div class="form-group">
+            <label>Tên đăng nhập mới (Username)</label>
+            <input type="text" id="new-admin-user" value="${escapeHtml(adminCredentials.username)}">
+        </div>
+        <div class="form-group">
+            <label>Mật khẩu hiện tại (Để xác nhận)</label>
+            <input type="password" id="current-admin-pass" placeholder="Nhập mật khẩu hiện tại...">
+        </div>
+        <div class="form-group">
+            <label>Mật khẩu mới</label>
+            <input type="password" id="new-admin-pass" placeholder="Nhập mật khẩu mới...">
+        </div>
+        <div class="form-group">
+            <label>Nhập lại mật khẩu mới</label>
+            <input type="password" id="confirm-admin-pass" placeholder="Nhập lại mật khẩu mới...">
+        </div>
+        
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-submit" onclick="saveAdminCredentials()">Lưu Thay Đổi</button>
+        </div>
+    `);
+}
+
+async function saveAdminCredentials() {
+    const newUser = document.getElementById("new-admin-user").value.trim();
+    const currentPass = document.getElementById("current-admin-pass").value.trim();
+    const newPass = document.getElementById("new-admin-pass").value.trim();
+    const confirmPass = document.getElementById("confirm-admin-pass").value.trim();
+
+    if (!newUser) return alert("Tên đăng nhập không được để trống!");
+
+    // Xác thực mật khẩu hiện tại
+    const currentHash = await hashPassword(currentPass);
+    if (currentHash !== adminCredentials.passwordHash) {
+        return alert("Mật khẩu hiện tại không đúng!");
+    }
+
+    // Nếu có đổi mật khẩu
+    let newHash = adminCredentials.passwordHash;
+    if (newPass || confirmPass) {
+        if (newPass !== confirmPass) return alert("Mật khẩu mới nhập lại không khớp!");
+        if (newPass.length < 6) return alert("Mật khẩu mới phải có ít nhất 6 ký tự!");
+        newHash = await hashPassword(newPass);
+    }
+
+    // Cập nhật dữ liệu
+    adminCredentials.username = newUser;
+    adminCredentials.passwordHash = newHash;
+
+    const success = await saveData();
+    if (success) {
+        alert("🎉 Đã cập nhật tài khoản và mật khẩu thành công!");
+        closeModal();
+    } else {
+        alert("Lỗi lưu Firebase. Vui lòng thử lại.");
+    }
+}
 // ===== CHẾ ĐỘ SÁNG/TỐI =====
 function toggleTheme() {
     document.body.classList.toggle('light-mode');
@@ -3107,26 +3213,63 @@ const observeDOMChanges = () => {
     if (folders) mutationObserver.observe(folders, { childList: true });
 };
 setTimeout(observeDOMChanges, 1500);
-// ===== CHAT TRỰC TUYẾN (LOCALSTORAGE) =====
-let chatMessages = JSON.parse(localStorage.getItem('class_chat_messages')) || [];
+let chatMessages = [];
+let isChatInitialized = false;
+
+function initChat() {
+    if (isChatInitialized) return;
+    
+    // Lắng nghe tin nhắn mới từ Firebase (chỉ lấy 50 tin nhắn gần nhất)
+    const chatRef = window.fbRef(window.rtdb, 'chat_messages');
+    const chatQuery = window.fbQuery(chatRef, window.fbLimitToLast(50));
+
+    window.fbOnChildAdded(chatQuery, (snapshot) => {
+        const msg = snapshot.val();
+        if (msg) {
+            // Nếu là tin nhắn mới, thêm vào mảng
+            if (!chatMessages.find(m => m.id === snapshot.key)) {
+                chatMessages.push({ id: snapshot.key, ...msg });
+                renderChatMessages();
+            }
+        }
+    });
+    
+    isChatInitialized = true;
+}
 
 function renderChatMessages() {
     const box = document.getElementById('chat-messages');
     if (!box) return;
+    
     box.innerHTML = '';
-    chatMessages.forEach((msg, idx) => {
-        const isMe = msg.name === (isAdmin ? "Admin" : localStorage.getItem('class_visitor'));
+    const myName = isAdmin ? "Admin" : (localStorage.getItem('class_visitor') || "");
+
+    if (chatMessages.length === 0) {
+        box.innerHTML = `<div style="text-align:center; color:var(--muted); font-size:12px; margin-top:20px;">Chưa có tin nhắn nào. Hãy là người đầu tiên! 💬</div>`;
+        return;
+    }
+
+    chatMessages.forEach((msg) => {
+        const isMe = msg.name === myName;
+        const timeStr = new Date(msg.time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        
         box.innerHTML += `
-            <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 80%;">
-                <div style="font-size:10px; color:var(--muted); margin-bottom:2px; text-align:${isMe ? 'right' : 'left'};">${escapeHtml(msg.name)}</div>
-                <div style="background:${isMe ? 'var(--purple)' : 'var(--chip)'}; color:${isMe ? '#fff' : 'var(--text)'}; padding:8px 12px; border-radius:12px; font-size:13px; word-break:break-word;">${escapeHtml(msg.text)}</div>
+            <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 85%; margin-bottom: 8px;">
+                <div style="font-size:10px; color:var(--muted); margin-bottom:2px; text-align:${isMe ? 'right' : 'left'}; padding: 0 4px;">
+                    ${escapeHtml(msg.name)} • ${timeStr}
+                </div>
+                <div style="background:${isMe ? 'var(--purple)' : 'var(--chip)'}; color:${isMe ? '#fff' : 'var(--text)'}; padding:8px 12px; border-radius:12px; font-size:13px; word-break:break-word; display:inline-block;">
+                    ${escapeHtml(msg.text)}
+                </div>
             </div>
         `;
     });
+    
+    // Tự động cuộn xuống tin nhắn mới nhất
     box.scrollTop = box.scrollHeight;
 }
 
-function sendChatMessage() {
+async function sendChatMessage() {
     const nameInput = document.getElementById('chat-name-input');
     const textInput = document.getElementById('chat-text-input');
     let name = nameInput.value.trim();
@@ -3134,31 +3277,34 @@ function sendChatMessage() {
 
     if(!name) {
         if(isAdmin) name = "Admin";
-        else return alert("Vui lòng nhập tên của bạn!");
+        else return alert("Vui lòng nhập tên của bạn trước khi chat!");
     } else {
         localStorage.setItem('class_visitor', name);
     }
 
     if(!text) return;
 
-    chatMessages.push({ name, text, time: Date.now() });
-    if (chatMessages.length > 100) chatMessages.shift(); 
-    localStorage.setItem('class_chat_messages', JSON.stringify(chatMessages));
-    
-    textInput.value = '';
-    renderChatMessages();
+    // Gửi tin nhắn lên Firebase
+    try {
+        const chatRef = window.fbRef(window.rtdb, 'chat_messages');
+        await window.fbPush(chatRef, {
+            name: name,
+            text: text,
+            time: Date.now()
+        });
+        
+        textInput.value = ''; // Xóa ô nhập
+    } catch (e) {
+        console.error("Lỗi gửi tin nhắn:", e);
+        alert("Không thể gửi tin nhắn. Vui lòng kiểm tra mạng!");
+    }
 }
 
-// Tự động làm mới chat mỗi 2 giây
-setInterval(() => {
-    chatMessages = JSON.parse(localStorage.getItem('class_chat_messages')) || [];
-    const box = document.getElementById('chat-messages');
-    if (box && document.getElementById('chat-widget').style.transform === 'translateY(0px)') {
-        renderChatMessages();
-    }
-}, 2000);
-
-setTimeout(renderChatMessages, 1000);
+// Khởi động chat sau khi web tải xong
+setTimeout(() => {
+    initChat();
+    renderChatMessages();
+}, 1500);
 </script>
 </body>
 </html>
