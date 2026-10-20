@@ -675,7 +675,8 @@ body {
             <span class="tag">CLASS SCHEDULE</span>
             <h1>Thời khóa biểu <span>lớp mình</span></h1>
             <!-- Thêm nút nhập nhanh TKB dành riêng cho Admin ở đây -->
-            <button class="primary-btn admin-only" style="margin-top:15px; background:var(--success);" onclick="importDefaultTKB()">📥 Nhập nhanh TKB 12A1</button>
+            <!-- Nút mới: Nhập TKB bằng JSON -->
+            <button class="primary-btn admin-only" style="margin-top:15px; background:var(--success);" onclick="openImportTKBJsonModal()">📥 Nhập TKB </button>
         </div>
         <div class="tkb-container">
                 <table class="tkb-table">
@@ -2490,40 +2491,94 @@ async function importDefaultMembers() {
         alert("🎉 Đã nhập thành công 45 thành viên lên hệ thống Firebase!");
     }
 }
-async function importDefaultTKB() {
-    if (!confirm("Bạn có chắc chắn muốn nạp dữ liệu Thời khóa biểu 12A1 (đã lược bỏ tên giáo viên) không?")) return;
+/* ===== NHẬP TKB BẰNG JSON (BẢO MẬT & TỰ ĐỘNG SỬA LỖI) ===== */
+function openImportTKBJsonModal() {
+    // Hiển thị TKB hiện tại để Admin dễ nhìn và sửa trực tiếp
+    const currentJson = JSON.stringify(scheduleData, null, 2);
+    
+    showModal(`
+        <h3>📥 Nhập Thời khóa biểu</h3>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">
+            Dán đoạn mã TKB vào ô bên dưới. Bạn có thể dán đoạn text thô (không cần ngoặc nhọn bọc ngoài).
+        </p>
+        <div class="form-group">
+            <textarea id="tkb-json-input" style="width:100%; min-height:250px; font-family:monospace; font-size:13px; padding:10px; border-radius:10px; border:1px solid var(--line); background:#0f0f12; color:var(--text);">${escapeHtml(currentJson)}</textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-submit" onclick="saveTKBFromJson()">Lưu Thời khóa biểu</button>
+        </div>
+    `);
+}
 
-    scheduleData = {
-        "Thứ 2": { 
-            1: "Hoá", 2: "Văn", 3: "Văn", 4: "Lí", 5: "",
-            7: "Hoá", 8: "Tin", 9: "Văn"
-        },
-        "Thứ 3": { 
-            1: "Toán", 2: "HĐTN", 3: "NNgữ", 4: "Hoá", 5: "Sinh",
-            7: "HT: Hoá", 8: "HT: Hoá", 9: "HT: Sinh", 10: "HT: Sinh"
-        },
-        "Thứ 4": { 
-            1: "GDTC", 2: "QP", 3: "Sử", 4: "NNgữ", 5: "",
-            7: "Lí", 8: "GDĐP", 9: "GDĐP"
-        },
-        "Thứ 5": { 
-            1: "Tin", 2: "HĐTN", 3: "Sử", 4: "Toán", 5: "Toán",
-            7: "BDHSG", 8: "BDHSG", 9: "QPAN", 10: "QPAN"
-        },
-        "Thứ 6": { 
-            1: "Sinh", 2: "GDTC", 3: "NNgữ", 4: "Lí", 5: "Toán"
-        },
-        "Thứ 7": { 
-            1: "Khảo sát HSG", 2: "Khảo sát HSG", 3: "Khảo sát HSG", 4: "Khảo sát HSG",
-            7: "HT: Lí", 8: "HT: Lí", 9: "HT: Toán", 10: "HT: Toán"
-        },
-        "Chủ Nhật": {}
-    };
+async function saveTKBFromJson() {
+    let rawInput = document.getElementById('tkb-json-input').value.trim();
+    if (!rawInput) return alert("Vui lòng dán mã vào khung!");
 
-    const success = await saveData();
-    if (success) {
-        renderTKB();
-        alert("🎉 Đã cập nhật thành công Thời khóa biểu rút gọn của lớp 12A1 lên Firebase!");
+    try {
+        // 1. TỰ ĐỘNG BỌC NGOẶC NHỌN (Nếu người dùng không dán)
+        if (!rawInput.startsWith("{")) rawInput = "{" + rawInput;
+        if (!rawInput.endsWith("}")) rawInput = rawInput + "}";
+
+        // 2. TỰ ĐỘNG THÊM NGOẶC KÉP CHO CÁC KEY SỐ (VD: 1: -> "1":)
+        // Điều này giúp JSON.parse không bị lỗi nếu người dùng quên ngoặc kép
+        let fixedInput = rawInput.replace(/(\d+)\s*:/g, '"$1":');
+
+        // 3. PHÂN TÍCH JSON
+        let parsedData;
+        try {
+            parsedData = JSON.parse(fixedInput);
+        } catch (e) {
+            return alert("❌ Lỗi cú pháp! Hãy kiểm tra lại các dấu phẩy, ngoặc kép.\nChi tiết: " + e.message);
+        }
+
+        // 4. CHỐNG PHÁ HOẠI (XSS)
+        // Chỉ cho phép các ngày hợp lệ, tiết 1-11, và tên môn học là chữ cái/số
+        const validDays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"];
+        let newScheduleData = {};
+        let hasData = false;
+
+        validDays.forEach(day => {
+            if (parsedData[day] && typeof parsedData[day] === 'object') {
+                newScheduleData[day] = {};
+                for (let tiet in parsedData[day]) {
+                    const tietNum = parseInt(tiet);
+                    const monHoc = parsedData[day][tiet];
+                    
+                    // Kiểm tra tính hợp lệ
+                    if (tietNum >= 1 && tietNum <= 11 && typeof monHoc === 'string') {
+                        // Lọc bỏ các ký tự nguy hiểm < > { } ( ) để chống chèn mã độc
+                        const safeMonHoc = monHoc.replace(/[<>{}()]/g, "").trim().toUpperCase();
+                        if (safeMonHoc) {
+                            newScheduleData[day][tietNum] = safeMonHoc;
+                            hasData = true;
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!hasData) {
+            return alert("Không tìm thấy dữ liệu TKB hợp lệ! Vui lòng kiểm tra lại định dạng.");
+        }
+
+        if (!confirm("Hệ thống đã kiểm tra an toàn. Bạn có chắc chắn muốn ghi đè TKB hiện tại bằng dữ liệu này không?")) return;
+
+        // 5. LƯU VÀ CẬP NHẬT
+        scheduleData = newScheduleData;
+        const success = await saveData();
+        
+        if (success) {
+            renderTKB();
+            closeModal();
+            alert("🎉 Đã cập nhật Thời khóa biểu an toàn thành công!");
+        } else {
+            alert("Lỗi lưu Firebase. Hãy thử lại.");
+        }
+
+    } catch (globalError) {
+        console.error(globalError);
+        alert("Đã xảy ra lỗi không mong muốn. Vui lòng kiểm tra lại dữ liệu dán vào.");
     }
 }
 async function importDefaultTeachers() {
