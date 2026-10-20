@@ -765,7 +765,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 window.fbOnSnapshot = onSnapshot;
 
 const firebaseConfig = {
@@ -785,6 +785,12 @@ window.fbGetDoc = getDoc;
 window.fbSetDoc = setDoc;
 window.db = db;
 window.firebaseReady = true;
+const auth = getAuth(app);
+signInAnonymously(auth).then(() => {
+    console.log("Đã đăng nhập ẩn danh thành công!");
+}).catch((error) => {
+    console.error("Lỗi đăng nhập ẩn danh:", error);
+});
 </script>
 
 <script>
