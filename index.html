@@ -2358,7 +2358,9 @@ const WISHES=[
 ];
 function isWomensDay(){const d=new Date();return d.getMonth()===9&&d.getDate()===20;}
 function renderHeartBubbles(){
-    const stage=document.getElementById("heart-stage"); 
+    let stage=document.getElementById("heart-stage"); 
+    
+    // Nếu chưa có khung chứa, tạo mới
     if(!stage) {
         const wrapper = document.createElement("div");
         wrapper.id = "heart-stage";
@@ -2366,8 +2368,13 @@ function renderHeartBubbles(){
         const container = document.querySelector("#members-page .full-page-card");
         if(container && (previewBubbles||isWomensDay())) {
             container.insertBefore(wrapper, container.querySelector(".member-toolbar"));
+            stage = wrapper; // Gán lại stage sau khi tạo
         } else return;
     }
+    
+    // Kiểm tra an toàn: Nếu không tìm thấy stage thì dừng lại, không báo lỗi
+    if (!stage) return; 
+
     const show=previewBubbles||isWomensDay();
     if(!show){stage.innerHTML=""; return;}
     const girls=members.filter(m=>m.gender==="Nữ");
