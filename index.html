@@ -399,6 +399,9 @@ body {
         <button class="nav-link" id="nav-memory" onclick="showPage('memory')">Kỷ niệm</button>
     </nav>
     <div class="nav-right">
+        <button class="admin-btn admin-only" onclick="downloadClassBackup()" style="padding:7px 10px;" title="Tải bản sao lưu">⬇ Backup</button>
+        <button class="admin-btn admin-only" onclick="triggerBackupRestore()" style="padding:7px 10px;" title="Khôi phục từ file sao lưu">⬆ Khôi phục</button>
+        <input type="file" id="class-backup-file" accept="application/json,.json" style="display:none" onchange="handleBackupFile(event)">
         <button class="admin-btn" id="admin-toggle-btn" onclick="openAdminModal()" style="background:transparent; border:none; color:var(--muted); opacity:0.3; padding:5px;" title="System">·</button>
     </div>
 </header>
@@ -1096,79 +1099,201 @@ function removeWinnerAndClose() {
     closeModal();
 }
 
-/* FIREBASE LOAD & SAVE (REALTIME) */
-async function loadDataFromFirebase() {
-    while(!window.firebaseReady) { await new Promise(r => setTimeout(r, 100)); }
+/* FIREBASE LOAD & SAVE (SAFE MODE + LOCAL BACKUP) */
+const CLASS_BACKUP_KEY = 'class_data_backup_v1';
+const CLASS_BACKUP_PREVIOUS_KEY = 'class_data_backup_previous_v1';
+let firebaseDocumentMissing = false;
+let missingDocWarningShown = false;
+let allowCreateForRestore = false;
+let saveQueue = Promise.resolve();
 
+function getClassDataPayload() {
+    return {
+        members, teachers, achievements, posts, bdayData, memoryFolders,
+        countdownEvents, scheduleData, specialEvents
+    };
+}
+
+function storeLocalClassBackup(payload) {
     try {
-        const docRef = window.fbDoc(window.db, "class_data", "main");
+        const nextData = JSON.stringify(payload);
+        const currentRaw = localStorage.getItem(CLASS_BACKUP_KEY);
+        let currentData = '';
+        try { currentData = currentRaw ? JSON.stringify(JSON.parse(currentRaw).data) : ''; } catch (e) {}
+        // Keep the previous distinct version too, so a bad overwrite doesn't instantly destroy the only local backup.
+        if (currentRaw && currentData && currentData !== nextData) {
+            localStorage.setItem(CLASS_BACKUP_PREVIOUS_KEY, currentRaw);
+        }
+        if (currentData !== nextData) {
+            localStorage.setItem(CLASS_BACKUP_KEY, JSON.stringify({
+                savedAt: new Date().toISOString(),
+                data: payload
+            }));
+        }
+    } catch (e) {
+        console.warn('Không thể lưu bản sao lưu trên trình duyệt (có thể đã hết dung lượng):', e);
+    }
+}
 
+function applyClassData(data) {
+    members = Array.isArray(data.members) ? data.members : [];
+    teachers = Array.isArray(data.teachers) ? data.teachers : [];
+    achievements = Array.isArray(data.achievements) ? data.achievements : [];
+    posts = Array.isArray(data.posts) ? data.posts : [];
+    bdayData = data.bdayData && typeof data.bdayData === 'object' ? data.bdayData : {};
+    memoryFolders = Array.isArray(data.memoryFolders) ? data.memoryFolders : [];
+    countdownEvents = Array.isArray(data.countdownEvents) ? data.countdownEvents : [];
+    scheduleData = data.scheduleData && typeof data.scheduleData === 'object' ? data.scheduleData : {};
+    specialEvents = Array.isArray(data.specialEvents) ? data.specialEvents : [];
+}
+
+function renderAllClassData() {
+    renderMembers();
+    renderTeachers();
+    renderAchievements();
+    renderTKB();
+    renderPosts();
+    renderBirthdays();
+    renderFolders();
+    renderCountdowns();
+    renderHeartBubbles();
+    renderSpecialEvents();
+    if (currentFolderId) renderMedia();
+}
+
+async function loadDataFromFirebase() {
+    while (!window.firebaseReady) await new Promise(r => setTimeout(r, 100));
+    try {
+        const docRef = window.fbDoc(window.db, 'class_data', 'main');
         window.fbOnSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                members = data.members || [];
-                teachers = data.teachers || []; // Tải dữ liệu thầy cô
-                achievements = data.achievements || [];
-                posts = data.posts || [];
-                bdayData = data.bdayData || {};
-                memoryFolders = data.memoryFolders || [];
-                countdownEvents = data.countdownEvents || [];
-                scheduleData = data.scheduleData || {};
-                specialEvents = data.specialEvents || [];
+                firebaseDocumentMissing = false;
+                allowCreateForRestore = false;
+                applyClassData(data);
+                storeLocalClassBackup(getClassDataPayload());
+                renderAllClassData();
             } else {
-                members = [
-                    { name: "Nguyễn Văn A", gender: "Nam", birthday: "2008-01-15", phone: "0912 345 678" }
-                ];
-                teachers = [
-                    { name: "Thầy Giáo A", gender: "Nam", birthday: "1980-05-10", phone: "0901 234 567", facebook: "", photo: "" }
-                ];
-                countdownEvents = [
-                    { id: 1, name: "Ngày Phụ nữ VN 20/10", icon: "🌷", date: "2026-10-20" }
-                ];
-                memoryFolders = [
-                    { id: 1, name: "Tháng 1", icon: "📁", media: [] }
-                ];
-                posts = [
-                    { id: Date.now(), text: "Chào mừng các bạn đến với trang kỷ niệm lớp 12A1 - K59 ♡", images: [], time: Date.now(), likes: 0, comments: [] }
-                ];
-                saveData();
+                // CRITICAL: Never seed demo data or write automatically when the cloud document is missing.
+                firebaseDocumentMissing = true;
+                applyClassData({});
+                renderAllClassData();
+                if (!missingDocWarningShown) {
+                    missingDocWarningShown = true;
+                    let hasBackup = false;
+                    try { hasBackup = !!localStorage.getItem(CLASS_BACKUP_KEY); } catch (e) {}
+                    alert('CẢNH BÁO: Firebase không tìm thấy class_data/main. Website đã chặn tự ghi dữ liệu để tránh ghi đè hoặc tạo dữ liệu mẫu. ' +
+                        (hasBackup ? 'Trình duyệt này có bản sao lưu cục bộ; hãy đăng nhập Admin và chọn Khôi phục từ file backup nếu bạn đã tải file đó.' : 'Hãy kiểm tra đúng Firebase project và bản sao lưu trước khi tiếp tục chỉnh sửa.'));
+                }
             }
-
-            renderMembers();
-            renderTeachers();
-            renderAchievements();
-            renderTKB();
-            renderPosts();
-            renderBirthdays();
-            renderFolders();
-            renderCountdowns();
-            renderHeartBubbles();
-            renderSpecialEvents();
-            if (currentFolderId) renderMedia();
         }, (error) => {
-            console.error("Lỗi lắng nghe dữ liệu realtime:", error);
+            console.error('Lỗi lắng nghe dữ liệu realtime:', error);
+            alert('Không tải được dữ liệu Firebase. Dữ liệu chưa được thay đổi; hãy kiểm tra mạng/quyền truy cập rồi thử lại.');
         });
-
     } catch (e) {
-        console.error("Lỗi kết nối Firebase:", e);
-        alert("Không thể kết nối đến cơ sở dữ liệu. Vui lòng kiểm tra mạng!");
+        console.error('Lỗi kết nối Firebase:', e);
+        alert('Không thể kết nối đến cơ sở dữ liệu. Vui lòng kiểm tra mạng!');
     }
 }
 
 async function saveData() {
-    if(!window.firebaseReady) return false;
-    try {
-        const docRef = window.fbDoc(window.db, "class_data", "main");
-        await window.fbSetDoc(docRef, {
-            members, teachers, achievements, posts, bdayData, memoryFolders, countdownEvents, scheduleData,
-            specialEvents 
-            
-        });
-        localStorage.setItem('class_my_likes', JSON.stringify(myLikes));
-        return true;
-    } catch (e) {
-        alert("Lỗi khi lưu dữ liệu lên Firebase!");
+    if (!window.firebaseReady) return false;
+    if (firebaseDocumentMissing && !allowCreateForRestore) {
+        alert('Đã chặn lưu vì Firebase không tìm thấy tài liệu class_data/main. Hãy kiểm tra cấu hình hoặc khôi phục từ file backup trước.');
         return false;
+    }
+
+    // Serialize writes so two quick edits do not race each other.
+    const operation = saveQueue.then(async () => {
+        const payload = getClassDataPayload();
+        const json = JSON.stringify(payload);
+        const bytes = new TextEncoder().encode(json).length;
+        // Firestore documents have a 1 MiB limit; keep a safety margin.
+        if (bytes > 700 * 1024) {
+            alert('Không thể lưu: dữ liệu đang quá lớn (' + Math.round(bytes / 1024) + ' KB). Firestore giới hạn mỗi tài liệu khoảng 1 MiB. Cần tách dữ liệu sang nhiều tài liệu trước khi tiếp tục.');
+            return false;
+        }
+        try {
+            const docRef = window.fbDoc(window.db, 'class_data', 'main');
+            await window.fbSetDoc(docRef, payload);
+            localStorage.setItem('class_my_likes', JSON.stringify(myLikes));
+            storeLocalClassBackup(payload);
+            allowCreateForRestore = false;
+            firebaseDocumentMissing = false;
+            return true;
+        } catch (e) {
+            console.error('Lỗi lưu dữ liệu lên Firebase:', e);
+            alert('Lưu Firebase thất bại. Dữ liệu chưa được xác nhận là đã lưu; hãy thử tải backup và kiểm tra kết nối/quyền truy cập.');
+            return false;
+        }
+    });
+    saveQueue = operation.then(() => undefined, () => undefined);
+    try { return await operation; } catch (e) { console.error(e); return false; }
+}
+
+function downloadClassBackup() {
+    let backup;
+    try {
+        const local = localStorage.getItem(CLASS_BACKUP_KEY);
+        const previous = localStorage.getItem(CLASS_BACKUP_PREVIOUS_KEY);
+        if (firebaseDocumentMissing) {
+            if (!local && !previous) { alert('Không tìm thấy bản sao lưu trên trình duyệt này.'); return; }
+            backup = JSON.parse(local || previous);
+        } else if (local && previous && !confirm('OK = tải bản sao lưu mới nhất. Cancel = tải bản sao lưu trước đó để phòng trường hợp dữ liệu vừa bị ghi đè.')) {
+            backup = JSON.parse(previous);
+        } else {
+            backup = { savedAt: new Date().toISOString(), data: getClassDataPayload() };
+        }
+    } catch (e) {
+        alert('Không tạo được backup. Hãy thử tải lại trang và kiểm tra dữ liệu.');
+        return;
+    }
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'backup-lop-12a1-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+function triggerBackupRestore() {
+    const input = document.getElementById('class-backup-file');
+    if (input) { input.value = ''; input.click(); }
+}
+
+async function handleBackupFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    if (!isAdmin) { alert('Chỉ Admin mới được khôi phục dữ liệu.'); return; }
+    try {
+        const parsed = JSON.parse(await file.text());
+        const data = parsed && parsed.data ? parsed.data : parsed;
+        const required = ['members', 'teachers', 'achievements', 'posts', 'bdayData', 'memoryFolders', 'countdownEvents', 'scheduleData', 'specialEvents'];
+        if (!data || !required.every(k => Object.prototype.hasOwnProperty.call(data, k))) {
+            alert('File backup không đúng định dạng của website lớp 12A1.');
+            return;
+        }
+        if (!confirm('Khôi phục dữ liệu từ file này sẽ thay thế toàn bộ dữ liệu hiện tại trên Firebase. Bạn đã chắc chắn chọn đúng file backup chưa?')) return;
+        applyClassData(data);
+        allowCreateForRestore = true; // Explicit, user-confirmed restore is the only path allowed to recreate a missing document.
+        firebaseDocumentMissing = false;
+        const success = await saveData();
+        if (success) {
+            storeLocalClassBackup(getClassDataPayload());
+            renderAllClassData();
+            alert('Khôi phục dữ liệu thành công. Hãy tải một file backup mới để lưu riêng ở máy bạn.');
+        } else {
+            firebaseDocumentMissing = true;
+            alert('Khôi phục chưa thành công; hãy giữ nguyên file backup và kiểm tra Firebase.');
+        }
+    } catch (e) {
+        console.error('Lỗi đọc file backup:', e);
+        alert('Không đọc được file backup JSON.');
+    } finally {
+        event.target.value = '';
     }
 }
 
@@ -1994,13 +2119,18 @@ async function submitPost(){
         comments: []
     });
 
-    await saveData();
+    const saved = await saveData();
+    if (!saved) {
+        // Keep the draft in the form so the user can retry; uploaded media URLs are not deleted.
+        closeModal();
+        renderPosts();
+        alert("Bài viết chưa được xác nhận lưu lên Firebase. Nội dung vẫn được giữ trong ô soạn thảo; hãy thử lưu lại sau khi kiểm tra kết nối.");
+        return;
+    }
     document.getElementById("post-text").value = "";
     document.getElementById("post-files").value = "";
     document.getElementById("post-preview").innerHTML = "";
     renderPosts();
-    
-    // Đóng bảng thông báo sau khi hoàn thành
     closeModal();
 }
 function timeAgo(ts){
