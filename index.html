@@ -2259,7 +2259,10 @@ function postHtml(p){
         const isAdminComment = c.name === "Admin";
         return `
         <div class="cmt">
-            <div class="cmt-avatar" style="${isAdminComment ? 'background:#0f2a22;color:#38d9a9;' : ''}">${escapeHtml((c.name || "?").trim().charAt(0).toUpperCase())}</div>
+            ${c.name === 'Admin' && adminCredentials.photo 
+            ? `<img src="${adminCredentials.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;">` 
+            : `<div class="cmt-avatar" style="${isAdminComment ? 'background:#0f2a22;color:#38d9a9;' : ''}">${escapeHtml((c.name || "?").trim().charAt(0).toUpperCase())}</div>`
+}
             <div>
                 <div class="cmt-bubble">
                     <strong class="${isAdminComment ? 'is-admin' : ''}">${escapeHtml(c.name)}</strong>
@@ -2275,7 +2278,7 @@ function postHtml(p){
 
     return `
         <div class="post-head">
-            <div class="avatar-circle">12A1</div>
+            ${adminCredentials.photo ? `<img src="${adminCredentials.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;">` : `<div class="avatar-circle">12A1</div>`}
             <div><strong>Admin · 12A1-k59</strong><div class="post-time">${timeAgo(p.time)} · 🌐</div></div>
             <button class="admin-only post-del" onclick="deletePost(${p.id})" title="Xóa bài">🗑</button>
         </div>
@@ -3143,7 +3146,12 @@ function openSettingsModal() {
     
     showModal(`
         <h3>⚙️ Cài đặt Quản trị viên</h3>
-        <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Thay đổi tài khoản và mật khẩu đăng nhập. Mật khẩu sẽ được mã hóa an toàn.</p>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Thay đổi tài khoản, mật khẩu và ảnh đại diện.</p>
+
+        <div class="form-group">
+            <label>Ảnh đại diện Admin</label>
+            <input type="file" id="admin-avatar" accept="image/*">
+        </div>
         
         <div class="form-group">
             <label>Tên đăng nhập mới (Username)</label>
@@ -3154,7 +3162,7 @@ function openSettingsModal() {
             <input type="password" id="current-admin-pass" placeholder="Nhập mật khẩu hiện tại...">
         </div>
         <div class="form-group">
-            <label>Mật khẩu mới</label>
+            <label>Mật khẩu mới (Để trống nếu không đổi)</label>
             <input type="password" id="new-admin-pass" placeholder="Nhập mật khẩu mới...">
         </div>
         <div class="form-group">
@@ -3168,12 +3176,12 @@ function openSettingsModal() {
         </div>
     `);
 }
-
 async function saveAdminCredentials() {
     const newUser = document.getElementById("new-admin-user").value.trim();
     const currentPass = document.getElementById("current-admin-pass").value.trim();
     const newPass = document.getElementById("new-admin-pass").value.trim();
     const confirmPass = document.getElementById("confirm-admin-pass").value.trim();
+    const file = document.getElementById("admin-avatar").files[0];
 
     if (!newUser) return alert("Tên đăng nhập không được để trống!");
 
@@ -3191,14 +3199,27 @@ async function saveAdminCredentials() {
         newHash = await hashPassword(newPass);
     }
 
+    // Xử lý ảnh đại diện
+    let newPhoto = adminCredentials.photo || ""; // Giữ ảnh cũ nếu không chọn ảnh mới
+    if (file) {
+        try {
+            newPhoto = await compressImage(file, 300, 0.8);
+        } catch (e) {
+            return alert("Lỗi tải ảnh đại diện: " + e);
+        }
+    }
+
     // Cập nhật dữ liệu
     adminCredentials.username = newUser;
     adminCredentials.passwordHash = newHash;
+    adminCredentials.photo = newPhoto;
 
     const success = await saveData();
     if (success) {
-        alert("🎉 Đã cập nhật tài khoản và mật khẩu thành công!");
+        alert("🎉 Đã cập nhật thông tin Admin thành công!");
         closeModal();
+        renderPosts(); // Render lại bảng tin để cập nhật avatar
+        renderMembers(); // Cập nhật lại giao diện thành viên (nếu cần)
     } else {
         alert("Lỗi lưu Firebase. Vui lòng thử lại.");
     }
