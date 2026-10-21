@@ -426,28 +426,31 @@ body {
 <body>
 
 <header class="navbar">
-    <a href="#" class="logo" onclick="showPage('home'); return false;"><span>✿</span> TRANG CHỦ</a>
+    <div style="display:flex; align-items:center; gap:10px; justify-self:start;">
+        <a href="#" class="logo" onclick="showPage('home'); return false;"><span>✿</span> TRANG CHỦ</a>
+        
+        <!-- Nút Admin (dấu chấm) - Nằm cạnh chữ TRANG CHỦ -->
+        <button class="admin-btn" id="admin-toggle-btn" onclick="openAdminModal()" style="background:transparent; border:none; color:var(--muted); opacity:0.3; padding:5px;" title="System">·</button>
+    </div>
+    
     <nav>
         <button class="nav-link active" id="nav-home" onclick="showPage('home')">Trang chủ</button>
         <button class="nav-link" id="nav-members" onclick="showPage('members')">Thành viên</button>
         <button class="nav-link" id="nav-teachers" onclick="showPage('teachers')">Thầy cô</button>
-        <button class="nav-link" id="nav-events" onclick="showPage('events')">🎉 Sự kiện</button> <!-- Thêm dòng này -->
+        <button class="nav-link" id="nav-events" onclick="showPage('events')">🎉 Sự kiện</button>
         <button class="nav-link" id="nav-clock" onclick="showPage('clock')">⏰ Đồng hồ</button>
         <button class="nav-link" id="nav-wheel" onclick="showPage('wheel')">Vòng quay</button>
         <button class="nav-link" id="nav-schedule" onclick="showPage('schedule')">Thời khóa biểu</button>
         <button class="nav-link" id="nav-achieve" onclick="showPage('achieve')">Thành tích</button>
         <button class="nav-link" id="nav-memory" onclick="showPage('memory')">Kỷ niệm</button>
     </nav>
-        <div class="nav-right">
-        <!-- Nút Admin (dấu chấm) - Chuyển lên đây -->
-        <button class="admin-btn" id="admin-toggle-btn" onclick="openAdminModal()" style="background:transparent; border:none; color:var(--muted); opacity:0.3; padding:5px; margin-right: 10px;" title="System">·</button>
 
+    <div class="nav-right">
         <button class="admin-btn" id="theme-toggle-btn" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text); padding:5px; font-size:18px;" title="Chuyển chế độ sáng/tối">🌙</button>
         <button class="admin-btn admin-only" onclick="downloadClassBackup()" style="padding:7px 10px;" title="Tải bản sao lưu">⬇ Backup</button>
         <button class="admin-btn admin-only" onclick="triggerBackupRestore()" style="padding:7px 10px;" title="Khôi phục từ file sao lưu">⬆ Khôi phục</button>
         <input type="file" id="class-backup-file" accept="application/json,.json" style="display:none" onchange="handleBackupFile(event)">
         
-        <!-- Nút Cài đặt mới thêm vào đây (chỉ hiện khi đăng nhập Admin) -->
         <button class="admin-btn admin-only" onclick="openSettingsModal()" style="padding:7px 10px; background:var(--chip); color:var(--deep); border:none;" title="Cài đặt hệ thống">⚙️ Cài đặt</button>
     </div>
 </header>
@@ -1607,22 +1610,26 @@ function renderMembers(keyword=""){
         const realIndex=members.indexOf(m);
         const tr=document.createElement("tr");
         const avatar=m.photo?`<img src="${m.photo}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;">`:"";
+        
         let isBday=false, bdayTxt="", bdayBadge="";
         if(m.birthday){
             const nb=nextBirthday(m.birthday);
-            if(nb.days===0){isBday=true; bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂 </span>`; 
-            if(m.facebook) {
-                bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc FB</a>`;
-            } else {
-                bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;
-            }
-        }
-        else if(nb.days<=7){isBday=true; bdayBadge=`<span class="bday-badge">🎂 Còn ${nb.days} ngày</span>`; 
-            if(m.facebook) {
-                bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc FB</a>`;
-            } else {
-                bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;
-            }
+            if(nb.days===0){
+                isBday=true; 
+                bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂 </span>`; 
+                if(m.facebook) {
+                    bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc FB</a>`;
+                } else {
+                    bdayTxt=`<span style="font-size:11px; color:var(--muted); margin-left:8px;">Chưa có FB</span>`;
+                }
+            } else if(nb.days<=7){
+                isBday=true; 
+                bdayBadge=`<span class="bday-badge">🎂 Còn ${nb.days} ngày</span>`; 
+                if(m.facebook) {
+                    bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc FB</a>`;
+                } else {
+                    bdayTxt=`<span style="font-size:11px; color:var(--muted); margin-left:8px;">Chưa có FB</span>`;
+                }
             }
         }
         
@@ -1633,28 +1640,28 @@ function renderMembers(keyword=""){
             : `<span style="color:var(--muted);font-size:12px;">--</span>`;
 
         tr.className=isBday?"bday-row":"";
-        // Thêm đoạn này trước lệnh tr.innerHTML = ...
-            let gmailDisplay = "--";
-            if (m.gmail) {
-                const parts = m.gmail.split("@");
-                const userPart = parts[0] || "";
-                const domainPart = parts[1] || "gmail.com";
-                gmailDisplay = `<span class="gmail-blur">${escapeHtml(userPart)}</span>@${escapeHtml(domainPart)}`;
-            }
-        // Trong phần tr.innerHTML, thêm ô chứa gmailDisplay vào đúng vị trí tương ứng:
+        
+        let gmailDisplay = "--";
+        if (m.gmail) {
+            const parts = m.gmail.split("@");
+            const userPart = parts[0] || "";
+            const domainPart = parts[1] || "gmail.com";
+            gmailDisplay = `<span class="gmail-blur">${escapeHtml(userPart)}</span>@${escapeHtml(domainPart)}`;
+        }
+        
         tr.innerHTML=`
             <td>${index+1}</td>
             <td>${avatar}<strong>${escapeHtml(m.name)}</strong>${bdayBadge}</td>
             <td>${formatBirthday(m.birthday)}</td>
             <td>${escapeHtml(m.gender||"Chưa cập nhật")}</td>
             <td><span class="phone-blur">${escapeHtml(m.phone||"")}</span></td>
-            <td>${fbBtn}</td>            <!-- Đưa nút Facebook ra trước -->
-            <td>${gmailDisplay}</td>     <!-- Đưa Gmail ra sau -->
+            <td>${fbBtn}</td>
+            <td>${gmailDisplay}</td>
             <td class="admin-only">
                 <button class="mini-btn" onclick="openMemberModal(${realIndex})">Sửa</button>
                 <button class="mini-btn danger" onclick="deleteMember(${realIndex})">Xóa</button>
                 ${bdayTxt}
-        </td>`;
+            </td>`;
         list.appendChild(tr);
     });
 }
