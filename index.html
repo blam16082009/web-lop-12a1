@@ -1618,7 +1618,7 @@ function renderMembers(keyword=""){
                 isBday=true; 
                 bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂 </span>`; 
                 if(m.facebook) {
-                    bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc FB</a>`;
+                    bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc </a>`;
                 } else {
                     bdayTxt=`<span style="font-size:11px; color:var(--muted); margin-left:8px;">Chưa có FB</span>`;
                 }
@@ -1626,7 +1626,7 @@ function renderMembers(keyword=""){
                 isBday=true; 
                 bdayBadge=`<span class="bday-badge">🎂 Còn ${nb.days} ngày</span>`; 
                 if(m.facebook) {
-                    bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc FB</a>`;
+                    bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc </a>`;
                 } else {
                     bdayTxt=`<span style="font-size:11px; color:var(--muted); margin-left:8px;">Chưa có FB</span>`;
                 }
@@ -2395,7 +2395,7 @@ function renderBirthdays(){
         let wishBtnHtml = "";
         const firstPerson = today[0];
         if (firstPerson.facebook) {
-            wishBtnHtml = `<a href="${escapeHtml(firstPerson.facebook)}" target="_blank" class="banner-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc FB 🎉</a>`;
+            wishBtnHtml = `<a href="${escapeHtml(firstPerson.facebook)}" target="_blank" class="banner-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc 🎉</a>`;
         } else {
             wishBtnHtml = `<span class="banner-btn" style="cursor:default; opacity:0.7;">Chưa có FB</span>`;
         }
