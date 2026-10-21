@@ -2385,10 +2385,25 @@ document.addEventListener("keydown",e=>{
 function renderBirthdays(){
     const banner=document.getElementById("birthday-banner"); if(!banner) return;
     const today=members.filter(m=>m.birthday&&nextBirthday(m.birthday).days===0);
+    
     if(today.length){
         banner.classList.remove("hidden");
-        banner.innerHTML=`🎂 Hôm nay là sinh nhật của <b>${today.map(x=>escapeHtml(x.name)).join(", ")}</b>! <button class="banner-btn" onclick="showPage('members'); setTimeout(()=>document.getElementById('member-list').scrollIntoView({behavior:'smooth'}),200)">Gửi lời chúc 🎉</button>`;
-    } else banner.classList.add("hidden");
+        // Tạo danh sách tên, nếu có nhiều người cùng sinh nhật thì nối bằng dấu phẩy
+        const namesHtml = today.map(x=>escapeHtml(x.name)).join(", ");
+        
+        // Xử lý nút Gửi lời chúc cho người đầu tiên (hoặc người duy nhất) trong danh sách
+        let wishBtnHtml = "";
+        const firstPerson = today[0];
+        if (firstPerson.facebook) {
+            wishBtnHtml = `<a href="${escapeHtml(firstPerson.facebook)}" target="_blank" class="banner-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc FB 🎉</a>`;
+        } else {
+            wishBtnHtml = `<span class="banner-btn" style="cursor:default; opacity:0.7;">Chưa có FB</span>`;
+        }
+
+        banner.innerHTML=`🎂 Hôm nay là sinh nhật của <b>${namesHtml}</b>! ${wishBtnHtml}`;
+    } else {
+        banner.classList.add("hidden");
+    }
 }
 function openWishChat(index){
     const m=members[index]; if(!m) return;
