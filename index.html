@@ -438,14 +438,14 @@ body {
         <button class="nav-link" id="nav-achieve" onclick="showPage('achieve')">Thành tích</button>
         <button class="nav-link" id="nav-memory" onclick="showPage('memory')">Kỷ niệm</button>
     </nav>
-       <div class="nav-right">
+        <div class="nav-right">
+        <!-- Nút Admin (dấu chấm) - Chuyển lên đây -->
+        <button class="admin-btn" id="admin-toggle-btn" onclick="openAdminModal()" style="background:transparent; border:none; color:var(--muted); opacity:0.3; padding:5px; margin-right: 10px;" title="System">·</button>
+
         <button class="admin-btn" id="theme-toggle-btn" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text); padding:5px; font-size:18px;" title="Chuyển chế độ sáng/tối">🌙</button>
         <button class="admin-btn admin-only" onclick="downloadClassBackup()" style="padding:7px 10px;" title="Tải bản sao lưu">⬇ Backup</button>
         <button class="admin-btn admin-only" onclick="triggerBackupRestore()" style="padding:7px 10px;" title="Khôi phục từ file sao lưu">⬆ Khôi phục</button>
         <input type="file" id="class-backup-file" accept="application/json,.json" style="display:none" onchange="handleBackupFile(event)">
-        
-        <!-- Nút Admin (dấu chấm) -->
-        <button class="admin-btn" id="admin-toggle-btn" onclick="openAdminModal()" style="background:transparent; border:none; color:var(--muted); opacity:0.3; padding:5px;" title="System">·</button>
         
         <!-- Nút Cài đặt mới thêm vào đây (chỉ hiện khi đăng nhập Admin) -->
         <button class="admin-btn admin-only" onclick="openSettingsModal()" style="padding:7px 10px; background:var(--chip); color:var(--deep); border:none;" title="Cài đặt hệ thống">⚙️ Cài đặt</button>
@@ -1610,8 +1610,20 @@ function renderMembers(keyword=""){
         let isBday=false, bdayTxt="", bdayBadge="";
         if(m.birthday){
             const nb=nextBirthday(m.birthday);
-            if(nb.days===0){isBday=true; bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂 </span>`; bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;}
-            else if(nb.days<=7){isBday=true; bdayBadge=`<span class="bday-badge">🎂 Còn ${nb.days} ngày</span>`; bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;}
+            if(nb.days===0){isBday=true; bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂 </span>`; 
+            if(m.facebook) {
+                bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc FB</a>`;
+            } else {
+                bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;
+            }
+        }
+        else if(nb.days<=7){isBday=true; bdayBadge=`<span class="bday-badge">🎂 Còn ${nb.days} ngày</span>`; 
+            if(m.facebook) {
+                bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc FB</a>`;
+            } else {
+                bdayTxt=`<button class="bday-wish-btn" onclick="openWishChat(${realIndex})">Gửi lời chúc</button>`;
+            }
+            }
         }
         
         const fbBtn = m.facebook 
