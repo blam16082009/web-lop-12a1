@@ -989,7 +989,14 @@ function renderAchievements(){
     if(!grid) return; grid.innerHTML="";
     if(achievements.length===0){grid.innerHTML=`<p class="empty-achieve">Chưa có thành tích nào. Admin hãy thêm nhé ♡</p>`;return;}
     
-    achievements.forEach((a,i)=>{
+    // Sắp xếp danh sách thành tích: mới nhất lên trước, cũ nhất xuống sau
+    const sortedAchievements = [...achievements].sort((a, b) => {
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return new Date(b.date) - new Date(a.date);
+    });
+
+    sortedAchievements.forEach((a)=>{
         const card=document.createElement("article");
         card.className="achieve-card";
         
@@ -998,16 +1005,21 @@ function renderAchievements(){
             imgSrc = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
         }
 
+        // Kiểm tra nếu là tập thể (không có tên cá nhân) thì đổi tiêu đề thành "VINH DANH TẬP THỂ"
+        const isCollective = !a.person || a.person.trim() === "";
+        const titleTopText = isCollective ? "VINH DANH TẬP THỂ" : "VINH DANH HỌC SINH";
+        const displayName = isCollective ? "Tập thể lớp" : escapeHtml(a.person);
+
         card.innerHTML=`
             <div class="achieve-admin-btns admin-only">
-                <button onclick="openAchieveModal(${i})" title="Sửa">✎</button>
+                <button onclick="openAchieveModal(${achievements.indexOf(a)})" title="Sửa">✎</button>
                 <button onclick="deleteAchievement(${a.id})" title="Xóa">✕</button>
             </div>
             <div class="achieve-badge">🏆</div>
-            <div class="achieve-title-top">Vinh danh học sinh</div>
+            <div class="achieve-title-top">${titleTopText}</div>
             <div class="achieve-title-sub">Đạt thành tích xuất sắc</div>
-            <img class="achieve-photo" src="${imgSrc}" alt="${escapeHtml(a.person)}">
-            <h3>${escapeHtml(a.person||"Tập thể lớp")}</h3>
+            <img class="achieve-photo" src="${imgSrc}" alt="${displayName}">
+            <h3>${displayName}</h3>
             <div class="achieve-desc">${escapeHtml(a.title)}</div>
             <div class="achieve-footer">
                 <span>🏫 Lớp: 12A1 - K59</span>
