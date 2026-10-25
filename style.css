@@ -292,50 +292,9 @@ tbody tr.bday-row{background:linear-gradient(90deg,rgba(169,154,244,.18),rgba(16
 .tkb-side-row{height:30px;background:#111!important;color:var(--muted)!important;font-size:11px!important;letter-spacing:1px;font-weight:800;cursor:default!important}
 
 /* THÀNH TÍCH */
-#achieve-page .full-page-card {
-    max-width: 1440px; /* Mở rộng khung trang thành tích từ 1100px lên 1440px */
-}
-.achieve-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    margin: 25px 2% 15px;
-    flex-wrap: wrap;
-}
-.achieve-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Hiển thị cố định 4 ô 1 dòng (đổi số 4 thành 5 nếu muốn 5 ô) */
-    gap: 20px;
-    padding: 0 2% 30px;
-    justify-items: center;
-}
-.achieve-card {
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,.25);
-    transition: .3s;
-    width: 100%;
-    max-width: 280px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 25px 15px;
-    position: relative;
-    border: 4px solid #e2e8f0;
-    background: linear-gradient(180deg, #eaf4ff 0%, #fff 40%);
-}
-/* Tự động co giãn đẹp mắt trên màn hình nhỏ / điện thoại */
-@media (max-width: 1100px) {
-    .achieve-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 800px) {
-    .achieve-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 500px) {
-    .achieve-grid { grid-template-columns: 1fr; }
-}
+.achieve-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:25px 5% 15px;flex-wrap:wrap}
+.achieve-grid{display:flex;flex-wrap:wrap;gap:20px;padding:0 5% 30px;justify-content:center}
+.achieve-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,.25);transition:.3s;width:260px;display:flex;flex-direction:column;align-items:center;padding:25px 15px;position:relative;border:4px solid #e2e8f0;background:linear-gradient(180deg, #eaf4ff 0%, #fff 40%)}
 
 /* KỶ NIỆM */
 .folders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;padding:25px 5%}
