@@ -410,3 +410,30 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
     color: var(--muted);
     margin-top: 6px;
 }
+th.admin-only, td.admin-only {
+    position: sticky !important;
+    right: 0;
+    z-index: 5;
+    box-shadow: -4px 0 12px rgba(0,0,0,0.15); 
+}
+thead th.admin-only {
+    background: #1e1c33 !important; 
+}
+tbody td.admin-only {
+    background: var(--card) !important; 
+}
+tbody tr:hover td.admin-only {
+    background: #1a1a22 !important; 
+}
+tbody tr.bday-row td.admin-only {
+    background: #1d1b2d !important; 
+}
+body.light-mode thead th.admin-only {
+    background: #eef1f6 !important;
+}
+body.light-mode tbody td.admin-only {
+    background: #ffffff !important;
+}
+body.light-mode tbody tr:hover td.admin-only {
+    background: #f9f9f9 !important; 
+}
