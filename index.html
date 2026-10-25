@@ -9,80 +9,115 @@
 </head>
 <body>
     <div id="app">
-        <header class="main-header">
-            <div class="logo-area">
-                <h1>12A1 - K59</h1>
-            </div>
-            <nav class="nav-menu">
-                <a href="#home" class="active">Trang chủ</a>
-                <a href="#members">Thành viên</a>
-                <a href="#schedule">Thời khóa biểu</a>
-                <a href="#gallery">Kỷ niệm</a>
-                <a href="#wishes">Lời chúc</a>
-                <button id="admin-btn" onclick="toggleAdminModal()"><i class="fa-solid fa-lock"></i> Admin</button>
+        <header class="navbar">
+            <a href="#home" class="logo">12A1 - K59</a>
+            <nav>
+                <a href="#home" class="nav-link active">Trang chủ</a>
+                <a href="#members" class="nav-link">Thành viên</a>
+                <a href="#schedule" class="nav-link">Thời khóa biểu</a>
+                <a href="#gallery" class="nav-link">Kỷ niệm</a>
+                <a href="#wishes" class="nav-link">Lời chúc</a>
             </nav>
+            <div class="nav-right">
+                <button id="admin-btn" class="admin-btn" onclick="toggleAdminModal()"><i class="fa-solid fa-lock"></i> Admin</button>
+            </div>
         </header>
 
-        <main>
-            <section id="home" class="hero-section">
-                <h2>Chào mừng đến với Website Tập thể Lớp 12A1</h2>
-<p>Every moment matters ✿</p>
-            </section>
-
-            <section id="members" class="content-section">
-                <h2>Danh sách thành viên</h2>
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Họ và tên</th>
-                                <th>Số điện thoại</th>
-                                <th>Liên hệ</th>
-                                <th>Gmail</th>
-                            </tr>
-                        </thead>
-                        <tbody id="member-list-body">
-                            <!-- Dữ liệu được nạp tự động qua script.js -->
-                        </tbody>
-                    </table>
+        <main class="layout">
+            <section id="home" class="page">
+                <div class="members-hero" style="border-radius: 20px; margin-bottom: 24px;">
+                    <span class="tag">chào mừng</span>
+                    <h1>Website Tập thể Lớp <span>12A1 - K59</span></h1>
+                    <p>Every moment matters ✿</p>
                 </div>
             </section>
 
-            <section id="schedule" class="content-section">
-                <h2>Thời khóa biểu</h2>
-                <div id="schedule-container"></div>
-            </section>
-
-            <section id="gallery" class="content-section">
-                <h2>Kho ảnh kỷ niệm</h2>
-                <div id="gallery-grid" class="grid-container"></div>
-            </section>
-
-            <section id="wishes" class="content-section">
-                <h2>Gửi lời chúc / Bình luận</h2>
-                <div class="comment-box">
-                    <input type="text" id="comment-name" placeholder="Tên của bạn..." maxlength="30">
-                    <textarea id="comment-content" placeholder="Nhập lời chúc..." maxlength="300"></textarea>
-                    <button onclick="postComment()">Gửi đi</button>
+            <section id="members" class="page">
+                <div class="full-page-card">
+                    <div class="members-hero">
+                        <span class="tag">danh bạ lớp học</span>
+                        <h1>Danh sách <span>Thành viên</span></h1>
+                        <p>Thông tin liên hệ của tập thể lớp 12A1</p>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Họ và tên</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Liên hệ</th>
+                                    <th>Gmail</th>
+                                </tr>
+                            </thead>
+                            <tbody id="member-list-body">
+                                <!-- Load tự động -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div id="comments-container"></div>
+            </section>
+
+            <section id="schedule" class="page" style="margin-top: 24px;">
+                <div class="full-page-card">
+                    <div class="schedule-hero">
+                        <span class="tag">thời gian biểu</span>
+                        <h1>Lịch học <span>Lớp 12A1</span></h1>
+                    </div>
+                    <div id="schedule-container" class="tkb-container"></div>
+                </div>
+            </section>
+
+            <section id="gallery" class="page" style="margin-top: 24px;">
+                <div class="full-page-card">
+                    <div class="achieve-hero">
+                        <span class="tag">khoảnh khắc</span>
+                        <h1>Kho ảnh <span>Kỷ niệm</span></h1>
+                    </div>
+                    <div id="gallery-grid" class="folders-grid"></div>
+                </div>
+            </section>
+
+            <section id="wishes" class="page" style="margin-top: 24px;">
+                <div class="full-page-card" style="padding: 30px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <span class="tag">gửi gắm yêu thương</span>
+                        <h2 style="font-size: 28px; color: var(--deep); margin-top: 10px;">Lời chúc / Bình luận</h2>
+                    </div>
+                    <div class="composer" style="max-width: 700px; margin: 0 auto 20px;">
+                        <div class="cmt-form" style="display: flex; flex-direction: column; gap: 10px;">
+                            <input type="text" id="comment-name" class="cmt-name" placeholder="Tên của bạn..." maxlength="30" style="width: 100%;">
+                            <textarea id="comment-content" class="cmt-text" placeholder="Nhập lời chúc của bạn..." maxlength="300" style="width: 100%; min-height: 80px;"></textarea>
+                            <button onclick="postComment()" class="primary-btn" style="margin-top: 0; align-self: flex-end;">Gửi lời chúc</button>
+                        </div>
+                    </div>
+                    <div id="comments-container" class="chat-list" style="max-width: 700px; margin: 0 auto; max-height: none;"></div>
+                </div>
             </section>
         </main>
 
         <footer>
-            <p>&copy; 2026 - 12A1 K59. All rights reserved.</p>
+            <span class="footer-logo">12A1 - K59</span>
+            <span>&copy; 2026. All rights reserved.</span>
         </footer>
     </div>
 
     <!-- Modal Đăng nhập Admin -->
-    <div id="admin-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="toggleAdminModal()">&times;</span>
+    <div id="admin-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
             <h3>Đăng nhập Quản trị viên</h3>
-            <input type="text" id="admin-user" placeholder="Tài khoản">
-            <input type="password" id="admin-pass" placeholder="Mật khẩu">
-            <button onclick="handleAdminLogin()">Đăng nhập</button>
+            <div class="form-group">
+                <label>Tài khoản</label>
+                <input type="text" id="admin-user" placeholder="Nhập tài khoản...">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="admin-pass" placeholder="Nhập mật khẩu...">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="toggleAdminModal()">Hủy</button>
+                <button class="btn-submit" onclick="handleAdminLogin()">Đăng nhập</button>
+            </div>
         </div>
     </div>
 
@@ -90,7 +125,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <!-- Tệp Logic chính -->
     <script src="script.js"></script>
 </body>
 </html>
