@@ -376,15 +376,29 @@ window.fbOnSnapshot = onSnapshot;
 window.db = db;
 window.firebaseReady = true;
 
-// Xuất các hàm xác thực ra window để script_2.js dùng được
-window.fbSignIn = signInWithEmailAndPassword;
-window.fbSignOut = signOut;
-window.fbAuth = auth;
+window.allowAdminSession = false;
+signOut(auth).catch(() => {});
+window.fbSignIn = async (authInstance, email, password) => {
+    window.allowAdminSession = true;
+    return await signInWithEmailAndPassword(authInstance, email, password);
+};
 
-// Lắng nghe trạng thái đăng nhập
+window.fbSignOut = async (authInstance) => {
+    window.allowAdminSession = false;
+    return await signOut(authInstance);
+};
+
+window.fbAuth = auth;
 onAuthStateChanged(auth, (user) => {
+    const isValidAdmin = Boolean(
+        window.allowAdminSession && 
+        user && 
+        !user.isAnonymous && 
+        user.email
+    );
+
     if (typeof window.setAdminState === 'function') {
-        window.setAdminState(!!user);
+        window.setAdminState(isValidAdmin);
     }
 });
 </script>
