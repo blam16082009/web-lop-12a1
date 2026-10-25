@@ -1721,6 +1721,7 @@ function renderSpecialEvents() {
         feed.appendChild(card);
     });
 }
+
 function openAddEventVideoModal() {
     showModal(`
         <h3>🎉 Đăng sự kiện / Video</h3>
@@ -1733,10 +1734,6 @@ function openAddEventVideoModal() {
             <input type="date" id="se-date">
         </div>
         <div class="form-group">
-            <label>Ảnh Thumbnail (Bắt buộc - Hiển thị to ở ngoài)</label>
-            <input type="file" id="se-thumbnail" accept="image/*">
-        </div>
-        <div class="form-group">
             <label>Loại nội dung:</label>
             <select id="se-media-type" onchange="toggleEventMediaType(this.value)">
                 <option value="image">Tải lên ảnh (Mở to khi bấm vào)</option>
@@ -1744,13 +1741,20 @@ function openAddEventVideoModal() {
                 <option value="video">Tải lên video (Mở trình phát khi bấm)</option>
             </select>
         </div>
+        <div class="form-group hidden" id="se-link-group">
+            <label>Link YouTube</label>
+            <input type="url" id="se-video-link" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
         <div class="form-group" id="se-file-group">
             <label>Chọn tệp (Ảnh hoặc Video)</label>
             <input type="file" id="se-file" accept="image/*,video/*">
         </div>
-        <div class="form-group hidden" id="se-link-group">
-            <label>Link YouTube</label>
-            <input type="url" id="se-video-link" placeholder="https://www.youtube.com/watch?v=...">
+        <div class="form-group" id="se-thumb-group">
+            <label id="lbl-thumbnail">Ảnh Thumbnail (Bắt buộc để hiển thị to ở ngoài)</label>
+            <input type="file" id="se-thumbnail" accept="image/*">
+            <p id="yt-thumb-note" class="hidden" style="font-size:11px;color:var(--muted);margin-top:4px;">
+                * Không cần chọn ảnh nếu muốn tự động lấy Thumbnail từ link YouTube.
+            </p>
         </div>
         <div class="form-group">
             <label>Lời chúc / Mô tả sự kiện</label>
@@ -1773,9 +1777,13 @@ function toggleEventMediaType(type) {
     if (type === 'youtube') {
         document.getElementById('se-file-group').classList.add('hidden');
         document.getElementById('se-link-group').classList.remove('hidden');
+        document.getElementById('lbl-thumbnail').textContent = 'Ảnh Thumbnail (Tùy chọn)';
+        document.getElementById('yt-thumb-note').classList.remove('hidden');
     } else {
         document.getElementById('se-file-group').classList.remove('hidden');
         document.getElementById('se-link-group').classList.add('hidden');
+        document.getElementById('lbl-thumbnail').textContent = 'Ảnh Thumbnail (Bắt buộc để hiển thị to ở ngoài)';
+        document.getElementById('yt-thumb-note').classList.add('hidden');
     }
 }
 
@@ -1789,7 +1797,19 @@ async function submitSpecialEvent() {
     const videoLink = document.getElementById('se-video-link').value.trim();
 
     if (!title) return alert("Vui lòng nhập tên sự kiện!");
-    if (!thumbFile) return alert("Vui lòng chọn ảnh Thumbnail!");
+    
+    let ytId = null;
+    // Kiểm tra và lấy ID video YouTube
+    if (mediaType === 'youtube') {
+        if (!videoLink) return alert("Vui lòng nhập link YouTube!");
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = videoLink.match(regExp);
+        ytId = (match && match[2].length === 11) ? match[2] : null;
+        if (!ytId) return alert("Link YouTube không hợp lệ! Vui lòng kiểm tra lại đường dẫn.");
+    } else {
+        // Nếu không phải Youtube thì buộc phải up Thumbnail
+        if (!thumbFile) return alert("Vui lòng chọn ảnh Thumbnail!");
+    }
 
     const progressContainer = document.getElementById('se-progress-container');
     const progressBar = document.getElementById('se-progress-bar');
@@ -1800,10 +1820,18 @@ async function submitSpecialEvent() {
     if (modalActions) modalActions.style.display = 'none';
 
     try {
-        if(progressText) progressText.textContent = "Đang tải ảnh Thumbnail...";
-        const thumbUrl = await uploadToCloudinaryWithProgress(thumbFile, (percent) => {
-            if (progressBar) progressBar.style.width = percent + '%';
-        });
+        let thumbUrl = "";
+        
+        // Nếu có up ảnh thumbnail thủ công thì ưu tiên dùng ảnh đó
+        if (thumbFile) {
+            if(progressText) progressText.textContent = "Đang tải ảnh Thumbnail...";
+            thumbUrl = await uploadToCloudinaryWithProgress(thumbFile, (percent) => {
+                if (progressBar) progressBar.style.width = percent + '%';
+            });
+        } else if (mediaType === 'youtube') {
+            // Nếu không up ảnh và là Youtube, lấy ảnh tự động
+            thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        }
 
         let contentUrl = "";
         let finalMediaType = mediaType;
@@ -1812,6 +1840,7 @@ async function submitSpecialEvent() {
             contentUrl = videoLink;
         } else if (contentFile) {
             if(progressText) progressText.textContent = "Đang tải nội dung...";
+            if (progressBar) progressBar.style.width = '0%'; // Reset bar cho content
             contentUrl = await uploadToCloudinaryWithProgress(contentFile, (percent) => {
                 if (progressBar) progressBar.style.width = percent + '%';
             });
