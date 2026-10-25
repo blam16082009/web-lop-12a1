@@ -7,429 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-.event-post-card img {
-    transition: transform 0.3s ease;
-}
-.event-post-card div:hover img {
-    transform: scale(1.02);
-}
-/* Hiệu ứng cuộn mượt mà */
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-}
-.reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-/* TRANG SỰ KIỆN VIDEO */
-.event-post-card {
-    background: var(--card2);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: var(--shadow);
-    position: relative;
-}
-.event-post-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-.event-post-title {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--deep);
-}
-.event-post-date {
-    font-size: 12px;
-    color: var(--muted);
-}
-.event-video-container {
-    width: 100%;
-    border-radius: 14px;
-    overflow: hidden;
-    background: #000;
-    margin: 15px 0;
-    max-height: 520px;
-}
-.event-video-container video, .event-video-container iframe {
-    width: 100%;
-    max-height: 520px;
-    display: block;
-    aspect-ratio: 16/9;
-}
-.event-post-desc {
-    font-size: 14px;
-    color: var(--text);
-    line-height: 1.6;
-    white-space: pre-wrap;
-}
-/* Thu gọn cột Gmail ở bảng Thành viên (cột thứ 7) */
-#members-page table th:nth-child(7), #members-page table td:nth-child(7) {
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Thu gọn cột Gmail ở bảng Thầy cô (cột thứ 8) */
-#teachers-page table th:nth-child(8), #teachers-page table td:nth-child(8) {
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Hiệu ứng làm mờ Gmail */
-.teacher-gmail-blur, .gmail-blur {
-    filter: blur(5px);
-    user-select: none;
-    transition: .2s;
-}
-body.admin-mode .teacher-gmail-blur, 
-body.admin-mode .gmail-blur {
-    filter: none;
-    user-select: auto;
-}
-/* Giới hạn chiều rộng tối đa và cho phép thu gọn cột Gmail */
-table th:nth-child(7), table td:nth-child(7) {
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-:root{color-scheme:dark;--blue:#8dbaf5;--purple:#a99af4;--deep:#b8adff;--text:#ecebf7;--muted:#8c8fab;--bg:#0e0e11;--card:#111114;--card2:#17171c;--line:#2a2a36;--chip:#25233b;--shadow:0 12px 35px rgba(0,0,0,.45);--danger:#ff6b6b;--success:#51cf66;--fb-color:#1877f2;--heart:#ff4d6d}
-/* Chế độ Sáng */
-body.light-mode {
-    --bg: #f4f6f9;
-    --card: #ffffff;
-    --card2: #ffffff;
-    --text: #333333;
-    --muted: #666666;
-    --line: #e0e0e0;
-    --chip: #eef1f6;
-    --deep: #4a3b86;
-    --blue: #1877f2;
-    --purple: #7a5cc7;
-    --shadow: 0 8px 25px rgba(0,0,0,0.08);
-    --heart: #ff4d6d;
-}
-body.light-mode .navbar { background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid var(--line); }
-body.light-mode .modal-card { background: #fff; color: #333; }
-body.light-mode .form-group input, body.light-mode .form-group select, body.light-mode .form-group textarea { background: #f9f9f9; color: #333; border-color: #ccc; }
-body.light-mode .post-card, body.light-mode .composer, body.light-mode .countdown-card { background: #fff; }
-body.light-mode .sidebar { background: #fff; border-color: #e0e0e0; }
-body.light-mode .cmt-bubble { background: #f0f2f5; color: #333; }
-body.light-mode .tkb-table td { background: #fff; color: #333; }
-body.light-mode .tkb-table th { background: #eef1f6; color: var(--purple); }
-body.light-mode footer { background: rgba(255, 255, 255, 0.96); color: #666; }
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Be Vietnam Pro',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding-bottom:52px}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-
-/* NAVBAR */
-.navbar{position:sticky;top:0;z-index:100;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:15px;padding:14px 5%;background:rgba(13,13,16,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-@media(max-width:900px){.navbar{grid-template-columns:1fr;justify-items:center;gap:10px}}
-.logo{color:var(--deep);font-size:22px;font-weight:800;text-decoration:none;white-space:nowrap;justify-self:start}
-@media(max-width:900px){.logo{justify-self:center}}
-.nav-right{display:flex;align-items:center;gap:10px;justify-self:end}
-@media(max-width:900px){.nav-right{justify-self:center}}
-.navbar nav{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-.nav-link{border:none;background:transparent;color:var(--muted);border-radius:12px;padding:8px 15px;font-weight:600;font-size:14px;transition:.2s}
-.nav-link:hover,.nav-link.active{background:var(--chip);color:var(--deep)}
-.admin-btn{border:1px dashed var(--purple);background:#1f1b33;color:var(--deep);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;transition:.2s;display:flex;align-items:center;gap:6px}
-.admin-btn:hover{background:var(--purple);color:#fff}
-.admin-btn.logged-in{background:#0f2a22;border-color:var(--success);color:#38d9a9}
-
-/* LAYOUT */
-.layout{max-width:100%;margin:0 auto;padding:24px 3%}
-.page{animation:appear .35s ease}
-.hidden{display:none!important}
-@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-/* TRANG CHỦ & COUNTDOWN SIDEBAR */
-.home-grid {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 24px;
-    width: 100%;
-}
-
-.feed-wrap {
-    flex: 1;
-    max-width: 1200px;
-}
-
-.sidebar {
-    width: 380px;
-    flex-shrink: 0;
-    margin-right: 40px;
-    position: sticky;
-    top: 85px;
-    max-height: calc(100vh - 105px);
-    overflow-y: auto;
-    padding: 18px;
-    border: 1px solid #2e2b45;
-    border-radius: 22px;
-    background: linear-gradient(160deg,#1c1b2c,#231f36);
-    scrollbar-width: thin;
-    margin-top: 0;
-}
-
-@media(max-width: 950px) {
-    .home-grid { flex-direction: column; align-items: center; }
-    .feed-wrap { max-width: 100%; width: 100%; }
-    .sidebar { width: 100%; max-width: 760px; position: static; margin-right: 0; }
-}
-.feed-title{font-size:22px;margin-bottom:16px;text-align:center}
-.composer{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:18px}
-.composer-top{display:flex;gap:12px}
-.composer textarea{flex:1;min-height:70px;resize:vertical;background:#0f0f12;border:1px solid var(--line);border-radius:12px;color:var(--text);padding:10px 12px;outline:none}
-.composer-actions{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px;flex-wrap:wrap}
-.photo-pick{cursor:pointer;color:var(--deep);font-weight:700;font-size:13px;padding:8px 14px;border-radius:10px;background:var(--chip)}
-.post-preview{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.post-preview img{width:60px;height:60px;border-radius:8px;object-fit:cover}
-.avatar-circle{width:42px;height:42px;border-radius:50%;background:linear-gradient(120deg,var(--blue),var(--purple));color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800;flex-shrink:0}
-.post-card{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:18px;box-shadow:var(--shadow)}
-.post-head{display:flex;align-items:center;gap:10px}
-.post-time{font-size:12px;color:var(--muted)}
-.post-del{margin-left:auto;border:none;background:none;font-size:16px}
-.post-text{margin-top:12px;white-space:pre-wrap;word-break:break-word;font-size:15px}
-.post-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:12px;border-radius:12px;overflow:hidden}
-.post-grid.n1{grid-template-columns:1fr}
-.post-grid.n3 .pg-cell:first-child{grid-column:1/-1}
-.pg-cell{position:relative;cursor:zoom-in;background:#16202a;overflow:hidden}
-.pg-cell img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:1/1}
-.post-grid.n1 .pg-cell img{aspect-ratio:auto;max-height:520px}
-.post-grid.n3 .pg-cell:first-child img{aspect-ratio:2/1}
-.pg-more{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;color:#fff}
-.post-stats{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-top:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.post-actions{display:flex;gap:6px;padding:6px 0;border-bottom:1px solid var(--line)}
-.post-actions button{flex:1;border:none;background:transparent;color:var(--muted);padding:8px;border-radius:8px;font-weight:700;transition:.2s;display:flex;align-items:center;justify-content:center;gap:6px}
-.post-actions button:hover{background:#1f1f28}
-.post-actions button.on{color:var(--heart)}
-.heart-icon{display:inline-block;transition:transform .25s}
-.post-actions button.on .heart-icon{animation:heartPop .4s ease}
-@keyframes heartPop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
-
-/* SIDEBAR COUNTDOWN */
-.sidebar{position:sticky;top:85px;max-height:calc(100vh - 105px);overflow-y:auto;padding:18px;border:1px solid #2e2b45;border-radius:22px;background:linear-gradient(160deg,#1c1b2c,#231f36);scrollbar-width:thin}
-.sidebar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.sidebar-heading h2{font-size:18px;margin-top:5px;color:var(--text)}
-.sidebar-heading p{color:var(--muted);font-size:11px}
-.countdown-grid{display:flex;flex-direction:column;gap:12px}
-.countdown-card{position:relative;padding:15px;border:1px solid #2b2a3c;border-radius:16px;background:#111115;box-shadow:0 4px 15px rgba(0,0,0,.3);transition:.2s}
-.countdown-card:hover{transform:translateY(-2px);border-color:#5b50a8}
-.event-icon{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#2a2545;font-size:18px;margin-bottom:8px}
-.countdown-card h3{font-size:14px;color:var(--text);margin-bottom:2px}
-.event-date{color:var(--muted);font-size:11px}
-.countdown-time{display:flex;gap:4px;margin-top:10px}
-.time-box{flex:1;padding:6px 1px;border-radius:8px;background:#23223a;text-align:center}
-.time-box strong{display:block;color:var(--deep);font-size:15px}
-.time-box span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase}
-.event-status{margin-top:8px;color:var(--deep);font-size:11px;font-weight:700}
-.btn-delete-item{position:absolute;top:10px;right:10px;z-index:2;background:#3a1f25;color:#ff8787;border:none;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:bold;display:none;align-items:center;justify-content:center;cursor:pointer}
-body.admin-mode .btn-delete-item{display:flex}
-
-/* COMMENT */
-.cmt-list{margin-top:10px;display:flex;flex-direction:column;gap:10px}
-.cmt{display:flex;gap:8px}
-.cmt-avatar{width:30px;height:30px;border-radius:50%;background:var(--chip);color:var(--deep);display:grid;place-items:center;font-weight:700;font-size:13px;flex-shrink:0}
-.cmt-bubble{background:#23232c;border-radius:14px;padding:6px 12px;font-size:13px}
-.cmt-bubble strong{color:var(--deep)}
-.cmt-bubble strong.is-admin{color:#38d9a9}
-.cmt-bubble p{word-break:break-word}
-.cmt-meta{font-size:11px;color:var(--muted);margin:2px 0 0 10px}
-.cmt-del{border:none;background:none;color:var(--danger);font-size:11px;margin-left:8px}
-.cmt-form{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
-.cmt-form input{min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:20px;background:#0f0f12;color:var(--text);outline:none;font-size:13px}
-.cmt-form input.cmt-name{width:130px}
-.cmt-form input.cmt-text{flex:1;min-width:140px}
-.cmt-form button{border:none;border-radius:20px;background:var(--purple);color:#fff;padding:0 16px;font-weight:700}
-
-/* TRANG CON */
-.full-page-card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;width:100%;max-width:1100px;margin:0 auto}
-.members-hero,.teachers-hero,.schedule-hero,.achieve-hero{padding:45px 5% 30px;background:linear-gradient(130deg,#1b1a2b,#221f38);text-align:center}
-.members-hero h1,.teachers-hero h1,.schedule-hero h1,.achieve-hero h1{margin:15px 0;font-size:clamp(24px,3vw,38px);line-height:1.3}
-.members-hero h1 span,.teachers-hero h1 span,.schedule-hero h1 span,.achieve-hero h1 span{color:var(--purple)}
-.members-hero>p,.teachers-hero>p,.schedule-hero>p,.achieve-hero>p{color:var(--muted);font-size:14px}
-.tag{display:inline-block;padding:6px 12px;border-radius:30px;background:var(--chip);color:var(--deep);font-size:11px;font-weight:800;letter-spacing:.8px}
-.primary-btn{margin-top:20px;padding:12px 22px;border:none;border-radius:12px;background:linear-gradient(120deg,var(--blue),var(--purple));color:#fff;font-weight:700;box-shadow:0 8px 20px rgba(155,158,234,.25);transition:.2s}
-.primary-btn:hover{transform:translateY(-2px)}
-.member-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:25px 5% 15px;flex-wrap:wrap}
-.member-toolbar input{width:min(100%,350px);padding:10px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card2);color:var(--text);outline:none}
-.table-wrap{overflow-x:auto;margin:0 5% 20px;border:1px solid var(--line);border-radius:15px}
-table{width:100%;border-collapse:collapse;text-align:left}
-thead{background:#1e1c33;color:var(--deep)}
-th,td{padding:14px 18px;border-bottom:1px solid #24242e;white-space:nowrap}
-th{font-size:13px}
-td{font-size:14px}
-tbody tr:hover{background:#1a1a22}
-tbody tr.bday-row{background:linear-gradient(90deg,rgba(169,154,244,.18),rgba(169,154,244,.05));border-left:4px solid var(--purple);animation:bdayPulse 2s infinite}
-@keyframes bdayPulse{0%,100%{box-shadow:inset 0 0 0 rgba(169,154,244,0)}50%{box-shadow:inset 0 0 30px rgba(169,154,244,.15)}}
-.bday-badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;background:var(--purple);color:#fff;font-size:10px;font-weight:800}
-.bday-wish-btn{border:none;background:var(--purple);color:#fff;border-radius:10px;padding:5px 10px;font-size:11px;font-weight:700;margin-left:8px}
-.privacy-note{margin:15px 5% 30px;color:var(--muted);font-size:12px;text-align:center}
-.mini-btn{border:none;background:var(--chip);color:var(--deep);padding:4px 10px;border-radius:6px}
-.mini-btn.danger{background:#3a1f25;color:#ff8787}
-.mini-btn+.mini-btn{margin-left:6px}
-.phone-blur{filter:blur(5px);user-select:none;transition:.2s}
-.gmail-blur{filter:blur(5px);user-select:none;transition:.2s}
-body.admin-mode .gmail-blur{filter:none;user-select:auto}
-body.admin-mode .phone-blur{filter:none;user-select:auto}
-
-/* THỜI KHÓA BIỂU LƯỚI */
-.tkb-container{overflow-x:auto;padding:20px 5%; border-top:1px solid var(--line);}
-.tkb-table{width:100%;border-collapse:collapse;min-width:800px;table-layout:fixed}
-.tkb-table th,.tkb-table td{border:1px solid var(--line);text-align:center;padding:10px 5px;vertical-align:middle}
-.tkb-table th{background:#1e1c33;color:var(--deep);font-weight:700;font-size:13px}
-.tkb-table td{background:var(--card2);height:50px;font-size:14px;font-weight:600;color:var(--text);transition:.2s;cursor:pointer}
-.tkb-table td:hover{background:#25233b}
-.tkb-table td.empty-slot:hover{background:#1f1f28;}
-.tkb-table td.empty-slot:hover::after{content:"+ Thêm"; color:var(--deep); font-size:12px; font-weight:500;}
-.tkb-side{width:80px;font-weight:800;color:var(--blue);font-size:13px;background:#15151a!important;text-align:center;padding:10px 5px!important}
-.tkb-side-row{height:30px;background:#111!important;color:var(--muted)!important;font-size:11px!important;letter-spacing:1px;font-weight:800;cursor:default!important}
-
-/* THÀNH TÍCH */
-.achieve-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:25px 5% 15px;flex-wrap:wrap}
-.achieve-grid{display:flex;flex-wrap:wrap;gap:20px;padding:0 5% 30px;justify-content:center}
-.achieve-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,.25);transition:.3s;width:260px;display:flex;flex-direction:column;align-items:center;padding:25px 15px;position:relative;border:4px solid #e2e8f0;background:linear-gradient(180deg, #eaf4ff 0%, #fff 40%)}
-.achieve-card:hover{transform:translateY(-5px);box-shadow:0 12px 30px rgba(141,186,245,.3)}
-.achieve-badge{font-size:24px;margin-bottom:5px}
-.achieve-title-top{color:#1e3a8a;font-weight:800;text-transform:uppercase;font-size:12px;text-align:center;margin-bottom:2px}
-.achieve-title-sub{color:#d97706;font-weight:600;font-size:11px;text-align:center;margin-bottom:15px;font-style:italic}
-.achieve-photo{width:110px;height:110px;border-radius:50%;object-fit:cover;border:4px solid #fbbf24;box-shadow:0 4px 10px rgba(0,0,0,.15);margin-bottom:12px;background:#cbd5e1}
-.achieve-card h3{font-size:15px;color:#1e293b;text-align:center;margin-bottom:2px;font-weight:700;line-height:1.3}
-.achieve-desc{font-size:13px;color:#b45309;font-weight:700;text-align:center;margin-bottom:12px;line-height:1.4}
-.achieve-footer{background:#e0f2fe;width:100%;border-radius:10px;padding:8px 10px;font-size:11px;color:#0369a1;display:flex;flex-direction:column;gap:4px}
-.achieve-footer span{display:flex;align-items:center;gap:6px}
-.achieve-admin-btns{position:absolute;top:10px;right:10px;display:flex;gap:5px;opacity:0;transition:.2s}
-.achieve-card:hover .achieve-admin-btns{opacity:1}
-.achieve-admin-btns button{background:rgba(255,255,255,.9);border:1px solid #ccc;color:#333;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer}
-.achieve-admin-btns button:hover{background:#ff6b6b;color:#fff;border-color:#ff6b6b}
-.empty-achieve{grid-column:1/-1;text-align:center;color:var(--muted);padding:30px 10px;font-size:14px;width:100%}
-
-/* KỶ NIỆM */
-.folders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;padding:25px 5%}
-.folder-card{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:center;cursor:pointer;transition:.2s;position:relative}
-.folder-card:hover{transform:translateY(-4px);border-color:var(--purple);background:#1c1c22}
-.folder-icon{font-size:40px;margin-bottom:10px;display:block}
-.folder-title{font-size:15px;font-weight:700;color:var(--text)}
-.folder-count{font-size:12px;color:var(--muted);margin-top:5px}
-.folder-del{position:absolute;top:10px;right:10px;background:rgba(255,107,107,.2);color:var(--danger);border:none;width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;display:none}
-body.admin-mode .folder-del{display:block}
-.folder-del:hover{background:var(--danger);color:#fff}
-.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:15px;padding:20px 5%}
-.media-item{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:1/1}
-.media-item img,.media-item video{width:100%;height:100%;object-fit:cover;cursor:zoom-in;display:block}
-.media-del{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.6);color:#fff;border:none;width:26px;height:26px;border-radius:50%;font-size:14px;cursor:pointer;display:none;z-index:2}
-body.admin-mode .media-del{display:flex;align-items:center;justify-content:center}
-.media-del:hover{background:var(--danger)}
-.folder-header-bar{display:flex;justify-content:space-between;align-items:center;padding:20px 5% 0;flex-wrap:wrap;gap:10px}
-.btn-back{background:none;border:none;color:var(--deep);font-weight:700;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:5px}
-.btn-back:hover{text-decoration:underline}
-
-/* MODAL & OTHERS */
-.admin-only{display:none!important}
-body.admin-mode .admin-only{display:inline-flex!important}
-body.admin-mode div.admin-only{display:block!important}
-body.admin-mode td.admin-only,body.admin-mode th.admin-only{display:table-cell!important}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-card{background:var(--card2);border:1px solid var(--line);padding:25px;border-radius:20px;width:min(100%,440px);max-height:90vh;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:appear .25s ease}
-.modal-card h3{margin-bottom:15px;color:var(--deep)}
-.form-group{margin-bottom:15px}
-.form-group label{display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--muted)}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#0f0f12;color:var(--text);outline:none}
-.form-group textarea{min-height:70px;resize:vertical}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--purple)}
-.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
-.btn-cancel{background:#2a2a33;color:var(--text);border:none;padding:9px 16px;border-radius:10px;font-weight:600}
-.btn-submit{background:var(--purple);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-weight:700}
-
-.lightbox{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px}
-.lightbox img{max-width:min(96vw,1100px);max-height:80vh;object-fit:contain;border-radius:8px}
-.lb-btn{position:absolute;background:rgba(255,255,255,.14);border:none;color:#fff;width:44px;height:44px;border-radius:50%;font-size:24px}
-.lb-btn:hover{background:rgba(255,255,255,.28)}
-.lb-close{top:16px;right:16px}
-.lb-prev{left:16px;top:50%;transform:translateY(-50%)}
-.lb-next{right:16px;top:50%;transform:translateY(-50%)}
-.lb-cap{color:#ddd;margin-top:12px;font-size:13px;text-align:center;max-width:700px}
-
-footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 15px;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;background:rgba(13,13,15,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);color:var(--muted);font-size:12px}
-.footer-logo{color:var(--deep);font-size:15px;font-weight:800}
-.fb-contact-btn{position:fixed;right:20px;bottom:64px;z-index:200;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:30px;background:var(--fb-color);color:#fff;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 6px 20px rgba(24,119,242,.35);transition:.2s}
-.fb-contact-btn:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(24,119,242,.45)}
-@media(max-width:600px){.footer-tagline{display:none}.fb-contact-btn span{display:none}.fb-contact-btn{padding:12px;border-radius:50%}}
-
-.chat-list{max-height:260px;overflow-y:auto;margin-bottom:14px;display:flex;flex-direction:column;gap:8px}
-.chat-msg{background:#0f0f12;border:1px solid var(--line);border-radius:12px;padding:8px 12px}
-.chat-name{font-size:12px;font-weight:700;color:var(--deep);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.chat-name span{color:var(--muted);font-weight:400}
-.chat-del{margin-left:auto;border:none;background:none;color:var(--danger)}
-.chat-text{font-size:14px;margin-top:2px;word-break:break-word}
-.chat-empty{color:var(--muted);font-size:13px;text-align:center;padding:16px 0}
-.chat-send{display:flex;gap:8px;flex-wrap:wrap}
-.chat-send input{flex:1;min-width:120px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#0f0f12;color:var(--text);outline:none}
-.birthday-banner{padding:12px 5%;background:linear-gradient(120deg,#4a3b86,#7a5cc7);color:#fff;font-size:14px;text-align:center;border-radius:16px;margin:0 0 16px}
-.banner-btn{margin-left:10px;border:none;border-radius:20px;padding:5px 14px;background:#fff;color:#4a3b86;font-weight:700;font-size:12px}
-
-.heart-stage{position:relative;height:420px;overflow:hidden;border:1px solid #2e2b45;border-radius:20px;background:linear-gradient(180deg,#1a1630,#2a2046);margin:0 5% 25px}
-.heart-bubble{position:absolute;bottom:-140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.5),rgba(255,77,109,.45) 45%,rgba(169,154,244,.25));box-shadow:inset 0 0 18px rgba(255,255,255,.18),0 6px 20px rgba(0,0,0,.35);color:#fff;font-weight:700;animation:heartFloat var(--dur,12s) linear infinite;animation-delay:var(--delay,0s);transition:transform .25s,filter .25s;cursor:pointer}
-.heart-bubble:hover{animation-play-state:paused;filter:brightness(1.35);transform:scale(1.18);z-index:5}
-.heart-bubble img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.6)}
-.heart-emoji{font-size:26px}
-.heart-name{font-size:12px;line-height:1.2;max-width:100%;text-shadow:0 1px 3px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@keyframes heartFloat{0%{transform:translate(0,0)}25%{transform:translate(16px,-140px)}50%{transform:translate(-14px,-290px)}75%{transform:translate(14px,-440px)}100%{transform:translate(0,-600px)}}
-.wish-photo{display:block;width:150px;height:150px;margin:0 auto;border-radius:50%;object-fit:cover;border:4px solid var(--purple);box-shadow:0 0 30px rgba(169,154,244,.4)}
-.wish-photo-empty{display:flex;align-items:center;justify-content:center;font-size:60px;background:var(--chip)}
-.wish-text{color:var(--text);font-size:15px;line-height:1.7}
-/* Thêm đoạn này vào để web mượt hơn */
-body {
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-}
-
-.post-card, .folder-card, .achieve-card, .countdown-card, .heart-bubble {
-    will-change: transform;
-    transform: translateZ(0);
-}
-/* Giao diện thanh tiến trình tải lên */
-.upload-progress-container {
-    width: 100%;
-    background: #2a2a36;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 15px;
-    display: none;
-}
-.upload-progress-bar {
-    width: 0%;
-    height: 12px;
-    background: linear-gradient(90deg, var(--blue), var(--purple));
-    transition: width 0.1s ease;
-}
-.upload-progress-text {
-    text-align: center;
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="navbar">
     <div style="display:flex; align-items:center; gap:10px; justify-self:start;">
         <a href="#" class="logo" onclick="showPage('home'); return false;"><span>✿</span> TRANG CHỦ</a>
-        
-        <!-- Nút Admin (dấu chấm) - Nằm cạnh chữ TRANG CHỦ -->
         <button class="admin-btn" id="admin-toggle-btn" onclick="openAdminModal()" style="background:transparent; border:none; color:var(--muted); opacity:0.3; padding:5px;" title="System">·</button>
     </div>
     
@@ -450,7 +34,6 @@ body {
         <button class="admin-btn admin-only" onclick="downloadClassBackup()" style="padding:7px 10px;" title="Tải bản sao lưu">⬇ Backup</button>
         <button class="admin-btn admin-only" onclick="triggerBackupRestore()" style="padding:7px 10px;" title="Khôi phục từ file sao lưu">⬆ Khôi phục</button>
         <input type="file" id="class-backup-file" accept="application/json,.json" style="display:none" onchange="handleBackupFile(event)">
-        
         <button class="admin-btn admin-only" onclick="openSettingsModal()" style="padding:7px 10px; background:var(--chip); color:var(--deep); border:none;" title="Cài đặt hệ thống">⚙️ Cài đặt</button>
     </div>
 </header>
@@ -460,14 +43,13 @@ body {
     <!-- TRANG CHỦ -->
     <section id="home-page" class="page">
         <div class="home-grid">
-            <!-- BẢNG TIN -->
             <div class="feed-wrap">
                 <div id="birthday-banner" class="birthday-banner hidden"></div>
                 <h1 class="feed-title">📰 Bảng tin lớp 12A1</h1>
                 <div class="composer admin-only">
                     <div class="composer-top">
                         <div class="avatar-circle">12A1</div>
-                        <textarea id="post-text" placeholder="Bạn đang nghĩ gì về lớp mình?"></textarea>
+                        <textarea id="post-text" placeholder="Bạn đang nghĩ gì về lớp mình?" maxlength="3000"></textarea>
                     </div>
                     <div id="post-preview" class="post-preview"></div>
                     <div class="composer-actions">
@@ -478,9 +60,8 @@ body {
                 <div id="post-feed"></div>
             </div>
 
-                        <!-- CỘT PHẢI: ĐẾM NGƯỢC & CHAT -->
+            <!-- CỘT PHẢI: ĐẾM NGƯỢC -->
             <aside class="sidebar">
-                <!-- Phần đếm ngược cũ -->
                 <div class="sidebar-header">
                     <div class="sidebar-heading">
                         <span class="tag">COUNTDOWN</span>
@@ -490,7 +71,6 @@ body {
                     <button class="primary-btn admin-only" style="padding:5px 10px;font-size:11px;margin:0;" onclick="openAddEventModal()">+ Thêm</button>
                 </div>
                 <div id="countdown-list" class="countdown-grid"></div>
-                
             </aside>
         </div>
     </section>
@@ -507,9 +87,6 @@ body {
                 <input id="search-member" type="search" placeholder="🔎 Tìm theo tên thành viên...">
                 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                     <span id="member-count">0 thành viên</span>
-                    <!-- Thêm nút này vào đây -->
-                    <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;background:var(--success);" onclick="importDefaultMembers()">📥 Nhập nhanh 45 thành viên</button>
-                    
                     <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;" onclick="openAddMemberModal()">+ Thêm thành viên</button>
                 </div>
             </div>
@@ -533,7 +110,8 @@ body {
             <p class="privacy-note">♡ Hãy xin phép các bạn trước khi chia sẻ thông tin cá nhân.</p>
         </div>
     </section>
-        <!-- TRANG SỰ KIỆN -->
+
+    <!-- TRANG SỰ KIỆN -->
     <section id="events-page" class="page hidden">
         <div class="full-page-card">
             <div class="achieve-hero">
@@ -542,32 +120,25 @@ body {
                 <p>Trình chiếu video, hình ảnh mừng các ngày lễ đặc biệt (20/10, 20/11, Tri ân,...)</p>
                 <button class="primary-btn admin-only" style="margin-top:15px;" onclick="openAddEventVideoModal()">+ Thêm sự kiện / Video</button>
             </div>
-
-            <!-- Danh sách bài trình chiếu sự kiện -->
-            <div id="events-feed" style="padding: 25px 5%; display: flex; flex-direction: column; gap: 30px;">
-                <!-- Video & nội dung sự kiện sẽ tự động render ở đây -->
-            </div>
+            <div id="events-feed" style="padding: 25px 5%; display: flex; flex-direction: column; gap: 30px;"></div>
         </div>
     </section>
+
     <!-- THẦY CÔ -->
-<section id="teachers-page" class="page hidden">
-    <div class="full-page-card">
-        <div class="teachers-hero">
-            <span class="tag">OUR TEACHERS</span>
-            <h1>Thầy cô <span>của lớp mình</span></h1>
-            <p>Những người lái đò thầm lặng dẫn dắt chúng ta đến bến bờ thành công.</p>
-        </div>
-        <div class="member-toolbar">
-            <input id="search-teacher" type="search" placeholder="🔎 Tìm theo tên thầy cô...">
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                <span id="teacher-count">0 thầy cô</span>
-                
-                <!-- Thêm nút Nhập nhanh thầy cô ở đây -->
-                <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;background:var(--success);" onclick="importDefaultTeachers()">📥 Nhập nhanh thầy cô</button>
-                
-                <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;" onclick="openAddTeacherModal()">+ Thêm thầy cô</button>
+    <section id="teachers-page" class="page hidden">
+        <div class="full-page-card">
+            <div class="teachers-hero">
+                <span class="tag">OUR TEACHERS</span>
+                <h1>Thầy cô <span>của lớp mình</span></h1>
+                <p>Những người lái đò thầm lặng dẫn dắt chúng ta đến bến bờ thành công.</p>
             </div>
-        </div>
+            <div class="member-toolbar">
+                <input id="search-teacher" type="search" placeholder="🔎 Tìm theo tên thầy cô...">
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <span id="teacher-count">0 thầy cô</span>
+                    <button class="primary-btn admin-only" style="margin:0;padding:8px 14px;font-size:12px;" onclick="openAddTeacherModal()">+ Thêm thầy cô</button>
+                </div>
+            </div>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -591,49 +162,47 @@ body {
     </section>
         
     <!-- ĐỒNG HỒ -->
-<section id="clock-page" class="page hidden">
-    <div class="full-page-card">
-        <div class="achieve-hero">
-            <span class="tag">TIMER</span>
-            <h1>Hẹn giờ <span>đếm ngược</span></h1>
-            <p>Nhập Giờ / Phút / Giây — hết giờ sẽ có chuông báo.</p>
-        </div>
+    <section id="clock-page" class="page hidden">
+        <div class="full-page-card">
+            <div class="achieve-hero">
+                <span class="tag">TIMER</span>
+                <h1>Hẹn giờ <span>đếm ngược</span></h1>
+                <p>Nhập Giờ / Phút / Giây — hết giờ sẽ có chuông báo.</p>
+            </div>
 
-        <div style="display:flex; flex-wrap:wrap; gap:28px; padding:30px 5%; justify-content:center;">
+            <div style="display:flex; flex-wrap:wrap; gap:28px; padding:30px 5%; justify-content:center;">
+                <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
+                    <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">⏳ Hẹn giờ đếm ngược</h2>
+                    <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Nhập Giờ / Phút / Giây rồi bấm Bắt đầu</p>
 
-            <!-- ĐỒNG HỒ HẸN GIỜ -->
-            <div style="flex:1; min-width:300px; max-width:480px; background:var(--card2); border:1px solid var(--line); border-radius:20px; padding:28px; text-align:center;">
-                <h2 style="font-size:16px; color:var(--deep); margin-bottom:6px;">⏳ Hẹn giờ đếm ngược</h2>
-                <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Nhập Giờ / Phút / Giây rồi bấm Bắt đầu</p>
+                    <div id="timer-display" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00:00</div>
 
-                <div id="timer-display" style="font-size:clamp(36px,8vw,64px); font-weight:800; color:var(--text); letter-spacing:2px; font-variant-numeric:tabular-nums; line-height:1.2;">00:00:00</div>
-
-                <div style="display:flex; gap:6px; justify-content:center; align-items:flex-start; margin:18px 0;">
-                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-                        <input type="number" id="timer-hour" min="0" max="99" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
-                        <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Giờ</span>
+                    <div style="display:flex; gap:6px; justify-content:center; align-items:flex-start; margin:18px 0;">
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                            <input type="number" id="timer-hour" min="0" max="99" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
+                            <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Giờ</span>
+                        </div>
+                        <span style="color:var(--muted); font-size:22px; font-weight:700; margin-top:8px;">:</span>
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                            <input type="number" id="timer-min" min="0" max="59" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
+                            <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Phút</span>
+                        </div>
+                        <span style="color:var(--muted); font-size:22px; font-weight:700; margin-top:8px;">:</span>
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                            <input type="number" id="timer-sec" min="0" max="59" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
+                            <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Giây</span>
+                        </div>
                     </div>
-                    <span style="color:var(--muted); font-size:22px; font-weight:700; margin-top:8px;">:</span>
-                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-                        <input type="number" id="timer-min" min="0" max="59" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
-                        <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Phút</span>
-                    </div>
-                    <span style="color:var(--muted); font-size:22px; font-weight:700; margin-top:8px;">:</span>
-                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-                        <input type="number" id="timer-sec" min="0" max="59" value="0" style="width:72px; padding:9px 6px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none; text-align:center; font-size:18px; font-weight:700;">
-                        <span style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Giây</span>
-                    </div>
-                </div>
 
-                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-                    <button class="primary-btn" style="margin:0; padding:11px 24px;" onclick="startTimer()">▶ Bắt đầu</button>
-                    <button class="primary-btn" style="margin:0; padding:11px 24px; background:#2a2a33;" onclick="pauseTimer()">⏸ Tạm dừng</button>
-                    <button class="primary-btn" style="margin:0; padding:11px 24px; background:#3a1f25; color:#ff8787;" onclick="resetTimer()">⟲ Đặt lại</button>
+                    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                        <button class="primary-btn" style="margin:0; padding:11px 24px;" onclick="startTimer()">▶ Bắt đầu</button>
+                        <button class="primary-btn" style="margin:0; padding:11px 24px; background:#2a2a33;" onclick="pauseTimer()">⏸ Tạm dừng</button>
+                        <button class="primary-btn" style="margin:0; padding:11px 24px; background:#3a1f25; color:#ff8787;" onclick="resetTimer()">⟲ Đặt lại</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
     <!-- VÒNG QUAY MAY MẮN -->
     <section id="wheel-page" class="page hidden">
@@ -645,27 +214,20 @@ body {
             </div>
             
             <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:35px; padding:30px 4%;">
-                <!-- Khu vực hiển thị bên trái (Thay đổi linh hoạt giữa Vòng quay Tên và Lưới Ô Số) -->
                 <div id="wheel-visual-container" style="position:relative; width:min(420px, 100%); min-height:420px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;">
-                    
-                    <!-- 1. KHUNG VÒNG QUAY (Dành cho Quay Tên) -->
                     <div id="wheel-canvas-container" style="position:relative; width:420px; height:420px;">
                         <div style="position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:32px solid var(--danger); z-index:10; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));"></div>
                         <canvas id="wheel-canvas" width="420" height="420" style="width:100%; height:100%; border-radius:50%; box-shadow:0 10px 30px rgba(0,0,0,0.5); border:6px solid var(--purple);"></canvas>
                         <button onclick="startWheel()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background:var(--purple); color:#fff; border:none; font-weight:800; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:5;">QUAY</button>
                     </div>
-
                 </div>
-                <!-- Bảng cài đặt & Chuyển đổi tính năng -->
+
                 <div id="wheel-settings-panel" style="flex:1; min-width:340px; max-width:520px; background:var(--card2); padding:22px; border-radius:18px; border:1px solid var(--line); text-align:left;">
-                    
-                    <!-- Nút chuyển đổi chế độ -->
                     <div style="display:flex; gap:10px; margin-bottom:15px; background:#0f0f12; padding:4px; border-radius:10px; border:1px solid var(--line);">
                         <button id="mode-name-btn" onclick="switchWheelMode('name')" style="flex:1; padding:8px; border:none; border-radius:8px; font-weight:700; font-size:13px; background:var(--purple); color:#fff; cursor:pointer; transition:0.2s;">Quay Tên</button>
                         <button id="mode-number-btn" onclick="switchWheelMode('number')" style="flex:1; padding:8px; border:none; border-radius:8px; font-weight:700; font-size:13px; background:transparent; color:var(--muted); cursor:pointer; transition:0.2s;">Random Số</button>
                     </div>
 
-                    <!-- KHUNG TẠO VÒNG QUAY SỐ -->
                     <div id="wheel-number-config" class="hidden" style="margin-bottom:15px; background:var(--card); padding:12px; border-radius:10px; border:1px solid var(--line);">
                         <label style="font-size:12px; font-weight:700; color:var(--deep); margin-bottom:8px; display:block;">⚙️ Cài đặt khoảng số:</label>
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:nowrap;">
@@ -676,15 +238,11 @@ body {
                         </div>
                     </div>
 
-                    <!-- BẢNG SỐ NẰM NGAY DƯỚI HÀNG TẠO VÒNG QUAY -->
                     <div id="number-grid-container" class="hidden" style="width:100%; box-sizing:border-box; background:var(--card2); border:1px solid var(--line); border-radius:16px; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; gap:16px; padding:14px; margin-bottom:15px;">
-                        <div id="number-cells-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(48px, 1fr)); gap:10px; width:100%; max-height:none; overflow:visible; padding:3px; box-sizing:border-box;">
-                            <!-- Các ô số sẽ tự động render ở đây -->
-                        </div>
+                        <div id="number-cells-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(48px, 1fr)); gap:10px; width:100%; max-height:none; overflow:visible; padding:3px; box-sizing:border-box;"></div>
                         <button class="primary-btn" onclick="startNumberRandom()" style="align-self:center; width:100%; max-width:220px; padding:12px; font-size:16px; font-weight:800; margin:0;">QUAY SỐ</button>
                     </div>
 
-                    <!-- KHUNG CÀI ĐẶT QUAY TÊN -->
                     <div id="wheel-name-config">
                         <div class="form-group" style="margin-bottom:14px;">
                             <label style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; display:block;">Thời gian quay (giây):</label>
@@ -696,7 +254,7 @@ body {
                         </div>
 
                         <div style="display:flex; gap:8px; margin-bottom:12px;">
-                            <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." style="flex:1; padding:9px 12px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none;">
+                            <input type="text" id="wheel-input-name" placeholder="Thêm tên mới..." maxlength="50" style="flex:1; padding:9px 12px; border:1px solid var(--line); border-radius:10px; background:#0f0f12; color:var(--text); outline:none;">
                             <button class="primary-btn" style="margin:0; padding:9px 16px; font-size:13px;" onclick="addWheelItem()" type="button">Thêm</button>
                         </div>
                         
@@ -710,9 +268,7 @@ body {
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <label style="font-size:12px; font-weight:700; color:var(--muted);">Danh sách tham gia (<span id="wheel-count-lbl">0</span> người được chọn):</label>
                         </div>
-                        <div style="max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:10px; background:#0f0f12; display:flex; flex-direction:column; gap:8px;" id="wheel-items-list">
-                            <!-- Danh sách tên -->
-                        </div>
+                        <div style="max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:10px; background:#0f0f12; display:flex; flex-direction:column; gap:8px;" id="wheel-items-list"></div>
                     </div>
                 </div>
             </div>
@@ -722,14 +278,12 @@ body {
     <!-- THỜI KHÓA BIỂU LƯỚI -->
     <section id="schedule-page" class="page hidden">
         <div class="full-page-card">
-        <div class="schedule-hero">
-            <span class="tag">CLASS SCHEDULE</span>
-            <h1>Thời khóa biểu <span>lớp mình</span></h1>
-            <!-- Thêm nút nhập nhanh TKB dành riêng cho Admin ở đây -->
-            <!-- Nút mới: Nhập TKB bằng JSON -->
-            <button class="primary-btn admin-only" style="margin-top:15px; background:var(--success);" onclick="openImportTKBJsonModal()">📥 Nhập TKB </button>
-        </div>
-        <div class="tkb-container">
+            <div class="schedule-hero">
+                <span class="tag">CLASS SCHEDULE</span>
+                <h1>Thời khóa biểu <span>lớp mình</span></h1>
+                <button class="primary-btn admin-only" style="margin-top:15px; background:var(--success);" onclick="openImportTKBJsonModal()">📥 Nhập TKB</button>
+            </div>
+            <div class="tkb-container">
                 <table class="tkb-table">
                     <thead>
                         <tr>
@@ -839,18 +393,19 @@ window.db = db;
 window.firebaseReady = true;
 const auth = getAuth(app);
 signInAnonymously(auth).then(() => {
-    console.log("Đã đăng nhập ẩn danh thành công!");
+    console.log("Đã kết nối bảo mật Firebase!");
 }).catch((error) => {
     console.error("Lỗi đăng nhập ẩn danh:", error);
 });
 </script>
 
+<!-- NẾU MUỐN TÁCH THÊM FILE script.js, HÃY CẮT NỘI DUNG TRONG THẺ <script> DƯỚI ĐÂY DÁN SANG script.js -->
 <script>
 /* ===== STATE ===== */
 let isAdmin = false;
 let members = [];
 let specialEvents = [];
-let teachers = []; // Thêm danh sách thầy cô
+let teachers = [];
 let achievements = [];
 let posts = [];
 let myLikes = (() => {
@@ -863,18 +418,50 @@ let currentFolderId = null;
 let previewBubbles = false;
 let countdownEvents = [];
 let scheduleData = {};
+let lastActionTimestamp = 0; // Chống spam thao tác liên tục
 
 /* TKB DATA */
 const TKB_DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"];
 const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
 const TKB_PERIODS_CHIEU = [7, 8, 9, 10, 11];
 
+/* ===== HÀM TIỆN ÍCH BẢO MẬT (CHỐNG XSS & LỘ DỮ LIỆU) ===== */
+function escapeHtml(str) {
+    return String(str ?? "").replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
+function safeUrl(url) {
+    if (!url) return "";
+    const trimmed = String(url).trim();
+    return /^https?:\/\//i.test(trimmed) ? escapeHtml(trimmed) : "";
+}
+
+function maskPhone(phone) {
+    if (!phone) return "--";
+    if (isAdmin) return escapeHtml(phone);
+    const str = String(phone).trim();
+    if (str.length <= 4) return "****";
+    return escapeHtml(str.slice(0, 3)) + "****" + escapeHtml(str.slice(-2));
+}
+
+function maskGmail(gmail) {
+    if (!gmail) return "--";
+    const parts = String(gmail).trim().split("@");
+    const userPart = parts[0] || "";
+    const domainPart = parts[1] || "gmail.com";
+    if (isAdmin) return `${escapeHtml(userPart)}@${escapeHtml(domainPart)}`;
+    const visiblePrefix = userPart.length > 2 ? escapeHtml(userPart.slice(0, 2)) : "*";
+    return `${visiblePrefix}***@${escapeHtml(domainPart)}`;
+}
+
 /* ===== VÒNG QUAY MAY MẮN & RANDOM SỐ ===== */
 let wheelItems = []; 
 let lastWinnerIndex = null; 
 let currentAngle = 0;
 let isSpinning = false;
-let currentWheelMode = 'name'; // 'name' hoặc 'number'
+let currentWheelMode = 'name';
 const wheelColors = ["#8dbaf5", "#a99af4", "#ff6b6b", "#51cf66", "#fcc419", "#ff922b", "#cc5de8", "#20c997"];
 
 function initWheelDefault() {
@@ -894,7 +481,6 @@ function initWheelDefault() {
     drawWheel(0);
 }
 
-// Chuyển đổi qua lại giữa chế độ Quay Tên và Random Số
 function switchWheelMode(mode) {
     currentWheelMode = mode;
     const nameBtn = document.getElementById("mode-name-btn");
@@ -931,13 +517,11 @@ function switchWheelMode(mode) {
         numberGridContainer.classList.remove("hidden");
         settingsPanel.style.maxWidth = "1100px";
         settingsPanel.style.flex = "1 1 100%";
-        generateNumberGrid(); // Tạo lưới ô số tự động khi chuyển sang chế độ số
+        generateNumberGrid();
     }
 }
 
-// Tạo danh sách số dựa trên khoảng người dùng nhập vào
 function generateNumberWheel() {
-    // Chỉ cập nhật lưới random số, tuyệt đối không sửa wheelItems của vòng quay tên.
     generateNumberGrid();
 }
 
@@ -955,7 +539,7 @@ function getActiveWheelItems() {
 }
 
 function renderWheelList() {
-    if (currentWheelMode === 'number') return; // Nếu đang ở chế độ số thì không cần render list tên chi tiết phía dưới
+    if (currentWheelMode === 'number') return;
     
     const container = document.getElementById("wheel-items-list");
     const countLbl = document.getElementById("wheel-count-lbl");
@@ -982,7 +566,7 @@ function renderWheelList() {
                 <input type="checkbox" ${item.active ? 'checked' : ''} onchange="toggleItemActive(${index})" style="width:16px; height:16px; cursor:pointer; accent-color:var(--purple);">
                 <span style="font-weight:500; word-break:break-word; opacity:${item.active ? '1' : '0.4'}; text-decoration:${item.active ? 'none' : 'line-through'};">${escapeHtml(item.name)}</span>
             </div>
-            <button onclick="removeWheelItem(${index})" title="Xóa" type="button" style="background:transparent; border:none; color:var(--muted); width:28px; height:28px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='rgba(255,107,107,0.2)'; this.style.color='var(--danger)';" onmouseout="this.style.background='transparent'; this.style.color='var(--muted)';">
+            <button onclick="removeWheelItem(${index})" title="Xóa" type="button" style="background:transparent; border:none; color:var(--muted); width:28px; height:28px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;">
                 🗑️
             </button>
         `;
@@ -1089,7 +673,6 @@ function startWheel() {
     }
     isSpinning = true;
 
-    // Ở chế độ random số, có thể fix cứng thời gian quay hoặc dùng chung ô input thời gian
     let durationInput = parseFloat(document.getElementById("wheel-duration-input")?.value || 5.0);
     let duration = (isNaN(durationInput) || durationInput <= 0) ? 5000 : durationInput * 1000;
 
@@ -1168,7 +751,7 @@ let saveQueue = Promise.resolve();
 function getClassDataPayload() {
     return {
         members, teachers, achievements, posts, bdayData, memoryFolders,
-        countdownEvents, scheduleData, specialEvents, adminCredentials // <-- Thêm vào đây
+        countdownEvents, scheduleData, specialEvents, adminCredentials
     };
 }
 
@@ -1178,7 +761,6 @@ function storeLocalClassBackup(payload) {
         const currentRaw = localStorage.getItem(CLASS_BACKUP_KEY);
         let currentData = '';
         try { currentData = currentRaw ? JSON.stringify(JSON.parse(currentRaw).data) : ''; } catch (e) {}
-        // Keep the previous distinct version too, so a bad overwrite doesn't instantly destroy the only local backup.
         if (currentRaw && currentData && currentData !== nextData) {
             localStorage.setItem(CLASS_BACKUP_PREVIOUS_KEY, currentRaw);
         }
@@ -1189,7 +771,7 @@ function storeLocalClassBackup(payload) {
             }));
         }
     } catch (e) {
-        console.warn('Không thể lưu bản sao lưu trên trình duyệt (có thể đã hết dung lượng):', e);
+        console.warn('Không thể lưu bản sao lưu trên trình duyệt:', e);
     }
 }
 
@@ -1233,7 +815,6 @@ async function loadDataFromFirebase() {
                 storeLocalClassBackup(getClassDataPayload());
                 renderAllClassData();
             } else {
-                // CRITICAL: Never seed demo data or write automatically when the cloud document is missing.
                 firebaseDocumentMissing = true;
                 applyClassData({});
                 renderAllClassData();
@@ -1241,13 +822,13 @@ async function loadDataFromFirebase() {
                     missingDocWarningShown = true;
                     let hasBackup = false;
                     try { hasBackup = !!localStorage.getItem(CLASS_BACKUP_KEY); } catch (e) {}
-                    alert('CẢNH BÁO: Firebase không tìm thấy class_data/main. Website đã chặn tự ghi dữ liệu để tránh ghi đè hoặc tạo dữ liệu mẫu. ' +
-                        (hasBackup ? 'Trình duyệt này có bản sao lưu cục bộ; hãy đăng nhập Admin và chọn Khôi phục từ file backup nếu bạn đã tải file đó.' : 'Hãy kiểm tra đúng Firebase project và bản sao lưu trước khi tiếp tục chỉnh sửa.'));
+                    alert('CẢNH BÁO: Firebase không tìm thấy class_data/main. Website đã chặn tự ghi dữ liệu để tránh ghi đè. ' +
+                        (hasBackup ? 'Trình duyệt này có bản sao lưu cục bộ; hãy đăng nhập Admin và chọn Khôi phục từ file backup.' : 'Hãy đăng nhập Admin và chọn Khôi phục từ file backup-lop-12a1.json.'));
                 }
             }
         }, (error) => {
             console.error('Lỗi lắng nghe dữ liệu realtime:', error);
-            alert('Không tải được dữ liệu Firebase. Dữ liệu chưa được thay đổi; hãy kiểm tra mạng/quyền truy cập rồi thử lại.');
+            alert('Không tải được dữ liệu Firebase. Hãy kiểm tra mạng/quyền truy cập rồi thử lại.');
         });
     } catch (e) {
         console.error('Lỗi kết nối Firebase:', e);
@@ -1258,18 +839,16 @@ async function loadDataFromFirebase() {
 async function saveData() {
     if (!window.firebaseReady) return false;
     if (firebaseDocumentMissing && !allowCreateForRestore) {
-        alert('Đã chặn lưu vì Firebase không tìm thấy tài liệu class_data/main. Hãy kiểm tra cấu hình hoặc khôi phục từ file backup trước.');
+        alert('Đã chặn lưu vì Firebase không tìm thấy tài liệu class_data/main. Hãy khôi phục từ file backup trước.');
         return false;
     }
 
-    // Serialize writes so two quick edits do not race each other.
     const operation = saveQueue.then(async () => {
         const payload = getClassDataPayload();
         const json = JSON.stringify(payload);
         const bytes = new TextEncoder().encode(json).length;
-        // Firestore documents have a 1 MiB limit; keep a safety margin.
         if (bytes > 700 * 1024) {
-            alert('Không thể lưu: dữ liệu đang quá lớn (' + Math.round(bytes / 1024) + ' KB). Firestore giới hạn mỗi tài liệu khoảng 1 MiB. Cần tách dữ liệu sang nhiều tài liệu trước khi tiếp tục.');
+            alert('Không thể lưu: dữ liệu đang quá lớn (' + Math.round(bytes / 1024) + ' KB). Giới hạn an toàn là 700 KB.');
             return false;
         }
         try {
@@ -1282,7 +861,7 @@ async function saveData() {
             return true;
         } catch (e) {
             console.error('Lỗi lưu dữ liệu lên Firebase:', e);
-            alert('Lưu Firebase thất bại. Dữ liệu chưa được xác nhận là đã lưu; hãy thử tải backup và kiểm tra kết nối/quyền truy cập.');
+            alert('Lưu Firebase thất bại. Hãy thử tải backup và kiểm tra kết nối/quyền truy cập.');
             return false;
         }
     });
@@ -1298,13 +877,13 @@ function downloadClassBackup() {
         if (firebaseDocumentMissing) {
             if (!local && !previous) { alert('Không tìm thấy bản sao lưu trên trình duyệt này.'); return; }
             backup = JSON.parse(local || previous);
-        } else if (local && previous && !confirm('OK = tải bản sao lưu mới nhất. Cancel = tải bản sao lưu trước đó để phòng trường hợp dữ liệu vừa bị ghi đè.')) {
+        } else if (local && previous && !confirm('OK = tải bản sao lưu mới nhất. Cancel = tải bản sao lưu trước đó.')) {
             backup = JSON.parse(previous);
         } else {
             backup = { savedAt: new Date().toISOString(), data: getClassDataPayload() };
         }
     } catch (e) {
-        alert('Không tạo được backup. Hãy thử tải lại trang và kiểm tra dữ liệu.');
+        alert('Không tạo được backup.');
         return;
     }
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
@@ -1335,18 +914,18 @@ async function handleBackupFile(event) {
             alert('File backup không đúng định dạng của website lớp 12A1.');
             return;
         }
-        if (!confirm('Khôi phục dữ liệu từ file này sẽ thay thế toàn bộ dữ liệu hiện tại trên Firebase. Bạn đã chắc chắn chọn đúng file backup chưa?')) return;
+        if (!confirm('Khôi phục dữ liệu từ file này sẽ thay thế toàn bộ dữ liệu hiện tại trên Firebase. Bạn chắc chắn chứ?')) return;
         applyClassData(data);
-        allowCreateForRestore = true; // Explicit, user-confirmed restore is the only path allowed to recreate a missing document.
+        allowCreateForRestore = true;
         firebaseDocumentMissing = false;
         const success = await saveData();
         if (success) {
             storeLocalClassBackup(getClassDataPayload());
             renderAllClassData();
-            alert('Khôi phục dữ liệu thành công. Hãy tải một file backup mới để lưu riêng ở máy bạn.');
+            alert('Khôi phục dữ liệu thành công!');
         } else {
             firebaseDocumentMissing = true;
-            alert('Khôi phục chưa thành công; hãy giữ nguyên file backup và kiểm tra Firebase.');
+            alert('Khôi phục chưa thành công; hãy kiểm tra kết nối Firebase.');
         }
     } catch (e) {
         console.error('Lỗi đọc file backup:', e);
@@ -1356,7 +935,6 @@ async function handleBackupFile(event) {
     }
 }
 
-function escapeHtml(str){return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function showModal(html){document.getElementById("modal-container").innerHTML=`<div class="modal-overlay"><div class="modal-card">${html}</div></div>`;}
 function showProgressModal(title) {
     showModal(`
@@ -1384,23 +962,23 @@ function showPage(page){
     if(page==="schedule"){ renderTKB(); }
     if(page==="achieve") renderAchievements();
     if(page==="memory"){ document.getElementById('folder-view').classList.remove('hidden'); document.getElementById('folder-detail').classList.add('hidden'); renderFolders(); }
-    if(page==="clock"){ updateTimerDisplay(); }  // ← Thêm dòng này
+    if(page==="clock"){ updateTimerDisplay(); }
 }
 
 /* ADMIN */
-let adminCredentials = { username: "admin", passwordHash: "" }; // Sẽ được load từ Firebase
+let adminCredentials = { username: "admin", passwordHash: "" };
 
 function openAdminModal(){
     if(isAdmin){
         isAdmin=false; document.body.classList.remove("admin-mode");
         const btn=document.getElementById("admin-toggle-btn");
-        btn.classList.remove("logged-in"); btn.innerHTML=`🔑 <span>Admin</span>`;
-        alert("Đã đăng xuất!"); renderMembers(); renderTeachers(); renderTKB(); renderAchievements(); renderFolders(); if(currentFolderId) renderMedia(); renderPosts(); renderCountdowns(); return;
+        btn.classList.remove("logged-in"); btn.innerHTML=`·`;
+        alert("Đã đăng xuất!"); renderAllClassData(); return;
     }
     showModal(`
         <h3>Đăng nhập Quản trị viên</h3>
         <div class="form-group"><label>Tên đăng nhập</label><input type="text" id="admin-user"></div>
-        <div class="form-group"><label>Mật khẩu</label><input type="password" id="admin-pass"></div>
+        <div class="form-group"><label>Mật khẩu</label><input type="password" id="admin-pass" onkeydown="if(event.key==='Enter')submitAdminLogin()"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAdminLogin()">Đăng nhập</button></div>
     `);
 }
@@ -1411,15 +989,12 @@ async function submitAdminLogin(){
     
     if(!u || !p) return alert("Vui lòng nhập đầy đủ thông tin!");
 
-    // Hash mật khẩu người dùng vừa nhập để so sánh với mật khẩu đã lưu trên Firebase
     const inputHash = await hashPassword(p);
 
-    // Kiểm tra xem mật khẩu đã được thiết lập trên Firebase chưa
     if (!adminCredentials.passwordHash) {
-        // Nếu chưa có (lần đầu chạy), lấy mật khẩu mặc định là "123456"
         const defaultHash = await hashPassword("123456");
         adminCredentials = { username: "admin", passwordHash: defaultHash };
-        await saveData(); // Lưu mật khẩu mặc định lên Firebase
+        await saveData();
     }
 
     if(u === adminCredentials.username && inputHash === adminCredentials.passwordHash){
@@ -1428,7 +1003,8 @@ async function submitAdminLogin(){
         btn.classList.add("logged-in"); 
         btn.innerHTML=`✓ <span>Admin</span>`;
         alert("Đăng nhập thành công!"); 
-        renderMembers(); renderTeachers(); renderTKB(); renderAchievements(); renderFolders(); if(currentFolderId) renderMedia(); renderPosts(); renderCountdowns(); closeModal();
+        renderAllClassData();
+        closeModal();
     } else {
         alert("Sai tài khoản hoặc mật khẩu!");
     }
@@ -1448,7 +1024,7 @@ function renderCountdowns() {
             <button class="btn-delete-item" onclick="deleteEvent(${ev.id})">×</button>
             <div class="event-icon">${escapeHtml(ev.icon || '📅')}</div>
             <h3>${escapeHtml(ev.name)}</h3>
-            <p class="event-date">${ev.date.split('-').reverse().join('/')}</p>
+            <p class="event-date">${escapeHtml(String(ev.date || "").split('-').reverse().join('/'))}</p>
             <div class="countdown-time">
                 <div class="time-box"><strong class="d">00</strong><span>Ngày</span></div>
                 <div class="time-box"><strong class="h">00</strong><span>Giờ</span></div>
@@ -1494,8 +1070,8 @@ function updateCountdowns() {
 function openAddEventModal() {
     showModal(`
         <h3>Thêm ngày đếm ngược</h3>
-        <div class="form-group"><label>Tên sự kiện</label><input type="text" id="e-name" placeholder="VD: Tết Trung Thu, 20/11..."></div>
-        <div class="form-group"><label>Biểu tượng (Icon)</label><input type="text" id="e-icon" placeholder="VD: 🎉, 🎂, 🧧..." value="📅"></div>
+        <div class="form-group"><label>Tên sự kiện</label><input type="text" id="e-name" maxlength="80" placeholder="VD: Tết Trung Thu, 20/11..."></div>
+        <div class="form-group"><label>Biểu tượng (Icon)</label><input type="text" id="e-icon" maxlength="10" placeholder="VD: 🎉, 🎂, 🧧..." value="📅"></div>
         <div class="form-group"><label>Ngày diễn ra</label><input type="date" id="e-date"></div>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">Hủy</button>
@@ -1537,7 +1113,7 @@ function renderTKB() {
         html += `<td class="tkb-side">TIẾT ${tiet}</td>`;
         TKB_DAYS.forEach(day => {
             const mon = scheduleData[day]?.[tiet] || '';
-            html += `<td class="${mon?'':'empty-slot'}" onclick="editTKB('${day}', ${tiet})">${mon || ''}</td>`;
+            html += `<td class="${mon?'':'empty-slot'}" onclick="editTKB('${day}', ${tiet})">${escapeHtml(mon)}</td>`;
         });
         html += `</tr>`;
     });
@@ -1549,7 +1125,7 @@ function renderTKB() {
         html += `<td class="tkb-side">TIẾT ${displayChieu[index]}</td>`;
         TKB_DAYS.forEach(day => {
             const mon = scheduleData[day]?.[tietLuuTru] || '';
-            html += `<td class="${mon?'':'empty-slot'}" onclick="editTKB('${day}', ${tietLuuTru})">${mon || ''}</td>`;
+            html += `<td class="${mon?'':'empty-slot'}" onclick="editTKB('${day}', ${tietLuuTru})">${escapeHtml(mon)}</td>`;
         });
         html += `</tr>`;
     });
@@ -1564,10 +1140,10 @@ function editTKB(day, tiet) {
     }
     const currentMon = scheduleData[day]?.[tiet] || '';
     showModal(`
-        <h3>Sửa lịch: ${day} - Tiết ${tiet}</h3>
+        <h3>Sửa lịch: ${escapeHtml(day)} - Tiết ${tiet}</h3>
         <div class="form-group">
             <label>Tên môn học (Để trống để xóa)</label>
-            <input type="text" id="tkb-mon" value="${escapeHtml(currentMon)}" placeholder="VD: TOÁN, VĂN, ANH..." style="text-transform:uppercase">
+            <input type="text" id="tkb-mon" maxlength="30" value="${escapeHtml(currentMon)}" placeholder="VD: TOÁN, VĂN, ANH..." style="text-transform:uppercase">
         </div>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">Hủy</button>
@@ -1590,7 +1166,7 @@ async function saveTKB(day, tiet) {
 }
 
 /* ===== THÀNH VIÊN ===== */
-function formatBirthday(d){if(!d)return"Chưa cập nhật";const p=d.split("-");return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d;}
+function formatBirthday(d){if(!d)return"Chưa cập nhật";const p=String(d).split("-");return p.length===3?`${escapeHtml(p[2])}/${escapeHtml(p[1])}/${escapeHtml(p[0])}`:escapeHtml(d);}
 function nextBirthday(dob){
     const [y,mo,d]=dob.split("-").map(Number); const now=new Date();
     const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
@@ -1602,61 +1178,48 @@ function getBd(key){if(!bdayData[key])bdayData[key]={react:{},wishes:[]};return 
 
 function renderMembers(keyword=""){
     const list=document.getElementById("member-list"), count=document.getElementById("member-count");
+    if(!list) return;
     list.innerHTML="";
-    const filtered=members.filter(m=>m.name.toLowerCase().includes(keyword.toLowerCase()));
+    const filtered=members.filter(m=>(m.name||"").toLowerCase().includes(keyword.toLowerCase()));
     count.textContent=`${filtered.length} thành viên`;
     if(filtered.length===0){list.innerHTML=`<tr><td colspan="8" style="text-align:center;">Không tìm thấy thành viên.</td></tr>`;return;}
     filtered.forEach((m,index)=>{
         const realIndex=members.indexOf(m);
         const tr=document.createElement("tr");
-        const avatar=m.photo?`<img src="${m.photo}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;">`:"";
+        const safePhoto = safeUrl(m.photo);
+        const avatar=safePhoto?`<img src="${safePhoto}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;">`:"";
+        const safeFb = safeUrl(m.facebook);
         
         let isBday=false, bdayTxt="", bdayBadge="";
         if(m.birthday){
             const nb=nextBirthday(m.birthday);
             if(nb.days===0){
                 isBday=true; 
-                bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂 </span>`; 
-                if(m.facebook) {
-                    bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc </a>`;
-                } else {
-                    bdayTxt=`<span style="font-size:11px; color:var(--muted); margin-left:8px;">Chưa có FB</span>`;
-                }
+                bdayBadge=`<span class="bday-badge">🎂 sinh nhật nè 🎂</span>`; 
+                bdayTxt = safeFb ? `<a href="${safeFb}" target="_blank" rel="noopener noreferrer" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc</a>` : `<span style="font-size:11px; color:var(--muted); margin-left:8px;">Chưa có FB</span>`;
             } else if(nb.days<=7){
                 isBday=true; 
                 bdayBadge=`<span class="bday-badge">🎂 Còn ${nb.days} ngày</span>`; 
-                if(m.facebook) {
-                    bdayTxt=`<a href="${escapeHtml(m.facebook)}" target="_blank" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc </a>`;
-                } else {
-                    bdayTxt=`<span style="font-size:11px; color:var(--muted); margin-left:8px;">Chưa có FB</span>`;
-                }
+                bdayTxt = safeFb ? `<a href="${safeFb}" target="_blank" rel="noopener noreferrer" class="bday-wish-btn" style="text-decoration:none; display:inline-block; margin-left:8px;">Gửi lời chúc</a>` : `<span style="font-size:11px; color:var(--muted); margin-left:8px;">Chưa có FB</span>`;
             }
         }
         
-        const fbBtn = m.facebook 
-            ? `<a href="${escapeHtml(m.facebook)}" target="_blank" style="color:var(--fb-color);text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
+        const fbBtn = safeFb 
+            ? `<a href="${safeFb}" target="_blank" rel="noopener noreferrer" style="color:var(--fb-color);text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook
                </a>` 
             : `<span style="color:var(--muted);font-size:12px;">--</span>`;
 
         tr.className=isBday?"bday-row":"";
         
-        let gmailDisplay = "--";
-        if (m.gmail) {
-            const parts = m.gmail.split("@");
-            const userPart = parts[0] || "";
-            const domainPart = parts[1] || "gmail.com";
-            gmailDisplay = `<span class="gmail-blur">${escapeHtml(userPart)}</span>@${escapeHtml(domainPart)}`;
-        }
-        
         tr.innerHTML=`
             <td>${index+1}</td>
             <td>${avatar}<strong>${escapeHtml(m.name)}</strong>${bdayBadge}</td>
             <td>${formatBirthday(m.birthday)}</td>
             <td>${escapeHtml(m.gender||"Chưa cập nhật")}</td>
-            <td><span class="phone-blur">${escapeHtml(m.phone||"")}</span></td>
+            <td><span class="phone-blur">${maskPhone(m.phone)}</span></td>
             <td>${fbBtn}</td>
-            <td>${gmailDisplay}</td>
+            <td><span class="gmail-blur">${maskGmail(m.gmail)}</span></td>
             <td class="admin-only">
                 <button class="mini-btn" onclick="openMemberModal(${realIndex})">Sửa</button>
                 <button class="mini-btn danger" onclick="deleteMember(${realIndex})">Xóa</button>
@@ -1680,13 +1243,13 @@ function openMemberModal(index=-1){
     const m=index>=0?members[index]:{name:"",gender:"",birthday:"",phone:"",gmail:"",facebook:""};
     showModal(`
         <h3>${index>=0?"Sửa thành viên":"Thêm thành viên"}</h3>
-        <div class="form-group"><label>Họ và tên</label><input type="text" id="m-name" value="${escapeHtml(m.name)}"></div>
+        <div class="form-group"><label>Họ và tên</label><input type="text" id="m-name" maxlength="60" value="${escapeHtml(m.name)}"></div>
         <div class="form-group"><label>Giới tính</label>
             <select id="m-gender"><option value="">-- Chọn --</option><option value="Nam" ${m.gender==="Nam"?"selected":""}>Nam</option><option value="Nữ" ${m.gender==="Nữ"?"selected":""}>Nữ</option></select>
         </div>
-        <div class="form-group"><label>Ngày sinh</label><input type="date" id="m-dob" value="${m.birthday||""}"></div>
-        <div class="form-group"><label>Số điện thoại</label><input type="text" id="m-phone" value="${escapeHtml(m.phone||"")}"></div>
-        <div class="form-group"><label>Gmail</label><input type="email" id="m-gmail" placeholder="vd: abc@gmail.com" value="${escapeHtml(m.gmail||"")}"></div> <!-- Thêm dòng này -->
+        <div class="form-group"><label>Ngày sinh</label><input type="date" id="m-dob" value="${escapeHtml(m.birthday||"")}"></div>
+        <div class="form-group"><label>Số điện thoại</label><input type="text" id="m-phone" maxlength="20" value="${escapeHtml(m.phone||"")}"></div>
+        <div class="form-group"><label>Gmail</label><input type="email" id="m-gmail" maxlength="80" placeholder="vd: abc@gmail.com" value="${escapeHtml(m.gmail||"")}"></div>
         <div class="form-group"><label>Link Facebook</label><input type="url" id="m-facebook" placeholder="https://facebook.com/..." value="${escapeHtml(m.facebook||"")}"></div>
         <div class="form-group"><label>Ảnh đại diện</label><input type="file" id="m-photo" accept="image/*"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitMember(${index})">Lưu</button></div>
@@ -1698,7 +1261,7 @@ async function submitMember(index){
         gender=document.getElementById("m-gender").value,
         birthday=document.getElementById("m-dob").value, 
         phone=document.getElementById("m-phone").value.trim(),
-        gmail=document.getElementById("m-gmail").value.trim(), // Thêm dòng này
+        gmail=document.getElementById("m-gmail").value.trim(),
         facebook=document.getElementById("m-facebook").value.trim(),
         file=document.getElementById("m-photo").files[0];
         
@@ -1708,7 +1271,7 @@ async function submitMember(index){
     let photo=index>=0?(members[index].photo||""):"";
     if(file){try{photo=await compressImage(file,400,0.75);}catch(e){return alert("Lỗi ảnh!");}}
     
-    const data={name,gender,birthday,phone,gmail,facebook,photo}; // Thêm gmail vào object data
+    const data={name,gender,birthday,phone,gmail,facebook,photo};
     if(index>=0) members[index]=data; else members.push(data);
     
     await saveData();
@@ -1729,26 +1292,19 @@ function renderTeachers(keyword=""){
     filtered.forEach((t,index)=>{
         const realIndex=teachers.indexOf(t);
         const tr=document.createElement("tr");
-        const avatar=t.photo?`<img src="${t.photo}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;">`:"";
+        const safePhoto = safeUrl(t.photo);
+        const avatar=safePhoto?`<img src="${safePhoto}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;">`:"";
         
         const roleBadge = t.role === "GVCN" 
             ? `<span style="display:inline-block; margin-left:6px; padding:2px 8px; border-radius:10px; background:var(--purple); color:#fff; font-size:10px; font-weight:800;">GVCN</span>`
             : `<span style="display:inline-block; margin-left:6px; padding:2px 8px; border-radius:10px; background:var(--chip); color:var(--muted); font-size:10px; font-weight:700;">GVBM</span>`;
 
-        const fbBtn = t.facebook 
-            ? `<a href="${escapeHtml(t.facebook)}" target="_blank" style="color:var(--fb-color);text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
+        const safeFb = safeUrl(t.facebook);
+        const fbBtn = safeFb 
+            ? `<a href="${safeFb}" target="_blank" rel="noopener noreferrer" style="color:var(--fb-color);text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook
                </a>` 
             : `<span style="color:var(--muted);font-size:12px;">--</span>`;
-
-        // Xử lý hiển thị làm mờ Gmail
-        let gmailDisplay = "--";
-        if (t.gmail) {
-            const parts = t.gmail.split("@");
-            const userPart = parts[0] || "";
-            const domainPart = parts[1] || "gmail.com";
-            gmailDisplay = `<span class="teacher-gmail-blur">${escapeHtml(userPart)}</span>@${escapeHtml(domainPart)}`;
-        }
 
         tr.innerHTML=`
             <td>${index+1}</td>
@@ -1763,9 +1319,9 @@ function renderTeachers(keyword=""){
             <td><strong style="color:var(--deep);">${escapeHtml(t.subject || "Chưa cập nhật")}</strong></td>
             <td>${formatBirthday(t.birthday)}</td>
             <td>${escapeHtml(t.gender||"Chưa cập nhật")}</td>
-            <td><span class="phone-blur">${escapeHtml(t.phone||"")}</span></td>
+            <td><span class="phone-blur">${maskPhone(t.phone)}</span></td>
             <td>${fbBtn}</td>
-            <td>${gmailDisplay}</td>
+            <td><span class="teacher-gmail-blur">${maskGmail(t.gmail)}</span></td>
             <td class="admin-only">
                 <button class="mini-btn" onclick="openTeacherModal(${realIndex})">Sửa</button>
                 <button class="mini-btn danger" onclick="deleteTeacher(${realIndex})">Xóa</button>
@@ -1773,6 +1329,7 @@ function renderTeachers(keyword=""){
         list.appendChild(tr);
     });
 }
+document.getElementById("search-teacher").addEventListener("input",function(){renderTeachers(this.value.trim());});
 
 function openAddTeacherModal(){ 
     openTeacherModal(-1); 
@@ -1782,20 +1339,20 @@ function openTeacherModal(index=-1){
     const t=index>=0?teachers[index]:{name:"",role:"GVBM",subject:"",gender:"",birthday:"",phone:"",gmail:"",facebook:""};
     showModal(`
         <h3>${index>=0?"Sửa thông tin thầy cô":"Thêm thầy cô"}</h3>
-        <div class="form-group"><label>Họ và tên</label><input type="text" id="t-name" value="${escapeHtml(t.name)}"></div>
+        <div class="form-group"><label>Họ và tên</label><input type="text" id="t-name" maxlength="60" value="${escapeHtml(t.name)}"></div>
         <div class="form-group"><label>Phân loại giáo viên</label>
             <select id="t-role">
                 <option value="GVBM" ${t.role==="GVBM"||!t.role?"selected":""}>Giáo viên bộ môn (GVBM)</option>
                 <option value="GVCN" ${t.role==="GVCN"?"selected":""}>Giáo viên chủ nhiệm (GVCN)</option>
             </select>
         </div>
-        <div class="form-group"><label>Bộ môn giảng dạy</label><input type="text" id="t-subject" placeholder="VD: TOÁN, NGỮ VĂN..." value="${escapeHtml(t.subject||"")}" style="text-transform:uppercase;"></div>
+        <div class="form-group"><label>Bộ môn giảng dạy</label><input type="text" id="t-subject" maxlength="40" placeholder="VD: TOÁN, NGỮ VĂN..." value="${escapeHtml(t.subject||"")}" style="text-transform:uppercase;"></div>
         <div class="form-group"><label>Giới tính</label>
             <select id="t-gender"><option value="">-- Chọn --</option><option value="Nam" ${t.gender==="Nam"?"selected":""}>Nam</option><option value="Nữ" ${t.gender==="Nữ"?"selected":""}>Nữ</option></select>
         </div>
-        <div class="form-group"><label>Ngày sinh</label><input type="date" id="t-dob" value="${t.birthday||""}"></div>
-        <div class="form-group"><label>Số điện thoại</label><input type="text" id="t-phone" value="${escapeHtml(t.phone||"")}"></div>
-        <div class="form-group"><label>Gmail</label><input type="email" id="t-gmail" placeholder="vd: abc@gmail.com" value="${escapeHtml(t.gmail||"")}"></div>
+        <div class="form-group"><label>Ngày sinh</label><input type="date" id="t-dob" value="${escapeHtml(t.birthday||"")}"></div>
+        <div class="form-group"><label>Số điện thoại</label><input type="text" id="t-phone" maxlength="20" value="${escapeHtml(t.phone||"")}"></div>
+        <div class="form-group"><label>Gmail</label><input type="email" id="t-gmail" maxlength="80" placeholder="vd: abc@gmail.com" value="${escapeHtml(t.gmail||"")}"></div>
         <div class="form-group"><label>Link Facebook</label><input type="url" id="t-facebook" placeholder="https://facebook.com/..." value="${escapeHtml(t.facebook||"")}"></div>
         <div class="form-group"><label>Ảnh đại diện</label><input type="file" id="t-photo" accept="image/*"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitTeacher(${index})">Lưu</button></div>
@@ -1836,10 +1393,14 @@ async function deleteTeacher(index){
 }
 
 function compressImage(file, maxSize = 900, quality = 0.7, onProgress = null) {
+    return uploadToCloudinaryWithProgress(file, onProgress);
+}
+
+function uploadToCloudinaryWithProgress(file, onProgress) {
     return new Promise((resolve, reject) => {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("upload_preset", "lop12a1"); 
+        formData.append("upload_preset", "lop12a1");
 
         const xhr = new XMLHttpRequest();
         const uploadUrl = "https://api.cloudinary.com/v1_1/trtlu8uw/auto/upload";
@@ -1879,48 +1440,6 @@ function compressImage(file, maxSize = 900, quality = 0.7, onProgress = null) {
         xhr.send(formData);
     });
 }
-function uploadToCloudinaryWithProgress(file, onProgress) {
-    return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", "lop12a1");
-
-        const xhr = new XMLHttpRequest();
-        let uploadUrl = "https://api.cloudinary.com/v1_1/trtlu8uw/auto/upload";
-
-        xhr.open("POST", uploadUrl, true);
-
-        xhr.upload.onprogress = function(e) {
-            if (e.lengthComputable) {
-                const percentComplete = Math.round((e.loaded / e.total) * 100);
-                onProgress(percentComplete);
-            }
-        };
-
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                try {
-                    const data = JSON.parse(xhr.responseText);
-                    if (data.secure_url) {
-                        resolve(data.secure_url);
-                    } else {
-                        reject("Lỗi Cloudinary: " + (data.error?.message || "Không xác định"));
-                    }
-                } catch (err) {
-                    reject("Lỗi phân tích phản hồi từ máy chủ.");
-                }
-            } else {
-                reject("Lỗi tải lên, mã lỗi HTTP: " + xhr.status);
-            }
-        };
-
-        xhr.onerror = function() {
-            reject("Lỗi kết nối mạng.");
-        };
-
-        xhr.send(formData);
-    });
-}
 
 /* ===== THÀNH TÍCH ===== */
 function renderAchievements(){
@@ -1932,7 +1451,7 @@ function renderAchievements(){
         const card=document.createElement("article");
         card.className="achieve-card";
         
-        let imgSrc = a.image;
+        let imgSrc = safeUrl(a.image);
         if (!imgSrc) {
             imgSrc = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
         }
@@ -1966,8 +1485,8 @@ function openAchieveModal(index=-1){
                 ${members.map(m=>`<option value="${escapeHtml(m.name)}" ${a.person===m.name?"selected":""}>${escapeHtml(m.name)}</option>`).join("")}
             </select>
         </div>
-        <div class="form-group"><label>Tên thành tích</label><input type="text" id="a-title" value="${escapeHtml(a.title)}" placeholder="VD: Học sinh giỏi cấp tỉnh"></div>
-        <div class="form-group"><label>Ngày đạt</label><input type="date" id="a-date" value="${a.date||""}"></div>
+        <div class="form-group"><label>Tên thành tích</label><input type="text" id="a-title" maxlength="120" value="${escapeHtml(a.title)}" placeholder="VD: Học sinh giỏi cấp tỉnh"></div>
+        <div class="form-group"><label>Ngày đạt</label><input type="date" id="a-date" value="${escapeHtml(a.date||"")}"></div>
         <div class="form-group"><label>Ảnh thẻ (Chân dung)</label><input type="file" id="a-image" accept="image/*"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAchievement(${index})">Lưu</button></div>
     `);
@@ -2011,9 +1530,9 @@ function renderFolders() {
         };
         card.innerHTML = `
             <button class="folder-del" onclick="deleteFolder(event, ${f.id})">×</button>
-            <span class="folder-icon">${f.icon || '📁'}</span>
+            <span class="folder-icon">${escapeHtml(f.icon || '📁')}</span>
             <div class="folder-title">${escapeHtml(f.name)}</div>
-            <div class="folder-count">${f.media.length} file</div>
+            <div class="folder-count">${(f.media || []).length} file</div>
         `;
         grid.appendChild(card);
     });
@@ -2038,19 +1557,20 @@ function renderMedia() {
     const folder = memoryFolders.find(f => f.id === currentFolderId);
     if (!grid || !folder) return;
     grid.innerHTML = '';
-    if (folder.media.length === 0) {
+    if (!folder.media || folder.media.length === 0) {
         grid.innerHTML = `<p class="empty-achieve" style="grid-column:1/-1;">Thư mục chưa có file nào ♡</p>`;
         return;
     }
-    folder.media.forEach((m, idx) => {
+    folder.media.forEach((m) => {
         const item = document.createElement('div');
         item.className = 'media-item';
+        const safeSrc = safeUrl(m.src);
         let imgHtml = '';
         if(m.type === 'video') {
-            imgHtml = `<video src="${m.src}" controls preload="metadata"></video>`;
+            imgHtml = `<video src="${safeSrc}" controls preload="metadata"></video>`;
         } else {
-            const imgs = folder.media.filter(x=>x.type==='image').map(x=>x.src);
-            imgHtml = `<img src="${m.src}" alt="" onclick="openLightbox([${imgs.map(s=>`'${s}'`).join(',')}], ${imgs.indexOf(m.src)}, '${escapeHtml(folder.name)}')">`;
+            const imgs = folder.media.filter(x=>x.type==='image').map(x=>safeUrl(x.src)).filter(Boolean);
+            imgHtml = `<img src="${safeSrc}" alt="" onclick="openFolderLightbox(${folder.id}, '${safeSrc}')">`;
         }
         item.innerHTML = `
             <button class="media-del" onclick="deleteMedia(${m.id})">×</button>
@@ -2058,6 +1578,13 @@ function renderMedia() {
         `;
         grid.appendChild(item);
     });
+}
+function openFolderLightbox(folderId, currentSrc) {
+    const folder = memoryFolders.find(f => f.id === folderId);
+    if (!folder) return;
+    const imgs = folder.media.filter(x => x.type === 'image').map(x => safeUrl(x.src)).filter(Boolean);
+    const idx = Math.max(0, imgs.indexOf(currentSrc));
+    openLightbox(imgs, idx, folder.name);
 }
 async function deleteMedia(id) {
     if (!confirm("Xóa file này khỏi thư mục?")) return;
@@ -2070,8 +1597,8 @@ async function deleteMedia(id) {
 function openAddFolderModal() {
     showModal(`
         <h3>Tạo thư mục kỷ niệm</h3>
-        <div class="form-group"><label>Tên thư mục</label><input type="text" id="f-name" placeholder="VD: Tháng 3 - Dã ngoại"></div>
-        <div class="form-group"><label>Icon (emoji)</label><input type="text" id="f-icon" placeholder="VD: 📁, 🌸, 🏖️" value="📁"></div>
+        <div class="form-group"><label>Tên thư mục</label><input type="text" id="f-name" maxlength="80" placeholder="VD: Tháng 3 - Dã ngoại"></div>
+        <div class="form-group"><label>Icon (emoji)</label><input type="text" id="f-icon" maxlength="10" placeholder="VD: 📁, 🌸, 🏖️" value="📁"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAddFolder()">Tạo</button></div>
     `);
 }
@@ -2169,7 +1696,6 @@ async function submitPost(){
     const files = [...document.getElementById("post-files").files].slice(0, 12);
     if (!text && files.length === 0) return alert("Hãy viết gì đó hoặc chọn ảnh/video nhé!");
     
-    // Hiển thị bảng progress đẹp mắt thay vì dùng alert()
     showProgressModal("Đang đăng bài viết...");
 
     let mediaList = []; 
@@ -2190,7 +1716,6 @@ async function submitPost(){
                 mediaList.push({ url, type });
             }
         } else {
-            // Nếu không có ảnh/video thì chạy thanh load giả lập nhanh cho mượt
             const bar = document.getElementById("post-progress-bar");
             const txt = document.getElementById("post-progress-text");
             if(bar) bar.style.width = "100%";
@@ -2212,10 +1737,9 @@ async function submitPost(){
 
     const saved = await saveData();
     if (!saved) {
-        // Keep the draft in the form so the user can retry; uploaded media URLs are not deleted.
         closeModal();
         renderPosts();
-        alert("Bài viết chưa được xác nhận lưu lên Firebase. Nội dung vẫn được giữ trong ô soạn thảo; hãy thử lưu lại sau khi kiểm tra kết nối.");
+        alert("Bài viết chưa được xác nhận lưu lên Firebase. Hãy thử lại sau khi kiểm tra kết nối.");
         return;
     }
     document.getElementById("post-text").value = "";
@@ -2224,6 +1748,7 @@ async function submitPost(){
     renderPosts();
     closeModal();
 }
+
 function timeAgo(ts){
     const s=Math.floor((Date.now()-ts)/1000);
     if(s<60) return "Vừa xong";
@@ -2232,12 +1757,13 @@ function timeAgo(ts){
     const d=Math.floor(h/24); if(d<7) return `${d} ngày trước`;
     return new Date(ts).toLocaleDateString("vi-VN");
 }
+
 function postHtml(p){
     const n = p.images ? p.images.length : 0;
     
     const renderMediaCell = (item, i) => {
-        const isObject = typeof item === 'object';
-        const url = isObject ? item.url : item;
+        const isObject = typeof item === 'object' && item !== null;
+        const url = safeUrl(isObject ? item.url : item);
         const type = isObject ? item.type : 'image';
 
         if (type === 'video') {
@@ -2254,15 +1780,16 @@ function postHtml(p){
     };
 
     const grid = n ? `<div class="post-grid n${Math.min(n, 4)}">${p.images.slice(0, 4).map((item, i) => renderMediaCell(item, i)).join("")}</div>` : "";
+    const safeAdminPhoto = safeUrl(adminCredentials.photo);
     
-    const comments = p.comments.map((c, i) => {
+    const comments = (p.comments || []).map((c, i) => {
         const isAdminComment = c.name === "Admin";
         return `
         <div class="cmt">
-            ${c.name === 'Admin' && adminCredentials.photo 
-            ? `<img src="${adminCredentials.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;">` 
+            ${isAdminComment && safeAdminPhoto 
+            ? `<img src="${safeAdminPhoto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;">` 
             : `<div class="cmt-avatar" style="${isAdminComment ? 'background:#0f2a22;color:#38d9a9;' : ''}">${escapeHtml((c.name || "?").trim().charAt(0).toUpperCase())}</div>`
-}
+            }
             <div>
                 <div class="cmt-bubble">
                     <strong class="${isAdminComment ? 'is-admin' : ''}">${escapeHtml(c.name)}</strong>
@@ -2278,26 +1805,28 @@ function postHtml(p){
 
     return `
         <div class="post-head">
-            ${adminCredentials.photo ? `<img src="${adminCredentials.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;">` : `<div class="avatar-circle">12A1</div>`}
+            ${safeAdminPhoto ? `<img src="${safeAdminPhoto}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;">` : `<div class="avatar-circle">12A1</div>`}
             <div><strong>Admin · 12A1-k59</strong><div class="post-time">${timeAgo(p.time)} · 🌐</div></div>
             <button class="admin-only post-del" onclick="deletePost(${p.id})" title="Xóa bài">🗑</button>
         </div>
         ${p.text ? `<p class="post-text">${escapeHtml(p.text)}</p>` : ""}
         ${grid}
-        <div class="post-stats"><span>❤️ ${p.likes} lượt thả tim</span><span>${p.comments.length} bình luận</span></div>
+        <div class="post-stats"><span>❤️ ${p.likes || 0} lượt thả tim</span><span>${(p.comments || []).length} bình luận</span></div>
         <div class="post-actions">
             <button class="${myLikes[p.id] ? "on" : ""}" onclick="toggleLike(${p.id})"><span class="heart-icon">${myLikes[p.id] ? "❤️" : "🤍"}</span> Thả tim</button>
             <button onclick="document.getElementById('c-text-${p.id}').focus()">💬 Bình luận</button>
         </div>
         <div class="cmt-list">${comments}</div>
         <div class="cmt-form">
-            <input class="cmt-name" type="text" id="c-name-${p.id}" placeholder="Tên bạn" value="${savedName}" ${readonly}>
-            <input class="cmt-text" type="text" id="c-text-${p.id}" placeholder="Viết bình luận..." onkeydown="if(event.key==='Enter')addComment(${p.id})">
+            <input class="cmt-name" type="text" id="c-name-${p.id}" maxlength="35" placeholder="Tên bạn" value="${savedName}" ${readonly}>
+            <input class="cmt-text" type="text" id="c-text-${p.id}" maxlength="500" placeholder="Viết bình luận..." onkeydown="if(event.key==='Enter')addComment(${p.id})">
             <button onclick="addComment(${p.id})">Gửi</button>
         </div>`;
 }
+
 function renderPosts(){
-    const feed=document.getElementById("post-feed"); feed.innerHTML="";
+    const feed=document.getElementById("post-feed"); if(!feed) return;
+    feed.innerHTML="";
     if(posts.length===0){feed.innerHTML=`<p class="empty-achieve">Chưa có bài đăng nào.</p>`;return;}
     posts.forEach(p=>{
         const art=document.createElement("article"); art.className="post-card"; art.id=`post-${p.id}`;
@@ -2319,17 +1848,28 @@ function refreshPost(id){
         nameInput.value = localStorage.getItem('class_visitor') || "";
     }
 }
-function openPostImage(id,i){const p=posts.find(x=>x.id===id); if(p) openLightbox(p.images,i,p.text.slice(0,120));}
+function openPostImage(id,i){
+    const p=posts.find(x=>x.id===id);
+    if(p && p.images) {
+        const urls = p.images.map(item => typeof item === 'object' ? safeUrl(item.url) : safeUrl(item)).filter(Boolean);
+        openLightbox(urls, i, (p.text || "").slice(0,120));
+    }
+}
 async function toggleLike(id){
-    const p=posts.find(x=>x.id===id); 
-    if(myLikes[id]){delete myLikes[id];p.likes=Math.max(0,p.likes-1);}
-    else{myLikes[id]=true;p.likes++;} 
+    const p=posts.find(x=>x.id===id);
+    if(!p) return;
+    if(myLikes[id]){delete myLikes[id];p.likes=Math.max(0,(p.likes||0)-1);}
+    else{myLikes[id]=true;p.likes=(p.likes||0)+1;} 
     await saveData(); 
     refreshPost(id);
 }
 
 async function addComment(id){
+    if (Date.now() - lastActionTimestamp < 4000) {
+        return alert("Bạn bình luận quá nhanh, vui lòng đợi vài giây!");
+    }
     const p = posts.find(x => x.id === id);
+    if (!p) return;
     const nameInput = document.getElementById(`c-name-${id}`);
     const textInput = document.getElementById(`c-text-${id}`);
     
@@ -2340,11 +1880,15 @@ async function addComment(id){
         name = "Admin";
     } else {
         if(!name) return alert("Vui lòng nhập tên của bạn!");
+        if(name.toLowerCase().includes("admin")) return alert("Không được giả mạo tên Admin!");
         localStorage.setItem('class_visitor', name);
     }
 
     if(!text) return alert("Vui lòng nhập nội dung bình luận!");
+    if(name.length > 35 || text.length > 500) return alert("Tên hoặc bình luận vượt quá độ dài cho phép!");
 
+    lastActionTimestamp = Date.now();
+    if (!Array.isArray(p.comments)) p.comments = [];
     p.comments.push({name, text, time: Date.now()}); 
     await saveData(); 
     refreshPost(id);
@@ -2370,7 +1914,7 @@ let lb={list:[],i:0,caps:""};
 function openLightbox(list,i=0,caps=""){lb={list,i,caps};renderLightbox();document.getElementById("lightbox").classList.remove("hidden");}
 function renderLightbox(){
     const multi=lb.list.length>1; const cap=Array.isArray(lb.caps)?(lb.caps[lb.i]||""):lb.caps;
-    document.getElementById("lb-img").src=lb.list[lb.i];
+    document.getElementById("lb-img").src=lb.list[lb.i] || "";
     document.getElementById("lb-prev").style.display=multi?"block":"none";
     document.getElementById("lb-next").style.display=multi?"block":"none";
     document.getElementById("lb-cap").textContent=[multi?`${lb.i+1}/${lb.list.length}`:"",cap].filter(Boolean).join(" · ");
@@ -2391,14 +1935,13 @@ function renderBirthdays(){
     
     if(today.length){
         banner.classList.remove("hidden");
-        // Tạo danh sách tên, nếu có nhiều người cùng sinh nhật thì nối bằng dấu phẩy
         const namesHtml = today.map(x=>escapeHtml(x.name)).join(", ");
         
-        // Xử lý nút Gửi lời chúc cho người đầu tiên (hoặc người duy nhất) trong danh sách
         let wishBtnHtml = "";
         const firstPerson = today[0];
-        if (firstPerson.facebook) {
-            wishBtnHtml = `<a href="${escapeHtml(firstPerson.facebook)}" target="_blank" class="banner-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc 🎉</a>`;
+        const safeFb = safeUrl(firstPerson.facebook);
+        if (safeFb) {
+            wishBtnHtml = `<a href="${safeFb}" target="_blank" rel="noopener noreferrer" class="banner-btn" style="text-decoration:none; display:inline-block;">Gửi lời chúc 🎉</a>`;
         } else {
             wishBtnHtml = `<span class="banner-btn" style="cursor:default; opacity:0.7;">Chưa có FB</span>`;
         }
@@ -2424,21 +1967,26 @@ function openWishChat(index){
     showModal(`
         <h3>🎂 Lời chúc cho ${escapeHtml(m.name)}</h3>
         <div class="chat-list" id="chat-list">${list}</div>
-        <div class="form-group"><input type="text" id="w-name" placeholder="Tên bạn" value="${savedName}" ${readonly}></div>
-        <div class="chat-send"><input type="text" id="w-text" placeholder="Viết lời chúc..." onkeydown="if(event.key==='Enter')sendWish(${index})"><button class="btn-submit" onclick="sendWish(${index})">Gửi</button></div>
+        <div class="form-group"><input type="text" id="w-name" maxlength="35" placeholder="Tên bạn" value="${savedName}" ${readonly}></div>
+        <div class="chat-send"><input type="text" id="w-text" maxlength="400" placeholder="Viết lời chúc..." onkeydown="if(event.key==='Enter')sendWish(${index})"><button class="btn-submit" onclick="sendWish(${index})">Gửi</button></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Đóng</button></div>
     `);
     const cl=document.getElementById("chat-list"); cl.scrollTop=cl.scrollHeight;
 }
 async function sendWish(index){
+    if (Date.now() - lastActionTimestamp < 4000) {
+        return alert("Bạn gửi quá nhanh, vui lòng đợi vài giây!");
+    }
     const m=members[index]; 
     let name = document.getElementById("w-name").value.trim();
     if(isAdmin) name = "Admin";
     else {
         if(!name) return alert("Nhập tên!");
+        if(name.toLowerCase().includes("admin")) return alert("Không được giả mạo tên Admin!");
         localStorage.setItem('class_visitor',name);
     }
     const text=document.getElementById("w-text").value.trim(); if(!text) return;
+    lastActionTimestamp = Date.now();
     getBd(bdayKey(m)).wishes.push({name,text,time:Date.now()}); 
     await saveData(); 
     openWishChat(index);
@@ -2462,8 +2010,6 @@ const WISHES=[
 function isWomensDay(){const d=new Date();return d.getMonth()===9&&d.getDate()===20;}
 function renderHeartBubbles(){
     let stage=document.getElementById("heart-stage"); 
-    
-    // Nếu chưa có khung chứa, tạo mới
     if(!stage) {
         const wrapper = document.createElement("div");
         wrapper.id = "heart-stage";
@@ -2471,11 +2017,9 @@ function renderHeartBubbles(){
         const container = document.querySelector("#members-page .full-page-card");
         if(container && (previewBubbles||isWomensDay())) {
             container.insertBefore(wrapper, container.querySelector(".member-toolbar"));
-            stage = wrapper; // Gán lại stage sau khi tạo
+            stage = wrapper;
         } else return;
     }
-    
-    // Kiểm tra an toàn: Nếu không tìm thấy stage thì dừng lại, không báo lỗi
     if (!stage) return; 
 
     const show=previewBubbles||isWomensDay();
@@ -2487,10 +2031,11 @@ function renderHeartBubbles(){
         const size=100+Math.round(Math.random()*26);
         const pct=((i+0.5)/girls.length)*100;
         const shortName=m.name.trim().split(/\s+/).slice(-2).join(" ");
+        const safePhoto = safeUrl(m.photo);
         const b=document.createElement("button");
         b.className="heart-bubble"; b.title=m.name;
         b.style.cssText=`width:${size}px;height:${size}px;left:calc(${pct}% - ${size/2}px);--dur:${(9+Math.random()*6).toFixed(1)}s;--delay:-${(Math.random()*12).toFixed(1)}s`;
-        b.innerHTML=`${m.photo?`<img src="${m.photo}" alt="">`:`<span class="heart-emoji">💗</span>`}<span class="heart-name">${escapeHtml(shortName)}</span>`;
+        b.innerHTML=`${safePhoto?`<img src="${safePhoto}" alt="">`:`<span class="heart-emoji">💗</span>`}<span class="heart-name">${escapeHtml(shortName)}</span>`;
         b.addEventListener("click",()=>openWishModal(members.indexOf(m)));
         stage.appendChild(b);
     });
@@ -2499,7 +2044,8 @@ function openWishModal(index,wishIdx){
     const m=members[index]; if(!m) return;
     const i=wishIdx!==undefined?wishIdx:Math.floor(Math.random()*WISHES.length);
     const given=m.name.trim().split(/\s+/).slice(-1)[0];
-    const photo=m.photo?`<img class="wish-photo" src="${m.photo}" alt="${escapeHtml(m.name)}">`:`<div class="wish-photo wish-photo-empty">💗</div>`;
+    const safePhoto = safeUrl(m.photo);
+    const photo=safePhoto?`<img class="wish-photo" src="${safePhoto}" alt="${escapeHtml(m.name)}">`:`<div class="wish-photo wish-photo-empty">💗</div>`;
     showModal(`
         <div style="text-align:center">
             ${photo}
@@ -2513,91 +2059,9 @@ function openWishModal(index,wishIdx){
     `);
 }
 
-/* ===== KHỞI CHẠY ===== */
-document.getElementById('post-feed').innerHTML = '<p style="text-align:center;color:var(--muted);">Đang tải dữ liệu từ máy chủ...</p>';
-loadDataFromFirebase();
-setInterval(()=>{ 
-    updateCountdowns(); 
-    renderBirthdays(); 
-}, 1000);
-showPage("home");
-async function importDefaultMembers() {
-    const defaultData = [
-        { "STT": 1, "Lop": "12A1", "HoVaTen": "Nguyễn Quốc An", "NgaySinh": "17/01/2009", "GioiTinh": "Nam", "SoDienThoai": "034675179", "Gmail": "quocan170109@gmail.com" },
-        { "STT": 2, "Lop": "12A1", "HoVaTen": "Cao Thị Lan Anh", "NgaySinh": "02/01/2009", "GioiTinh": "Nữ", "SoDienThoai": "0866517683", "Gmail": "caolananh0201@gmail.com" },
-        { "STT": 3, "Lop": "12A1", "HoVaTen": "Đinh Tuấn Anh", "NgaySinh": "12/01/2009", "GioiTinh": "Nam", "SoDienThoai": "0867468766", "Gmail": "anhmastersniper@gmail.com" },
-        { "STT": 4, "Lop": "12A1", "HoVaTen": "Nguyễn Ngọc Anh", "NgaySinh": "20/09/2009", "GioiTinh": "Nữ", "SoDienThoai": "0963159209", "Gmail": "ngocanhnguyen20092009@gmail.com" },
-        { "STT": 5, "Lop": "12A1", "HoVaTen": "Hoàng Gia Bảo", "NgaySinh": "29/09/2009", "GioiTinh": "Nam", "SoDienThoai": "0912746001", "Gmail": "hoangbao2992009@gmail.com" },
-        { "STT": 6, "Lop": "12A1", "HoVaTen": "Nguyễn Tuấn Châu", "NgaySinh": "15/12/2009", "GioiTinh": "Nam", "SoDienThoai": "0338122888", "Gmail": "chaunguyentuan2@gmail.com" },
-        { "STT": 7, "Lop": "12A1", "HoVaTen": "Hà Ngọc Vân Dung", "NgaySinh": "29/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0866205093", "Gmail": "zeduring209@gmail.com" },
-        { "STT": 8, "Lop": "12A1", "HoVaTen": "Nguyễn Minh Dũng", "NgaySinh": "23/02/2009", "GioiTinh": "Nam", "SoDienThoai": "0377118892", "Gmail": "nguyenminhdung6b2009@gmail.com" },
-        { "STT": 9, "Lop": "12A1", "HoVaTen": "Trần Đình Đăng", "NgaySinh": "06/08/2009", "GioiTinh": "Nam", "SoDienThoai": "0355068391", "Gmail": "trandinhdang6809@gmail.com" },
-        { "STT": 10, "Lop": "12A1", "HoVaTen": "Đặng Quang Hào", "NgaySinh": "16/12/2009", "GioiTinh": "Nam", "SoDienThoai": "0977885936", "Gmail": "dangquanghao1612@gmail.com" },
-        { "STT": 11, "Lop": "12A1", "HoVaTen": "Hà Thị Hồng Hải", "NgaySinh": "03/06/2009", "GioiTinh": "Nữ", "SoDienThoai": "0787431471", "Gmail": "hahonghai0306@gmail.com" },
-        { "STT": 12, "Lop": "12A1", "HoVaTen": "Đặng Đình Hạnh", "NgaySinh": "19/05/2009", "GioiTinh": "Nam", "SoDienThoai": "0869950968", "Gmail": "thuyhaidbp@gmail.com" },
-        { "STT": 13, "Lop": "12A1", "HoVaTen": "Chu Minh Hiếu", "NgaySinh": "03/03/2009", "GioiTinh": "Nam", "SoDienThoai": "0375656916", "Gmail": "anhtraihiphop123456789@gmail.com" },
-        { "STT": 14, "Lop": "12A1", "HoVaTen": "Nguyễn Bích Hồng", "NgaySinh": "03/12/2009", "GioiTinh": "Nữ", "SoDienThoai": "0862181309", "Gmail": "nguyenbichhong1239@gmail.com" },
-        { "STT": 15, "Lop": "12A1", "HoVaTen": "Phạm Lâm Hồng", "NgaySinh": "22/12/2009", "GioiTinh": "Nam", "SoDienThoai": "0353958365", "Gmail": "mostbua1t@gmail.com" },
-        { "STT": 16, "Lop": "12A1", "HoVaTen": "Cao Hoàng Huy", "NgaySinh": "07/10/2009", "GioiTinh": "Nam", "SoDienThoai": "0969750229", "Gmail": "caohuy12011992@gmail.com" },
-        { "STT": 17, "Lop": "12A1", "HoVaTen": "Lương Thu Hương", "NgaySinh": "20/04/2009", "GioiTinh": "Nữ", "SoDienThoai": "0374645209", "Gmail": "thuhuong20042009@gmail.com" },
-        { "STT": 18, "Lop": "12A1", "HoVaTen": "Nguyễn Khắc Mai Hương", "NgaySinh": "15/02/2009", "GioiTinh": "Nữ", "SoDienThoai": "0329002648", "Gmail": "lengatn2017@gmail.com" },
-        { "STT": 19, "Lop": "12A1", "HoVaTen": "Lê Du Kỳ", "NgaySinh": "30/05/2009", "GioiTinh": "Nam", "SoDienThoai": "0345744882", "Gmail": "leky30052009@gmail.com" },
-        { "STT": 20, "Lop": "12A1", "HoVaTen": "Lương Đức Khang", "NgaySinh": "02/08/2009", "GioiTinh": "Nam", "SoDienThoai": "0975681498", "Gmail": "duckhang.no1@gmail.com" },
-        { "STT": 21, "Lop": "12A1", "HoVaTen": "Phan Trọng Khôi", "NgaySinh": "17/05/2009", "GioiTinh": "Nam", "SoDienThoai": "0369430720", "Gmail": "khoi17052009@gmail.com" },
-        { "STT": 22, "Lop": "12A1", "HoVaTen": "Đinh Bảo Lâm", "NgaySinh": "16/08/2009", "GioiTinh": "Nam", "SoDienThoai": "0358650255", "Gmail": "baolam1608.vanxuan2009@gmail.com" },
-        { "STT": 23, "Lop": "12A1", "HoVaTen": "Mai Thùy Linh", "NgaySinh": "02/05/2009", "GioiTinh": "Nữ", "SoDienThoai": "0948436748", "Gmail": "maithuylinh02052009@gmail.com" },
-        { "STT": 24, "Lop": "12A1", "HoVaTen": "Nguyễn Khánh Linh", "NgaySinh": "21/11/2009", "GioiTinh": "Nữ", "SoDienThoai": "0334220136", "Gmail": "linhmanhthoa@gmail.com" },
-        { "STT": 25, "Lop": "12A1", "HoVaTen": "Trần Khánh Ly", "NgaySinh": "23/11/2009", "GioiTinh": "Nữ", "SoDienThoai": "0379742386", "Gmail": "lykhanhtran58@gmail.com" },
-        { "STT": 26, "Lop": "12A1", "HoVaTen": "Trần Đức Mạnh", "NgaySinh": "24/04/2009", "GioiTinh": "Nam", "SoDienThoai": "0862809912", "Gmail": "tmanh240409@gmail.com" },
-        { "STT": 27, "Lop": "12A1", "HoVaTen": "Phan Quang Minh", "NgaySinh": "03/10/2009", "GioiTinh": "Nam", "SoDienThoai": "0983463313", "Gmail": "mingnqb@gmail.com" },
-        { "STT": 28, "Lop": "12A1", "HoVaTen": "Nguyễn Hà My", "NgaySinh": "20/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0338570270", "Gmail": "nguyenhamy28062009@gmail.com" },
-        { "STT": 29, "Lop": "12A1", "HoVaTen": "Đỗ Hoàng An Na", "NgaySinh": "08/01/2009", "GioiTinh": "Nữ", "SoDienThoai": "0965189509", "Gmail": "ngalytamnong@gmail.com" },
-        { "STT": 30, "Lop": "12A1", "HoVaTen": "Hồ Thị Kim Ngân", "NgaySinh": "01/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0365437693", "Gmail": "hongan123phutho@gmail.com" },
-        { "STT": 31, "Lop": "12A1", "HoVaTen": "Lê Huyền Ngọc", "NgaySinh": "21/10/2009", "GioiTinh": "Nữ", "SoDienThoai": "0913342512", "Gmail": "lehngoc211009@gmail.com" },
-        { "STT": 32, "Lop": "12A1", "HoVaTen": "Hoàng Cao Phong", "NgaySinh": "28/01/2009", "GioiTinh": "Nam", "SoDienThoai": "0943108168", "Gmail": "Caophong2912k9@gmail.com" },
-        { "STT": 33, "Lop": "12A1", "HoVaTen": "Hán Ngọc Minh Phương", "NgaySinh": "30/10/2009", "GioiTinh": "Nữ", "SoDienThoai": "0335886098", "Gmail": "hanngocminhphuong@gmail.com" },
-        { "STT": 34, "Lop": "12A1", "HoVaTen": "Chu Tiến Thành", "NgaySinh": "26/11/2009", "GioiTinh": "Nam", "SoDienThoai": "0984281869", "Gmail": "" },
-        { "STT": 35, "Lop": "12A1", "HoVaTen": "Bùi Thanh Thảo", "NgaySinh": "14/09/2009", "GioiTinh": "Nữ", "SoDienThoai": "0382869216", "Gmail": "thanhthao1492009@gmail.com" },
-        { "STT": 36, "Lop": "12A1", "HoVaTen": "Nguyễn Phương Thảo", "NgaySinh": "10/09/2009", "GioiTinh": "Nữ", "SoDienThoai": "0378903109", "Gmail": "ptjs03011995@gmail.com" },
-        { "STT": 37, "Lop": "12A1", "HoVaTen": "Phạm Thị Thu Thảo", "NgaySinh": "06/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0835886886", "Gmail": "phamthao682009@gmail.com" },
-        { "STT": 38, "Lop": "12A1", "HoVaTen": "Đặng Huyền Trang", "NgaySinh": "13/08/2009", "GioiTinh": "Nữ", "SoDienThoai": "0373606349", "Gmail": "dangtragn813@gmail.com" },
-        { "STT": 39, "Lop": "12A1", "HoVaTen": "Lý Đắc Quang Trung", "NgaySinh": "11/08/2009", "GioiTinh": "Nam", "SoDienThoai": "0987123448", "Gmail": "lydacquangtrung@gmail.com" },
-        { "STT": 40, "Lop": "12A1", "HoVaTen": "Đỗ Quốc Việt", "NgaySinh": "15/03/2009", "GioiTinh": "Nam", "SoDienThoai": "0364966283", "Gmail": "doquocvietnek@gmail.com" },
-        { "STT": 41, "Lop": "12A1", "HoVaTen": "Nguyễn Bá Việt", "NgaySinh": "07/03/2009", "GioiTinh": "Nam", "SoDienThoai": "0966070309", "Gmail": "Kotlo.nbv@gmail.com" },
-        { "STT": 42, "Lop": "12A1", "HoVaTen": "Trần Minh Vương", "NgaySinh": "30/01/2009", "GioiTinh": "Nam", "SoDienThoai": "0349108018", "Gmail": "tranminhvuong2930@gmail.com" },
-        { "STT": 43, "Lop": "12A1", "HoVaTen": "Đinh Hữu Vượng", "NgaySinh": "29/06/2009", "GioiTinh": "Nam", "SoDienThoai": "0356852817", "Gmail": "huuvuongdinh2009@gmail.com" },
-        { "STT": 44, "Lop": "12A1", "HoVaTen": "Lại Thị Hải Yến", "NgaySinh": "25/12/2009", "GioiTinh": "Nữ", "SoDienThoai": "0972191966", "Gmail": "quanda4612@gmail.com" },
-        { "STT": 45, "Lop": "12A1", "HoVaTen": "Nguyễn Đặng Hải Yến", "NgaySinh": "07/12/2009", "GioiTinh": "Nữ", "SoDienThoai": "0333283076", "Gmail": "Yen828342@gamil.com" }
-    ];
-
-    if (!confirm("Bạn có chắc chắn muốn nạp toàn bộ 45 thành viên này lên hệ thống không?")) return;
-
-    members = defaultData.map(item => {
-        let parts = item.NgaySinh.split("/");
-        let formattedDob = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : "";
-        
-        return {
-            name: item.HoVaTen,
-            gender: item.GioiTinh,
-            birthday: formattedDob,
-            phone: item.SoDienThoai,
-            gmail: item.Gmail,
-            facebook: "",
-            photo: ""
-        };
-    });
-
-    const success = await saveData();
-    if (success) {
-        renderMembers();
-        alert("🎉 Đã nhập thành công 45 thành viên lên hệ thống Firebase!");
-    }
-}
 /* ===== NHẬP TKB BẰNG JSON (BẢO MẬT & TỰ ĐỘNG SỬA LỖI) ===== */
 function openImportTKBJsonModal() {
-    // Hiển thị TKB hiện tại để Admin dễ nhìn và sửa trực tiếp
     const currentJson = JSON.stringify(scheduleData, null, 2);
-    
     showModal(`
         <h3>📥 Nhập Thời khóa biểu</h3>
         <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">
@@ -2618,33 +2082,23 @@ async function saveTKBFromJson() {
     if (!rawInput) return alert("Vui lòng dán mã vào khung!");
 
     try {
-        // 1. TỰ ĐỘNG BỌC NGOẶC NHỌN (Nếu người dùng dán đoạn text thô không có { })
         if (!rawInput.startsWith("{")) rawInput = "{" + rawInput;
         if (!rawInput.endsWith("}")) rawInput = rawInput + "}";
-        
-        // 2. XÓA DẤU PHẨY THỪA Ở CUỐI (Nếu người dùng dán "..., }" )
         rawInput = rawInput.replace(/,\s*}/g, "}");
-
-        // 3. TỰ ĐỘNG THÊM NGOẶC KÉP CHO CÁC KEY SỐ (VD: 1: -> "1":)
-        // Điều này giúp JSON.parse không bị lỗi nếu người dùng quên ngoặc kép
         let fixedInput = rawInput.replace(/(\d+)\s*:/g, '"$1":');
 
-        // 4. PHÂN TÍCH JSON
         let parsedData;
         try {
             parsedData = JSON.parse(fixedInput);
         } catch (e) {
-            // Nếu vẫn lỗi, thử một lần nữa sau khi xóa mọi dấu phẩy thừa
             let retryInput = fixedInput.replace(/,(\s*})/g, '$1');
             try {
                 parsedData = JSON.parse(retryInput);
             } catch (e2) {
-                console.error("Lỗi JSON gốc:", e);
                 return alert("❌ Lỗi cú pháp JSON! Hãy kiểm tra lại các dấu phẩy, ngoặc kép.\nChi tiết: " + e.message);
             }
         }
 
-        // 5. CHỐNG PHÁ HOẠI (XSS) VÀ LỌC DỮ LIỆU
         const validDays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"];
         let newScheduleData = {};
         let hasData = false;
@@ -2655,10 +2109,7 @@ async function saveTKBFromJson() {
                 for (let tiet in parsedData[day]) {
                     const tietNum = parseInt(tiet);
                     const monHoc = parsedData[day][tiet];
-                    
-                    // Kiểm tra tính hợp lệ (Tiết từ 1-11, tên môn học là chuỗi)
                     if (tietNum >= 1 && tietNum <= 11 && typeof monHoc === 'string') {
-                        // Lọc bỏ các ký tự nguy hiểm < > { } ( ) để chống chèn mã độc
                         const safeMonHoc = monHoc.replace(/[<>{}()]/g, "").trim().toUpperCase();
                         if (safeMonHoc) {
                             newScheduleData[day][tietNum] = safeMonHoc;
@@ -2669,53 +2120,22 @@ async function saveTKBFromJson() {
             }
         });
 
-        if (!hasData) {
-            return alert("Không tìm thấy dữ liệu TKB hợp lệ! Vui lòng kiểm tra lại định dạng.");
-        }
+        if (!hasData) return alert("Không tìm thấy dữ liệu TKB hợp lệ!");
+        if (!confirm("Hệ thống đã kiểm tra an toàn. Bạn có chắc chắn muốn ghi đè TKB hiện tại không?")) return;
 
-        if (!confirm("Hệ thống đã kiểm tra an toàn. Bạn có chắc chắn muốn ghi đè TKB hiện tại bằng dữ liệu này không?")) return;
-
-        // 6. LƯU VÀ CẬP NHẬT
         scheduleData = newScheduleData;
         const success = await saveData();
-        
         if (success) {
             renderTKB();
             closeModal();
             alert("🎉 Đã cập nhật Thời khóa biểu an toàn thành công!");
-        } else {
-            alert("Lỗi lưu Firebase. Hãy thử lại.");
         }
-
     } catch (globalError) {
         console.error(globalError);
         alert("Đã xảy ra lỗi không mong muốn. Vui lòng kiểm tra lại dữ liệu dán vào.");
     }
 }
-async function importDefaultTeachers() {
-    const defaultTeacherData = [
-        { name: "Bùi Văn Hiếu", subject: "TOÁN HỌC", gender: "Nam", facebook: "", phone: "", birthday: "", gmail: "hieuhuyen.PT15@gmail.com", role: "GVCN" },
-        { name: "Tô Thị Thắm", subject: "HÓA HỌC", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "totham76@gmail.com", role: "GVBM" },
-        { name: "Lê Thị Dương", subject: "TIN HỌC", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "leduong.hvu@gmail.com", role: "GVBM" },
-        { name: "Bùi Thị Tuyết Lan", subject: "VẬT LÝ", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "tuyetlansp83@gmail.com", role: "GVBM" },
-        { name: "Nguyễn Thị Thanh Bình", subject: "SINH HỌC", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "thanhbinhtamnong@gmail.com", role: "GVBM" },
-        { name: "Nguyễn Thị Thu Hường", subject: "LỊCH SỬ", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "nguyenthithuhuongtn1977@gmail.com", role: "GVBM" },
-        { name: "Nguyễn Thị Hạnh", subject: "TIẾNG ANH", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "nguyenhanh86ta@gmail.com", role: "GVBM" },
-        { name: "Nguyễn Bích Thuỷ", subject: "NGỮ VĂN", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "nguyenbichthuyvantn@gmail.com", role: "GVBM" },
-        { name: "Đỗ Thị Minh", subject: "THỂ DỤC", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "Dominh220182@gmail.com", role: "GVBM" },
-        { name: "Vũ Thị Xim", subject: "QUỐC PHÒNG", gender: "Nữ", facebook: "", phone: "", birthday: "", gmail: "vuthixim1979@gmail.com", role: "GVBM" }
-    ];
 
-    if (!confirm("Bạn có chắc chắn muốn nạp toàn bộ danh sách thầy cô kèm Gmail lên hệ thống không?")) return;
-
-    teachers = defaultTeacherData;
-
-    const success = await saveData();
-    if (success) {
-        renderTeachers();
-        alert("🎉 Đã nhập thành công danh sách thầy cô kèm Gmail lên Firebase!");
-    }
-}
 /* ===== QUẢN LÝ SỰ KIỆN / VIDEO TRÌNH CHIẾU ===== */
 function renderSpecialEvents() {
     const feed = document.getElementById("events-feed");
@@ -2731,37 +2151,29 @@ function renderSpecialEvents() {
         const card = document.createElement("article");
         card.className = "event-post-card";
         
-        // Tạo HTML cho ảnh Thumbnail
-        const thumbSrc = ev.thumbnail || "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E";
-        
-        let actionHtml = "";
+        const thumbSrc = safeUrl(ev.thumbnail) || "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E";
+        const safeMediaUrl = safeUrl(ev.mediaUrl);
         let clickAttr = "";
 
-        if (ev.mediaType === 'youtube') {
-            clickAttr = `onclick="window.open('${escapeHtml(ev.mediaUrl)}', '_blank')"`;
-        } else if (ev.mediaType === 'video') {
-             // Nếu là video tự tải lên, mở lightbox hoặc cửa sổ mới. Ở đây tôi để mở tab mới cho tiện.
-            clickAttr = `onclick="window.open('${escapeHtml(ev.mediaUrl)}', '_blank')"`;
-        } else if (ev.mediaType === 'image') {
-            clickAttr = `onclick="openLightbox(['${escapeHtml(ev.mediaUrl)}'], 0, '${escapeHtml(ev.title)}')"`;
+        if ((ev.mediaType === 'youtube' || ev.mediaType === 'video') && safeMediaUrl) {
+            clickAttr = `onclick="window.open('${safeMediaUrl}', '_blank', 'noopener,noreferrer')"`;
+        } else if (ev.mediaType === 'image' && safeMediaUrl) {
+            clickAttr = `onclick="openLightbox(['${safeMediaUrl}'], 0, '${escapeHtml(ev.title)}')"`;
         }
 
         card.innerHTML = `
             <div class="event-post-header">
                 <div>
                     <div class="event-post-title">🎉 ${escapeHtml(ev.title)}</div>
-                    <div class="event-post-date">📅 ${ev.date ? ev.date.split('-').reverse().join('/') : 'Sự kiện đặc biệt'}</div>
+                    <div class="event-post-date">📅 ${ev.date ? escapeHtml(ev.date.split('-').reverse().join('/')) : 'Sự kiện đặc biệt'}</div>
                 </div>
                 <div class="admin-only">
                     <button class="mini-btn danger" onclick="deleteSpecialEvent(${index})">Xóa sự kiện</button>
                 </div>
             </div>
 
-            <!-- Khung hiển thị ảnh Thumbnail To Đùng -->
             <div style="position:relative; width:100%; border-radius:14px; overflow:hidden; cursor:pointer; margin:15px 0;" ${clickAttr}>
                 <img src="${thumbSrc}" style="width:100%; display:block; aspect-ratio:16/9; object-fit:cover;">
-                
-                <!-- Nút Play giả lập nếu là video/youtube -->
                 ${(ev.mediaType === 'youtube' || ev.mediaType === 'video') ? `
                 <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(255,0,0,0.9); width:70px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,0,0,0.5);">
                     <div style="width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-left:20px solid #fff; margin-left:5px;"></div>
@@ -2779,18 +2191,16 @@ function openAddEventVideoModal() {
         <h3>🎉 Đăng sự kiện / Video</h3>
         <div class="form-group">
             <label>Tên sự kiện</label>
-            <input type="text" id="se-title" placeholder="VD: Mừng ngày Phụ Nữ Việt Nam 20/10">
+            <input type="text" id="se-title" maxlength="120" placeholder="VD: Mừng ngày Phụ Nữ Việt Nam 20/10">
         </div>
         <div class="form-group">
             <label>Ngày diễn ra</label>
             <input type="date" id="se-date">
         </div>
-        
         <div class="form-group">
             <label>Ảnh Thumbnail (Bắt buộc - Hiển thị to ở ngoài)</label>
             <input type="file" id="se-thumbnail" accept="image/*">
         </div>
-
         <div class="form-group">
             <label>Loại nội dung:</label>
             <select id="se-media-type" onchange="toggleEventMediaType(this.value)">
@@ -2799,22 +2209,17 @@ function openAddEventVideoModal() {
                 <option value="video">Tải lên video (Mở trình phát khi bấm)</option>
             </select>
         </div>
-
-        <!-- Khu vực chọn file ảnh/video -->
         <div class="form-group" id="se-file-group">
             <label>Chọn tệp (Ảnh hoặc Video)</label>
             <input type="file" id="se-file" accept="image/*,video/*">
         </div>
-
-        <!-- Khu vực dán link YouTube -->
         <div class="form-group hidden" id="se-link-group">
             <label>Link YouTube</label>
             <input type="url" id="se-video-link" placeholder="https://www.youtube.com/watch?v=...">
         </div>
-
         <div class="form-group">
             <label>Lời chúc / Mô tả sự kiện</label>
-            <textarea id="se-desc" placeholder="Viết những lời chúc tốt đẹp..."></textarea>
+            <textarea id="se-desc" maxlength="2000" placeholder="Viết những lời chúc tốt đẹp..."></textarea>
         </div>
 
         <div class="upload-progress-container" id="se-progress-container" style="display:none;">
@@ -2860,13 +2265,11 @@ async function submitSpecialEvent() {
     if (modalActions) modalActions.style.display = 'none';
 
     try {
-        // 1. Tải ảnh Thumbnail
         if(progressText) progressText.textContent = "Đang tải ảnh Thumbnail...";
         const thumbUrl = await uploadToCloudinaryWithProgress(thumbFile, (percent) => {
             if (progressBar) progressBar.style.width = percent + '%';
         });
 
-        // 2. Xử lý nội dung (Ảnh, Video hoặc Link Youtube)
         let contentUrl = "";
         let finalMediaType = mediaType;
 
@@ -2877,7 +2280,6 @@ async function submitSpecialEvent() {
             contentUrl = await uploadToCloudinaryWithProgress(contentFile, (percent) => {
                 if (progressBar) progressBar.style.width = percent + '%';
             });
-            // Nếu là ảnh, đánh dấu là 'image', nếu là video đánh dấu là 'video'
             if (contentFile.type.startsWith('image/')) finalMediaType = 'image';
             if (contentFile.type.startsWith('video/')) finalMediaType = 'video';
         }
@@ -2895,7 +2297,6 @@ async function submitSpecialEvent() {
         await saveData();
         renderSpecialEvents();
         closeModal();
-
     } catch (e) {
         alert("Lỗi khi đăng sự kiện: " + e);
         if (modalActions) modalActions.style.display = 'flex';
@@ -2908,6 +2309,7 @@ async function deleteSpecialEvent(index) {
         renderSpecialEvents();
     }
 }
+
 /* ===== XỬ LÝ LƯỚI Ô SỐ RANDOM ===== */
 let numberGridItems = [];
 let isNumberSpinning = false;
@@ -2916,15 +2318,9 @@ function generateNumberGrid() {
     const fromVal = parseInt(document.getElementById("num-from").value);
     const toVal = parseInt(document.getElementById("num-to").value);
 
-    if (isNaN(fromVal) || isNaN(toVal)) {
-        return alert("Vui lòng nhập đầy đủ khoảng số hợp lệ!");
-    }
-    if (fromVal > toVal) {
-        return alert("Số bắt đầu phải nhỏ hơn hoặc bằng số kết thúc!");
-    }
-    if ((toVal - fromVal + 1) > 100) {
-        return alert("Khoảng số quá lớn (tối đa 100 số để hiển thị lưới)!");
-    }
+    if (isNaN(fromVal) || isNaN(toVal)) return alert("Vui lòng nhập đầy đủ khoảng số hợp lệ!");
+    if (fromVal > toVal) return alert("Số bắt đầu phải nhỏ hơn hoặc bằng số kết thúc!");
+    if ((toVal - fromVal + 1) > 100) return alert("Khoảng số quá lớn (tối đa 100 số)!");
 
     numberGridItems = [];
     for (let i = fromVal; i <= toVal; i++) {
@@ -2961,7 +2357,6 @@ function renderNumberGridCells(activeIndex) {
     });
 }
 
-// Âm thanh rất nhẹ, kiểu tiếng chạm mềm; không dùng tiếng còi hoặc âm lượng lớn.
 let numberAudioContext = null;
 function playSoftNumberTone(frequency = 620, duration = 0.035, volume = 0.018, delay = 0) {
     try {
@@ -2982,7 +2377,7 @@ function playSoftNumberTone(frequency = 620, duration = 0.035, volume = 0.018, d
         gain.connect(ctx.destination);
         oscillator.start(startAt);
         oscillator.stop(startAt + duration + 0.01);
-    } catch (e) { /* Không để lỗi âm thanh ảnh hưởng vòng quay. */ }
+    } catch (e) {}
 }
 function playSoftNumberTick() {
     playSoftNumberTone(560 + Math.random() * 100, 0.028, 0.012);
@@ -3000,10 +2395,8 @@ function startNumberRandom() {
     isNumberSpinning = true;
 
     let currentIndex = 0;
-    // Chạy hết khoảng số ít nhất 2 vòng, rồi đi thêm một đoạn ngẫu nhiên.
-    // Mỗi bước giữ nguyên tốc độ; đến bước cuối thì dừng bất chợt, không giảm tốc.
     const totalSteps = numberGridItems.length * 2 + Math.floor(Math.random() * numberGridItems.length);
-    const speed = 38; // Tốc độ cố định (ms), không tăng dần
+    const speed = 38;
     let currentStep = 0;
 
     function step() {
@@ -3026,13 +2419,13 @@ function startNumberRandom() {
 
     step();
 }
+
 /* ===== ĐỒNG HỒ ===== */
 let timerInterval = null;
 let timerRemaining = 0;
 let timerRunning = false;
 let timerEndTime = 0;
 
-// --- Đồng hồ hẹn giờ ---
 function updateTimerDisplay() {
     const el = document.getElementById('timer-display');
     if (!el) return;
@@ -3101,7 +2494,6 @@ function resetTimer() {
     });
 }
 
-// --- Tiếng chuông báo ---
 function playTimerBell() {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -3129,16 +2521,15 @@ function playTimerBell() {
             ring(t, 880, 0.35, 0.25);
             ring(t + 0.4, 660, 0.45, 0.2);
         }
-    } catch (e) { /* bỏ qua lỗi âm thanh */ }
+    } catch (e) {}
 }
-// ===== BẢO MẬT: HÀM MÃ HÓA & ĐỔI MẬT KHẨU =====
-// Hàm băm mật khẩu bằng SHA-256 (chuẩn bảo mật, không thể dịch ngược)
+
+/* ===== BẢO MẬT: HÀM MÃ HÓA & ĐỔI MẬT KHẨU ===== */
 async function hashPassword(password) {
     const msgBuffer = new TextEncoder().encode(password);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 function openSettingsModal() {
@@ -3152,10 +2543,9 @@ function openSettingsModal() {
             <label>Ảnh đại diện Admin</label>
             <input type="file" id="admin-avatar" accept="image/*">
         </div>
-        
         <div class="form-group">
             <label>Tên đăng nhập mới (Username)</label>
-            <input type="text" id="new-admin-user" value="${escapeHtml(adminCredentials.username)}">
+            <input type="text" id="new-admin-user" maxlength="40" value="${escapeHtml(adminCredentials.username)}">
         </div>
         <div class="form-group">
             <label>Mật khẩu hiện tại (Để xác nhận)</label>
@@ -3176,6 +2566,7 @@ function openSettingsModal() {
         </div>
     `);
 }
+
 async function saveAdminCredentials() {
     const newUser = document.getElementById("new-admin-user").value.trim();
     const currentPass = document.getElementById("current-admin-pass").value.trim();
@@ -3185,13 +2576,11 @@ async function saveAdminCredentials() {
 
     if (!newUser) return alert("Tên đăng nhập không được để trống!");
 
-    // Xác thực mật khẩu hiện tại
     const currentHash = await hashPassword(currentPass);
     if (currentHash !== adminCredentials.passwordHash) {
         return alert("Mật khẩu hiện tại không đúng!");
     }
 
-    // Nếu có đổi mật khẩu
     let newHash = adminCredentials.passwordHash;
     if (newPass || confirmPass) {
         if (newPass !== confirmPass) return alert("Mật khẩu mới nhập lại không khớp!");
@@ -3199,8 +2588,7 @@ async function saveAdminCredentials() {
         newHash = await hashPassword(newPass);
     }
 
-    // Xử lý ảnh đại diện
-    let newPhoto = adminCredentials.photo || ""; // Giữ ảnh cũ nếu không chọn ảnh mới
+    let newPhoto = adminCredentials.photo || "";
     if (file) {
         try {
             newPhoto = await compressImage(file, 300, 0.8);
@@ -3209,7 +2597,6 @@ async function saveAdminCredentials() {
         }
     }
 
-    // Cập nhật dữ liệu
     adminCredentials.username = newUser;
     adminCredentials.passwordHash = newHash;
     adminCredentials.photo = newPhoto;
@@ -3218,20 +2605,20 @@ async function saveAdminCredentials() {
     if (success) {
         alert("🎉 Đã cập nhật thông tin Admin thành công!");
         closeModal();
-        renderPosts(); // Render lại bảng tin để cập nhật avatar
-        renderMembers(); // Cập nhật lại giao diện thành viên (nếu cần)
+        renderPosts();
+        renderMembers();
     } else {
         alert("Lỗi lưu Firebase. Vui lòng thử lại.");
     }
 }
-// ===== CHẾ ĐỘ SÁNG/TỐI =====
+
+/* ===== CHẾ ĐỘ SÁNG/TỐI ===== */
 function toggleTheme() {
     document.body.classList.toggle('light-mode');
     const isLight = document.body.classList.contains('light-mode');
     document.getElementById('theme-toggle-btn').innerText = isLight ? '☀️' : '🌙';
     localStorage.setItem('class_theme', isLight ? 'light' : 'dark');
 }
-// Tự động load theme khi mở web
 if (localStorage.getItem('class_theme') === 'light') {
     document.body.classList.add('light-mode');
     document.addEventListener('DOMContentLoaded', () => {
@@ -3239,27 +2626,24 @@ if (localStorage.getItem('class_theme') === 'light') {
         if(btn) btn.innerText = '☀️';
     });
 }
-// ===== HIỆU ỨNG CUỘN MƯỢT MÀ (TỰ ĐỘNG) =====
+
+/* ===== HIỆU ỨNG CUỘN MƯỢT MÀ ===== */
 let scrollObserver = null;
 
 function initScrollReveal() {
-    // Nếu đã có observer cũ, hủy đi để tránh rò rỉ bộ nhớ
     if (scrollObserver) scrollObserver.disconnect();
-
     const elementsToReveal = document.querySelectorAll('.post-card, .achieve-card, .folder-card, .countdown-card, .event-post-card');
     
-    // Khởi tạo IntersectionObserver
     scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                scrollObserver.unobserve(entry.target); // Chỉ chạy 1 lần cho mỗi phần tử
+                scrollObserver.unobserve(entry.target);
             }
         });
     }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
 
     elementsToReveal.forEach(el => {
-        // Chỉ thêm class 'reveal' nếu phần tử đó chưa từng được hiển thị
         if (!el.classList.contains('reveal') && !el.classList.contains('active')) {
             el.classList.add('reveal');
             scrollObserver.observe(el);
@@ -3267,17 +2651,14 @@ function initScrollReveal() {
     });
 }
 
-// Tự động chạy hiệu ứng sau khi web tải dữ liệu xong
 setTimeout(initScrollReveal, 1000);
 
-// Tự động theo dõi nếu có dữ liệu mới được render (bài viết mới, bình luận mới...)
 const observeDOMChanges = () => {
     const feed = document.getElementById('post-feed');
     const achieveGrid = document.getElementById('achieve-grid');
     const folders = document.getElementById('folders-grid');
     
     const mutationObserver = new MutationObserver(() => {
-        // Khi có thẻ mới được thêm vào, khởi động lại bộ lắng nghe
         initScrollReveal();
     });
 
@@ -3286,6 +2667,13 @@ const observeDOMChanges = () => {
     if (folders) mutationObserver.observe(folders, { childList: true });
 };
 setTimeout(observeDOMChanges, 1500);
+
+/* ===== KHỞI CHẠY ===== */
+document.getElementById('post-feed').innerHTML = '<p style="text-align:center;color:var(--muted);">Đang tải dữ liệu từ máy chủ...</p>';
+loadDataFromFirebase();
+// Chỉ chạy updateCountdowns mỗi giây, không gọi renderBirthdays mỗi giây để tiết kiệm CPU
+setInterval(updateCountdowns, 1000);
+showPage("home");
 </script>
 </body>
 </html>
