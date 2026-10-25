@@ -410,33 +410,3 @@ footer{position:fixed;left:0;right:0;bottom:0;z-index:150;margin:0;padding:10px 
     color: var(--muted);
     margin-top: 6px;
 }
-/* Bổ sung chỉnh định dạng Navbar và Layout chuẩn */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 5%;
-    background: rgba(13, 13, 16, 0.92);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--line);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-.navbar nav {
-    display: flex;
-    gap: 8px;
-}
-.nav-link {
-    color: var(--muted);
-    text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: 0.2s;
-}
-.nav-link:hover, .nav-link.active {
-    background: var(--chip);
-    color: var(--deep);
-}
