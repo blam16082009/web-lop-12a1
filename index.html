@@ -354,8 +354,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-window.fbOnSnapshot = onSnapshot;
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBD7C-4YqcnioENEf8XFX8O7QELegdTV4w",
@@ -368,17 +367,24 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 window.fbDoc = doc;
 window.fbGetDoc = getDoc;
 window.fbSetDoc = setDoc;
 window.db = db;
 window.firebaseReady = true;
-const auth = getAuth(app);
-signInAnonymously(auth).then(() => {
-    console.log("Connected!");
-}).catch((error) => {
-    console.error("Auth error:", error);
+
+// Xuất các hàm xác thực ra window để script_2.js dùng được
+window.fbSignIn = signInWithEmailAndPassword;
+window.fbSignOut = signOut;
+window.fbAuth = auth;
+
+// Lắng nghe trạng thái đăng nhập
+onAuthStateChanged(auth, (user) => {
+    if (typeof window.setAdminState === 'function') {
+        window.setAdminState(!!user);
+    }
 });
 </script>
 

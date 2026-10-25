@@ -557,50 +557,6 @@ function showPage(page){
     if(page==="clock"){ updateTimerDisplay(); }
 }
 
-let adminCredentials = { username: "admin", passwordHash: "" };
-
-function openAdminModal(){
-    if(isAdmin){
-        isAdmin=false; document.body.classList.remove("admin-mode");
-        const btn=document.getElementById("admin-toggle-btn");
-        btn.classList.remove("logged-in"); btn.innerHTML=`·`;
-        alert("Đã đăng xuất!"); renderAllClassData(); return;
-    }
-    showModal(`
-        <h3>Đăng nhập Quản trị viên</h3>
-        <div class="form-group"><label>Tên đăng nhập</label><input type="text" id="admin-user"></div>
-        <div class="form-group"><label>Mật khẩu</label><input type="password" id="admin-pass" onkeydown="if(event.key==='Enter')submitAdminLogin()"></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAdminLogin()">Đăng nhập</button></div>
-    `);
-}
-
-async function submitAdminLogin(){
-    const u=document.getElementById("admin-user").value.trim();
-    const p=document.getElementById("admin-pass").value.trim();
-    
-    if(!u || !p) return alert("Vui lòng nhập đầy đủ thông tin!");
-
-    const inputHash = await hashPassword(p);
-
-    if (!adminCredentials.passwordHash) {
-        const defaultHash = await hashPassword("123456");
-        adminCredentials = { username: "admin", passwordHash: defaultHash };
-        await saveData();
-    }
-
-    if(u === adminCredentials.username && inputHash === adminCredentials.passwordHash){
-        isAdmin=true; document.body.classList.add("admin-mode");
-        const btn=document.getElementById("admin-toggle-btn"); 
-        btn.classList.add("logged-in"); 
-        btn.innerHTML=`✓ <span>Admin</span>`;
-        alert("Đăng nhập thành công!"); 
-        renderAllClassData();
-        closeModal();
-    } else {
-        alert("Sai tài khoản hoặc mật khẩu!");
-    }
-}
-
 function renderCountdowns() {
     const container = document.getElementById("countdown-list");
     if (!container) return;
@@ -2101,90 +2057,54 @@ function playTimerBell() {
     } catch (e) {}
 }
 
-async function hashPassword(password) {
-    const msgBuffer = new TextEncoder().encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
-function openSettingsModal() {
-    if(!isAdmin) return alert("Bạn không có quyền truy cập!");
-    
+window.setAdminState = function(isLoggedIn) {
+    isAdmin = isLoggedIn;
+    const btn = document.getElementById("admin-toggle-btn");
+    if (isLoggedIn) {
+        document.body.classList.add("admin-mode");
+        if(btn) {
+            btn.classList.add("logged-in"); 
+            btn.innerHTML = `✓ <span>Admin</span>`;
+        }
+    } else {
+        document.body.classList.remove("admin-mode");
+        if(btn) {
+            btn.classList.remove("logged-in"); 
+            btn.innerHTML = `·`;
+        }
+    }
+    renderAllClassData();
+};
+
+function openAdminModal(){
+    if(isAdmin){
+        window.fbSignOut(window.fbAuth).then(() => {
+            alert("Đã đăng xuất!");
+        });
+        return;
+    }
     showModal(`
-        <h3>⚙️ Cài đặt Quản trị viên</h3>
-        <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Thay đổi tài khoản, mật khẩu và ảnh đại diện.</p>
-
-        <div class="form-group">
-            <label>Ảnh đại diện Admin</label>
-            <input type="file" id="admin-avatar" accept="image/*">
-        </div>
-        <div class="form-group">
-            <label>Tên đăng nhập mới (Username)</label>
-            <input type="text" id="new-admin-user" maxlength="40" value="${escapeHtml(adminCredentials.username)}">
-        </div>
-        <div class="form-group">
-            <label>Mật khẩu hiện tại (Để xác nhận)</label>
-            <input type="password" id="current-admin-pass" placeholder="Nhập mật khẩu hiện tại...">
-        </div>
-        <div class="form-group">
-            <label>Mật khẩu mới (Để trống nếu không đổi)</label>
-            <input type="password" id="new-admin-pass" placeholder="Nhập mật khẩu mới...">
-        </div>
-        <div class="form-group">
-            <label>Nhập lại mật khẩu mới</label>
-            <input type="password" id="confirm-admin-pass" placeholder="Nhập lại mật khẩu mới...">
-        </div>
-        
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-            <button class="btn-submit" onclick="saveAdminCredentials()">Lưu Thay Đổi</button>
-        </div>
+        <h3>Đăng nhập Quản trị viên</h3>
+        <div class="form-group"><label>Email Admin</label><input type="email" id="admin-user" placeholder="Nhập email trên Firebase (vd: admin1608@gmail.com)"></div>
+        <div class="form-group"><label>Mật khẩu</label><input type="password" id="admin-pass" onkeydown="if(event.key==='Enter')submitAdminLogin()"></div>
+        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAdminLogin()">Đăng nhập</button></div>
     `);
 }
 
-async function saveAdminCredentials() {
-    const newUser = document.getElementById("new-admin-user").value.trim();
-    const currentPass = document.getElementById("current-admin-pass").value.trim();
-    const newPass = document.getElementById("new-admin-pass").value.trim();
-    const confirmPass = document.getElementById("confirm-admin-pass").value.trim();
-    const file = document.getElementById("admin-avatar").files[0];
+async function submitAdminLogin(){
+    const u = document.getElementById("admin-user").value.trim();
+    const p = document.getElementById("admin-pass").value.trim();
+    
+    if(!u || !p) return alert("Vui lòng nhập đầy đủ thông tin!");
 
-    if (!newUser) return alert("Tên đăng nhập không được để trống!");
-
-    const currentHash = await hashPassword(currentPass);
-    if (currentHash !== adminCredentials.passwordHash) {
-        return alert("Mật khẩu hiện tại không đúng!");
-    }
-
-    let newHash = adminCredentials.passwordHash;
-    if (newPass || confirmPass) {
-        if (newPass !== confirmPass) return alert("Mật khẩu mới nhập lại không khớp!");
-        if (newPass.length < 6) return alert("Mật khẩu mới phải có ít nhất 6 ký tự!");
-        newHash = await hashPassword(newPass);
-    }
-
-    let newPhoto = adminCredentials.photo || "";
-    if (file) {
-        try {
-            newPhoto = await compressImage(file, 300, 0.8);
-        } catch (e) {
-            return alert("Lỗi tải ảnh đại diện: " + e);
-        }
-    }
-
-    adminCredentials.username = newUser;
-    adminCredentials.passwordHash = newHash;
-    adminCredentials.photo = newPhoto;
-
-    const success = await saveData();
-    if (success) {
-        alert("🎉 Đã cập nhật thông tin Admin thành công!");
+    try {
+        await window.fbSignIn(window.fbAuth, u, p);
+        alert("Đăng nhập thành công!"); 
         closeModal();
-        renderPosts();
-        renderMembers();
-    } else {
-        alert("Lỗi lưu Firebase. Vui lòng thử lại.");
+    } catch (error) {
+        alert("Sai Email hoặc Mật khẩu!");
+        console.error(error);
     }
 }
 
