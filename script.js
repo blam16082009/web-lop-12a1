@@ -2086,7 +2086,7 @@ function openAdminModal(){
     }
     showModal(`
         <h3>Đăng nhập Quản trị viên</h3>
-        <div class="form-group"><label>Email Admin</label><input type="email" id="admin-user" placeholder="Nhập email trên Firebase (vd: admin1608@gmail.com)"></div>
+        <div class="form-group"><label>Email Admin</label><input type="email" id="admin-user" placeholder=""></div>
         <div class="form-group"><label>Mật khẩu</label><input type="password" id="admin-pass" onkeydown="if(event.key==='Enter')submitAdminLogin()"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAdminLogin()">Đăng nhập</button></div>
     `);
