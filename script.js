@@ -547,6 +547,12 @@ function showPage(page){
         const nav=document.getElementById("nav-"+p); if(nav) nav.classList.toggle("active",page===p);
     });
     window.scrollTo({top:0,behavior:"smooth"});
+
+    if(page==="home"){ 
+        renderPosts(); 
+        renderCountdowns(); 
+        renderBirthdays(); 
+    }
     if(page==="members"){ renderMembers(document.getElementById("search-member").value.trim()); renderHeartBubbles(); }
     if(page==="teachers"){ renderTeachers(document.getElementById("search-teacher").value.trim()); }
     if(page==="events"){ renderSpecialEvents(); }
@@ -556,7 +562,6 @@ function showPage(page){
     if(page==="memory"){ document.getElementById('folder-view').classList.remove('hidden'); document.getElementById('folder-detail').classList.add('hidden'); renderFolders(); }
     if(page==="clock"){ updateTimerDisplay(); }
 }
-
 function renderCountdowns() {
     const container = document.getElementById("countdown-list");
     if (!container) return;
