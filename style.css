@@ -141,14 +141,30 @@ button{cursor:pointer}
 
 /* NAVBAR */
 .navbar{position:sticky;top:0;z-index:100;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:15px;padding:14px 5%;background:rgba(13,13,16,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-@media(max-width:900px){
-    .navbar{grid-template-columns:1fr;justify-items:center;gap:10px}
-    .navbar nav{width:100%}
-}
 .logo{color:var(--deep);font-size:22px;font-weight:800;text-decoration:none;white-space:nowrap;justify-self:start}
-@media(max-width:900px){.logo{justify-self:center}}
 .nav-right{display:flex;align-items:center;gap:10px;justify-self:end}
-@media(max-width:900px){.nav-right{justify-self:center}}
+
+/* Bố cục riêng cho điện thoại */
+@media(max-width:900px){
+    .navbar {
+        grid-template-columns: 1fr auto; /* Chia làm 2 cột: TRANG CHỦ ở 1fr (rộng), NÚT TRĂNG ở auto (vừa đủ) */
+        grid-template-areas: 
+            "logo right"
+            "nav nav"
+            "hint hint";
+        gap: 10px;
+        padding: 12px 5%;
+    }
+    
+    /* Gán từng thành phần vào đúng khu vực lưới (Grid Area) */
+    .navbar > div:nth-child(1) { grid-area: logo; justify-self: start; width: 100%; }
+    .navbar > nav { grid-area: nav; width: 100%; }
+    .navbar > .swipe-hint { grid-area: hint; }
+    .navbar > .nav-right { grid-area: right; justify-self: end; }
+    
+    /* Thu nhỏ logo một xíu để cân đối với hàng nút ngang */
+    .logo { font-size: 19px; }
+}
 .navbar nav {
     display: flex;
     gap: 8px;
