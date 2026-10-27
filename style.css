@@ -134,12 +134,27 @@ button{cursor:pointer}
 
 /* NAVBAR */
 .navbar{position:sticky;top:0;z-index:100;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:15px;padding:14px 5%;background:rgba(13,13,16,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-@media(max-width:900px){.navbar{grid-template-columns:1fr;justify-items:center;gap:10px}}
+@media(max-width:900px){
+    .navbar{grid-template-columns:1fr;justify-items:center;gap:10px}
+    .navbar nav{width:100%}
+}
 .logo{color:var(--deep);font-size:22px;font-weight:800;text-decoration:none;white-space:nowrap;justify-self:start}
 @media(max-width:900px){.logo{justify-self:center}}
 .nav-right{display:flex;align-items:center;gap:10px;justify-self:end}
 @media(max-width:900px){.nav-right{justify-self:center}}
-.navbar nav{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.navbar nav {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+    flex-wrap: nowrap; /* Bắt buộc luôn nằm trên 1 hàng */
+    overflow-x: auto;  /* Vuốt ngang trên điện thoại hoặc màn hình nhỏ */
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+}
+.navbar nav::-webkit-scrollbar { 
+    display: none; /* Ẩn thanh cuộn trên Chrome / Safari */
+}
 .nav-link{border:none;background:transparent;color:var(--muted);border-radius:12px;padding:8px 15px;font-weight:600;font-size:14px;transition:.2s}
 .nav-link:hover,.nav-link.active{background:var(--chip);color:var(--deep)}
 .admin-btn{border:1px dashed var(--purple);background:#1f1b33;color:var(--deep);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;transition:.2s;display:flex;align-items:center;gap:6px}
@@ -518,4 +533,98 @@ body.light-mode tbody td.admin-only {
 }
 body.light-mode tbody tr:hover td.admin-only {
     background: #f9f9f9 !important; 
+}
+/* ========================================================= */
+/* TỐI ƯU MOBILE: CHUYỂN BẢNG THÀNH DẠNG CARD (Dưới 768px) */
+/* ========================================================= */
+@media (max-width: 768px) {
+    /* Ẩn tiêu đề cột cũ */
+    #members-page thead, #teachers-page thead { 
+        display: none; 
+    }
+    
+    /* Chuyển cấu trúc bảng thành các khối block */
+    #members-page table, #teachers-page table,
+    #members-page tbody, #teachers-page tbody,
+    #members-page tr, #teachers-page tr,
+    #members-page td, #teachers-page td {
+        display: block;
+        width: 100%;
+    }
+
+    /* Định dạng mỗi hàng (tr) thành một thẻ Card */
+    #members-page tr, #teachers-page tr {
+        background: var(--card2);
+        margin-bottom: 15px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        padding: 12px 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        position: relative;
+    }
+    
+    body.light-mode #members-page tr, 
+    body.light-mode #teachers-page tr {
+        background: #ffffff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Thiết kế lại từng ô dữ liệu (td) */
+    #members-page td, #teachers-page td {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Căn nội dung sang phải */
+        text-align: right;
+        padding: 10px 0;
+        border-bottom: 1px dashed var(--line);
+        white-space: normal;
+    }
+    
+    /* Ẩn đường gạch ngang ở ô cuối cùng */
+    #members-page td:last-child, #teachers-page td:last-child {
+        border-bottom: none;
+    }
+
+    /* Tự động sinh tên cột (Nhãn) dán sang bên trái */
+    #members-page td::before, #teachers-page td::before {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-right: auto; /* Đẩy nội dung thật sang phải */
+        padding-right: 15px;
+    }
+
+    /* --- Gán tên nhãn cho Bảng Thành Viên --- */
+    #members-page td:nth-child(1)::before { content: "STT"; }
+    #members-page td:nth-child(2)::before { content: "Họ và tên"; }
+    #members-page td:nth-child(3)::before { content: "Ngày sinh"; }
+    #members-page td:nth-child(4)::before { content: "Giới tính"; }
+    #members-page td:nth-child(5)::before { content: "Số điện thoại"; }
+    #members-page td:nth-child(6)::before { content: "Liên hệ"; }
+    #members-page td:nth-child(7)::before { content: "Gmail"; }
+    #members-page td:nth-child(8)::before { content: "Thao tác"; }
+
+    /* --- Gán tên nhãn cho Bảng Thầy Cô --- */
+    #teachers-page td:nth-child(1)::before { content: "STT"; }
+    #teachers-page td:nth-child(2)::before { content: "Họ và tên"; }
+    #teachers-page td:nth-child(3)::before { content: "Bộ môn"; }
+    #teachers-page td:nth-child(4)::before { content: "Ngày sinh"; }
+    #teachers-page td:nth-child(5)::before { content: "Giới tính"; }
+    #teachers-page td:nth-child(6)::before { content: "Số điện thoại"; }
+    #teachers-page td:nth-child(7)::before { content: "Liên hệ"; }
+    #teachers-page td:nth-child(8)::before { content: "Gmail"; }
+    #teachers-page td:nth-child(9)::before { content: "Thao tác"; }
+
+    /* Chỉnh lại giao diện cột Thao Tác (nút Sửa, Xóa) */
+    #members-page td:nth-child(8), #teachers-page td:nth-child(9) {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    /* Gỡ bỏ thuộc tính cố định ghim cột bên phải của bảng khi sang mobile */
+    th.admin-only, td.admin-only {
+        position: relative !important;
+        box-shadow: none !important;
+    }
 }
