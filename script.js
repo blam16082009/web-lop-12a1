@@ -626,22 +626,32 @@ function openAddEventModal() {
         <div class="form-group"><label>Ngày diễn ra</label><input type="date" id="e-date"></div>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-            <button class="btn-submit" onclick="submitAddEvent()">Thêm</button>
+            <button class="btn-submit" id="btn-save-event" onclick="submitAddEvent()">Thêm</button>
         </div>
     `);
 }
 
 async function submitAddEvent() {
+    const btnSave = document.getElementById("btn-save-event");
+    if (btnSave && btnSave.disabled) return;
+
     const name = document.getElementById("e-name").value.trim();
     const icon = document.getElementById("e-icon").value.trim() || "📅";
     const date = document.getElementById("e-date").value;
     if (!name || !date) return alert("Vui lòng nhập đầy đủ tên và ngày!");
     
-    countdownEvents.push({ id: Date.now(), name, icon, date });
-    countdownEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-    await saveData();
-    renderCountdowns();
-    closeModal();
+    if (btnSave) { btnSave.disabled = true; btnSave.style.opacity = "0.6"; btnSave.innerText = "Đang thêm..."; }
+
+    try {
+        countdownEvents.push({ id: Date.now(), name, icon, date });
+        countdownEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+        await saveData();
+        renderCountdowns();
+        closeModal();
+    } catch(e) {
+        alert("Lỗi khi lưu sự kiện!");
+        if (btnSave) { btnSave.disabled = false; btnSave.style.opacity = "1"; btnSave.innerText = "Thêm"; }
+    }
 }
 
 async function deleteEvent(id) {
@@ -801,11 +811,19 @@ function openMemberModal(index=-1){
         <div class="form-group"><label>Gmail</label><input type="email" id="m-gmail" maxlength="80" placeholder="vd: abc@gmail.com" value="${escapeHtml(m.gmail||"")}"></div>
         <div class="form-group"><label>Link Facebook</label><input type="url" id="m-facebook" placeholder="https://facebook.com/..." value="${escapeHtml(m.facebook||"")}"></div>
         <div class="form-group"><label>Ảnh đại diện</label><input type="file" id="m-photo" accept="image/*"></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitMember(${index})">Lưu</button></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-submit" id="btn-save-member" onclick="submitMember(${index})">Lưu</button>
+        </div>
     `);
 }
 
 async function submitMember(index){
+    const btnSave = document.getElementById("btn-save-member");
+    
+    // Nếu nút đang bị khóa (đang lưu) thì bỏ qua, không cho chạy tiếp
+    if (btnSave && btnSave.disabled) return; 
+
     const name=document.getElementById("m-name").value.trim(), 
         gender=document.getElementById("m-gender").value,
         birthday=document.getElementById("m-dob").value, 
@@ -817,16 +835,35 @@ async function submitMember(index){
     if(!name) return alert("Nhập tên!"); 
     if(!gender) return alert("Chọn giới tính!");
     
-    let photo=index>=0?(members[index].photo||""):"";
-    if(file){try{photo=await compressImage(file,400,0.75);}catch(e){return alert("Lỗi ảnh!");}}
+    // Khóa nút Lưu lại và đổi chữ để người dùng biết hệ thống đang xử lý
+    if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.style.opacity = "0.6";
+        btnSave.innerText = "Đang lưu...";
+    }
     
-    const data={name,gender,birthday,phone,gmail,facebook,photo};
-    if(index>=0) members[index]=data; else members.push(data);
-    
-    await saveData();
-    renderMembers(document.getElementById("search-member").value.trim());
-    renderHeartBubbles(); 
-    closeModal();
+    try {
+        let photo=index>=0?(members[index].photo||""):"";
+        if(file) { photo = await compressImage(file,400,0.75); }
+        
+        const data={name,gender,birthday,phone,gmail,facebook,photo};
+        if(index>=0) members[index]=data; else members.push(data);
+        
+        await saveData();
+        renderMembers(document.getElementById("search-member").value.trim());
+        renderHeartBubbles(); 
+        
+        // Lưu xong thì đóng bảng
+        closeModal(); 
+    } catch(e) {
+        alert("Có lỗi xảy ra, vui lòng thử lại!");
+        // Nếu có lỗi (ví dụ lỗi mạng), mở khóa nút lại để người dùng bấm lại
+        if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.style.opacity = "1";
+            btnSave.innerText = "Lưu";
+        }
+    }
 }
 
 function renderTeachers(keyword=""){
@@ -903,11 +940,17 @@ function openTeacherModal(index=-1){
         <div class="form-group"><label>Gmail</label><input type="email" id="t-gmail" maxlength="80" placeholder="vd: abc@gmail.com" value="${escapeHtml(t.gmail||"")}"></div>
         <div class="form-group"><label>Link Facebook</label><input type="url" id="t-facebook" placeholder="https://facebook.com/..." value="${escapeHtml(t.facebook||"")}"></div>
         <div class="form-group"><label>Ảnh đại diện</label><input type="file" id="t-photo" accept="image/*"></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitTeacher(${index})">Lưu</button></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-submit" id="btn-save-teacher" onclick="submitTeacher(${index})">Lưu</button>
+        </div>
     `);
 }
 
 async function submitTeacher(index){
+    const btnSave = document.getElementById("btn-save-teacher");
+    if (btnSave && btnSave.disabled) return;
+
     const name=document.getElementById("t-name").value.trim(), 
         role=document.getElementById("t-role").value,
         subject=document.getElementById("t-subject").value.trim().toLocaleUpperCase("vi"),
@@ -921,15 +964,22 @@ async function submitTeacher(index){
     if(!name) return alert("Nhập tên!"); 
     if(!gender) return alert("Chọn giới tính!");
     
-    let photo=index>=0?(teachers[index].photo||""):"";
-    if(file){try{photo=await compressImage(file,400,0.75);}catch(e){return alert("Lỗi ảnh!");}}
-    
-    const data={name,role,subject,gender,birthday,phone,gmail,facebook,photo};
-    if(index>=0) teachers[index]=data; else teachers.push(data);
-    
-    await saveData();
-    renderTeachers(document.getElementById("search-teacher").value.trim());
-    closeModal();
+    if (btnSave) { btnSave.disabled = true; btnSave.style.opacity = "0.6"; btnSave.innerText = "Đang lưu..."; }
+
+    try {
+        let photo=index>=0?(teachers[index].photo||""):"";
+        if(file){ photo=await compressImage(file,400,0.75); }
+        
+        const data={name,role,subject,gender,birthday,phone,gmail,facebook,photo};
+        if(index>=0) teachers[index]=data; else teachers.push(data);
+        
+        await saveData();
+        renderTeachers(document.getElementById("search-teacher").value.trim());
+        closeModal();
+    } catch(e) {
+        alert("Có lỗi xảy ra: " + e);
+        if (btnSave) { btnSave.disabled = false; btnSave.style.opacity = "1"; btnSave.innerText = "Lưu"; }
+    }
 }
 
 async function deleteTeacher(index){
@@ -1047,21 +1097,37 @@ function openAchieveModal(index=-1){
         <div class="form-group"><label>Tên thành tích</label><input type="text" id="a-title" maxlength="120" value="${escapeHtml(a.title)}" placeholder="VD: Học sinh giỏi cấp tỉnh"></div>
         <div class="form-group"><label>Ngày đạt</label><input type="date" id="a-date" value="${escapeHtml(a.date||"")}"></div>
         <div class="form-group"><label>Ảnh thẻ (Chân dung)</label><input type="file" id="a-image" accept="image/*"></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAchievement(${index})">Lưu</button></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-submit" id="btn-save-achieve" onclick="submitAchievement(${index})">Lưu</button>
+        </div>
     `);
 }
+
 async function submitAchievement(index){
+    const btnSave = document.getElementById("btn-save-achieve");
+    if (btnSave && btnSave.disabled) return;
+
     const person=document.getElementById("a-person").value, title=document.getElementById("a-title").value.trim(),
         date=document.getElementById("a-date").value, file=document.getElementById("a-image").files[0];
     if(!title) return alert("Nhập tên thành tích!");
-    let image=index>=0?(achievements[index].image||""):"";
-    if(file){try{image=await compressImage(file,600,0.8);}catch(e){return alert("Lỗi ảnh!");}}
-    if(!image && index<0) return alert("Chọn ảnh chân dung!");
-    const data={id:index>=0?achievements[index].id:Date.now(),person,title,date,image};
-    if(index>=0) achievements[index]=data; else achievements.unshift(data);
     
-    await saveData();
-    renderAchievements(); closeModal();
+    let image=index>=0?(achievements[index].image||""):"";
+    if(!image && !file && index<0) return alert("Chọn ảnh chân dung!");
+
+    if (btnSave) { btnSave.disabled = true; btnSave.style.opacity = "0.6"; btnSave.innerText = "Đang lưu..."; }
+
+    try {
+        if(file){ image=await compressImage(file,600,0.8); }
+        const data={id:index>=0?achievements[index].id:Date.now(),person,title,date,image};
+        if(index>=0) achievements[index]=data; else achievements.unshift(data);
+        
+        await saveData();
+        renderAchievements(); closeModal();
+    } catch(e) {
+        alert("Có lỗi xảy ra: " + e);
+        if (btnSave) { btnSave.disabled = false; btnSave.style.opacity = "1"; btnSave.innerText = "Lưu"; }
+    }
 }
 async function deleteAchievement(id){
     if(confirm("Xóa thành tích này?")){
@@ -1157,15 +1223,32 @@ function openAddFolderModal() {
         <h3>Tạo thư mục kỷ niệm</h3>
         <div class="form-group"><label>Tên thư mục</label><input type="text" id="f-name" maxlength="80" placeholder="VD: Tháng 3 - Dã ngoại"></div>
         <div class="form-group"><label>Icon (emoji)</label><input type="text" id="f-icon" maxlength="10" placeholder="VD: 📁, 🌸, 🏖️" value="📁"></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Hủy</button><button class="btn-submit" onclick="submitAddFolder()">Tạo</button></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-submit" id="btn-save-folder" onclick="submitAddFolder()">Tạo</button>
+        </div>
     `);
 }
+
 async function submitAddFolder() {
+    const btnSave = document.getElementById("btn-save-folder");
+    if (btnSave && btnSave.disabled) return;
+
     const name = document.getElementById('f-name').value.trim();
     const icon = document.getElementById('f-icon').value.trim() || '📁';
     if (!name) return alert("Nhập tên thư mục!");
-    memoryFolders.push({ id: Date.now(), name, icon, media: [] });
-    await saveData(); renderFolders(); closeModal();
+    
+    if (btnSave) { btnSave.disabled = true; btnSave.style.opacity = "0.6"; btnSave.innerText = "Đang tạo..."; }
+
+    try {
+        memoryFolders.push({ id: Date.now(), name, icon, media: [] });
+        await saveData(); 
+        renderFolders(); 
+        closeModal();
+    } catch(e) {
+        alert("Lỗi khi tạo thư mục!");
+        if (btnSave) { btnSave.disabled = false; btnSave.style.opacity = "1"; btnSave.innerText = "Tạo"; }
+    }
 }
 async function deleteFolder(e, id) {
     e.stopPropagation();
