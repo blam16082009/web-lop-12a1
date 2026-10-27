@@ -150,10 +150,21 @@ button{cursor:pointer}
     overflow-x: auto;  /* Vuốt ngang trên điện thoại hoặc màn hình nhỏ */
     max-width: 100%;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+    scrollbar-width: thin; /* Hiện thanh cuộn mỏng trên Firefox */
+    scrollbar-color: rgba(169, 154, 244, 0.4) transparent; 
+    padding-bottom: 6px; /* Tạo khoảng hở một chút cho thanh cuộn */
 }
+
+/* Tùy chỉnh thanh cuộn siêu mỏng trên Chrome/Safari */
 .navbar nav::-webkit-scrollbar { 
-    display: none; /* Ẩn thanh cuộn trên Chrome / Safari */
+    height: 3px; 
+}
+.navbar nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+.navbar nav::-webkit-scrollbar-thumb {
+    background: rgba(169, 154, 244, 0.4); 
+    border-radius: 10px;
 }
 .nav-link{border:none;background:transparent;color:var(--muted);border-radius:12px;padding:8px 15px;font-weight:600;font-size:14px;transition:.2s}
 .nav-link:hover,.nav-link.active{background:var(--chip);color:var(--deep)}
@@ -628,4 +639,25 @@ body.light-mode tbody tr:hover td.admin-only {
         position: relative !important;
         box-shadow: none !important;
     }
+}
+.swipe-hint { 
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .swipe-hint {
+        display: block; /* Chỉ hiện trên mobile */
+        width: 100%;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        margin-top: -2px;
+        margin-bottom: 2px;
+        animation: swipePulse 1.8s infinite;
+    }
+}
+@keyframes swipePulse {
+    0%, 100% { opacity: 0.5; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(5px); }
 }
