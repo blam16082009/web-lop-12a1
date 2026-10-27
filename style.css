@@ -573,26 +573,27 @@ body.light-mode tbody tr:hover td.admin-only {
     #members-page td, #teachers-page td {
         display: flex;
         align-items: center;
-        justify-content: flex-end; /* Căn nội dung sang phải */
+        justify-content: flex-end; /* Ép giá trị sang sát lề phải */
         text-align: right;
         padding: 10px 0;
         border-bottom: 1px dashed var(--line);
-        white-space: normal;
-    }
-    
-    /* Ẩn đường gạch ngang ở ô cuối cùng */
-    #members-page td:last-child, #teachers-page td:last-child {
-        border-bottom: none;
+        max-width: none !important; /* XÓA GIỚI HẠN 160px TRÊN DESKTOP GÂY MẤT CHỮ GMAIL */
+        width: 100%;
+        white-space: normal !important;
     }
 
-    /* Tự động sinh tên cột (Nhãn) dán sang bên trái */
+    /* Tự động sinh tên cột (Nhãn) */
     #members-page td::before, #teachers-page td::before {
         font-size: 12px;
         font-weight: 700;
         color: var(--muted);
         text-transform: uppercase;
-        margin-right: auto; /* Đẩy nội dung thật sang phải */
+        margin-right: auto; /* Lực đẩy: Đẩy Nhãn sang MAX TRÁI, Giá trị sang MAX PHẢI */
         padding-right: 15px;
+        flex-shrink: 0; /* Khóa cứng kích thước nhãn, không cho phép chữ GMAIL bị bóp méo */
+    }
+    #members-page td > div, #teachers-page td > div {
+        min-width: 0 !important;
     }
 
     /* --- Gán tên nhãn cho Bảng Thành Viên --- */
