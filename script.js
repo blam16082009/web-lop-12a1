@@ -1076,7 +1076,7 @@ function renderFolders() {
     if (!grid) return;
     grid.innerHTML = '';
     if (memoryFolders.length === 0) {
-        grid.innerHTML = `<p class="empty-achieve">Chưa có thư mục nào. Admin hãy tạo mới ♡</p>`;
+        grid.innerHTML = `<p class="empty-achieve">Chưa có thư mục nào.</p>`;
         return;
     }
     memoryFolders.forEach(f => {
