@@ -129,7 +129,14 @@ body{
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
 }
-button,input,select,textarea{font:inherit}
+button, input, select, textarea, a {
+    font: inherit;
+    touch-action: manipulation;
+}
+
+html, body {
+    touch-action: manipulation;
+}
 button{cursor:pointer}
 
 /* NAVBAR */
