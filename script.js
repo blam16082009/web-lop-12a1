@@ -1452,25 +1452,34 @@ function postHtml(p){
     let grid = "";
     let linkCardHtml = "";
     let titleHtml = "";
-
-    // Nếu có tiêu đề, Tách tiêu đề ra để đưa lên trên cùng
     if (p.linkTitle) {
         titleHtml = `<div class="post-main-title">${escapeHtml(p.linkTitle)}</div>`;
     }
-
-    // Phân nhánh hiển thị: Nếu bài viết CÓ LINK thì hiện thẻ Link
     if (p.linkUrl) {
         let thumbUrl = n > 0 ? (typeof p.images[0] === 'object' ? safeUrl(p.images[0].url) : safeUrl(p.images[0])) : "";
+        
+        // Kiểm tra xem có phải link Facebook không để đổi giao diện nút
+        const isFb = p.linkUrl.includes("facebook.com") || p.linkUrl.includes("fb.watch") || p.linkUrl.includes("fb.me");
+        
+        // Tạo nút "Đi đến bài viết" (Có logo FB hoặc logo Web)
+        const actionBtnHtml = isFb 
+            ? `<div style="display:inline-flex; align-items:center; gap:6px; background:rgba(24,119,242,0.15); color:#1877f2; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; margin-top:4px;">
+                 <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> 
+                 Đi đến bài viết
+               </div>`
+            : `<div style="display:inline-flex; align-items:center; gap:6px; background:rgba(141,186,245,0.15); color:var(--blue); padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; margin-top:4px;">
+                 🌐 Đi đến trang web
+               </div>`;
+
         linkCardHtml = `
         <a href="${escapeHtml(p.linkUrl)}" target="_blank" rel="noopener noreferrer" class="link-preview-card">
             ${thumbUrl ? `<img src="${thumbUrl}" class="link-image" alt="Thumbnail">` : `<div style="height:140px; background:var(--chip); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; font-weight:bold;">🔗 Bài viết không có ảnh bìa</div>`}
             <div class="link-info">
-                <div class="link-domain">🌐 Nhấn để xem chi tiết bài viết tại nguồn</div>
-                <div style="font-size:11px; color:var(--muted); margin-top:4px; word-break:break-all;">${escapeHtml(p.linkUrl)}</div>
+                <h4 class="link-title">${escapeHtml(p.linkTitle)}</h4>
+                ${actionBtnHtml}
             </div>
         </a>`;
-    } 
-    // Nếu KHÔNG CÓ LINK, hiển thị lưới ảnh/video như bình thường
+    }
     else if (n > 0) {
         grid = `<div class="post-grid n${Math.min(n, 4)}">${p.images.slice(0, 4).map((item, i) => renderMediaCell(item, i)).join("")}</div>`;
     }
