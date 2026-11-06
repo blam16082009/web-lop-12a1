@@ -684,3 +684,42 @@ body.light-mode tbody tr:hover td.admin-only {
     0%, 100% { opacity: 0.5; transform: translateX(0); }
     50% { opacity: 1; transform: translateX(5px); }
 }
+.link-preview-card {
+    display: block;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--card);
+    transition: 0.2s;
+    margin-top: 12px;
+}
+.link-preview-card:hover {
+    border-color: var(--purple);
+    box-shadow: 0 4px 15px rgba(169, 154, 244, 0.15);
+    transform: translateY(-2px);
+}
+.link-image {
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Ép cứng chuẩn tỷ lệ vàng để không bị méo/dài ảnh */
+    object-fit: cover;
+    border-bottom: 1px solid var(--line);
+    display: block;
+}
+.link-info {
+    padding: 12px 15px;
+}
+.link-title {
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    line-height: 1.4;
+}
+.link-domain {
+    color: var(--muted);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}

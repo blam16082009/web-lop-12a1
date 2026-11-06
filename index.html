@@ -57,9 +57,26 @@
                         <div class="avatar-circle">12A1</div>
                         <textarea id="post-text" placeholder="Bạn đang nghĩ gì về lớp mình?" maxlength="3000"></textarea>
                     </div>
+                    
+                    <!-- BẮT ĐẦU: Khung nhập Link (Mặc định ẩn đi) -->
+                    <div id="link-attachment" class="hidden" style="margin-top:12px; padding:15px; background:var(--card); border-radius:12px; border:1px dashed var(--purple);">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <label style="font-size:13px; color:var(--deep); font-weight:bold;">🔗 Gắn Thẻ Link</label>
+                            <button type="button" onclick="toggleLinkAttachment()" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:12px; font-weight:bold;">✕ Hủy gắn link</button>
+                        </div>
+                        <input type="text" id="post-link-title" placeholder="Nhập tiêu đề bài viết (VD: Cả lớp vào bình chọn nhé)..." style="width:100%; margin-bottom:10px; padding:10px; border-radius:8px; background:#0f0f12; color:var(--text); border:1px solid var(--line); outline:none;">
+                        <input type="url" id="post-link-url" placeholder="Dán đường link vào đây (https://...)" style="width:100%; padding:10px; border-radius:8px; background:#0f0f12; color:var(--text); border:1px solid var(--line); outline:none;">
+                        <div style="font-size:11px; color:var(--muted); margin-top:8px;">* Mẹo: Bấm "Thêm ảnh" bên dưới để tải lên 1 tấm ảnh làm ảnh bìa cho Link.</div>
+                    </div>
+                    <!-- KẾT THÚC: Khung nhập Link -->
+
                     <div id="post-preview" class="post-preview"></div>
                     <div class="composer-actions">
-                        <label class="photo-pick">🖼️ Thêm ảnh/video<input type="file" id="post-files" accept="image/*,video/*" multiple hidden onchange="previewPostFiles()"></label>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <label class="photo-pick">🖼️ Thêm ảnh/video<input type="file" id="post-files" accept="image/*,video/*" multiple hidden onchange="previewPostFiles()"></label>
+                            <!-- Nút để mở khung nhập link -->
+                            <button type="button" id="btn-show-link" class="photo-pick" style="border:none; outline:none;" onclick="toggleLinkAttachment()">🔗 Gắn Link</button>
+                        </div>
                         <button class="primary-btn" style="margin:0;padding:9px 22px;" onclick="submitPost()">Đăng</button>
                     </div>
                 </div>

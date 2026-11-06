@@ -1320,7 +1320,20 @@ async function submitAddMedia() {
         if(modalActions) modalActions.style.display = 'flex';
     }
 }
-
+// Hàm bật/tắt khung nhập Link
+function toggleLinkAttachment() {
+    const linkDiv = document.getElementById("link-attachment");
+    const btnShow = document.getElementById("btn-show-link");
+    if(linkDiv.classList.contains("hidden")) {
+        linkDiv.classList.remove("hidden");
+        btnShow.style.display = "none";
+    } else {
+        linkDiv.classList.add("hidden");
+        btnShow.style.display = "block";
+        document.getElementById("post-link-title").value = "";
+        document.getElementById("post-link-url").value = "";
+    }
+}
 function previewPostFiles(){
     const files = [...document.getElementById("post-files").files];
     document.getElementById("post-preview").innerHTML = files.map(f => {
@@ -1333,8 +1346,14 @@ function previewPostFiles(){
 
 async function submitPost(){
     const text = document.getElementById("post-text").value.trim();
+    // Lấy dữ liệu link (nếu có nhập)
+    const linkTitle = document.getElementById("post-link-title") ? document.getElementById("post-link-title").value.trim() : "";
+    const linkUrl = document.getElementById("post-link-url") ? document.getElementById("post-link-url").value.trim() : "";
+    
     const files = [...document.getElementById("post-files").files].slice(0, 12);
-    if (!text && files.length === 0) return alert("Hãy viết gì đó hoặc chọn ảnh/video nhé!");
+    
+    if (!text && files.length === 0 && !linkUrl) return alert("Hãy viết gì đó, chọn ảnh hoặc gắn link nhé!");
+    if (linkUrl && !linkTitle) return alert("Vui lòng nhập tiêu đề cho Link!");
     
     showProgressModal("Đang đăng bài viết...");
 
@@ -1369,6 +1388,8 @@ async function submitPost(){
     posts.unshift({
         id: Date.now(),
         text,
+        linkTitle, // Dữ liệu mới
+        linkUrl,   // Dữ liệu mới
         images: mediaList,
         time: Date.now(),
         likes: 0,
@@ -1382,9 +1403,18 @@ async function submitPost(){
         alert("Bài viết chưa được xác nhận lưu lên Firebase. Hãy thử lại sau khi kiểm tra kết nối.");
         return;
     }
+    
+    // Xóa rỗng form sau khi đăng thành công
     document.getElementById("post-text").value = "";
     document.getElementById("post-files").value = "";
     document.getElementById("post-preview").innerHTML = "";
+    if(document.getElementById("post-link-title")) document.getElementById("post-link-title").value = "";
+    if(document.getElementById("post-link-url")) document.getElementById("post-link-url").value = "";
+    
+    // Đóng khung link lại
+    const linkDiv = document.getElementById("link-attachment");
+    if(linkDiv && !linkDiv.classList.contains("hidden")) toggleLinkAttachment();
+
     renderPosts();
     closeModal();
 }
@@ -1419,7 +1449,26 @@ function postHtml(p){
         }
     };
 
-    const grid = n ? `<div class="post-grid n${Math.min(n, 4)}">${p.images.slice(0, 4).map((item, i) => renderMediaCell(item, i)).join("")}</div>` : "";
+    let grid = "";
+    let linkCardHtml = "";
+
+    // Phân nhánh hiển thị: Nếu bài viết CÓ LINK thì hiện thẻ Link
+    if (p.linkUrl) {
+        // Lấy ảnh tải lên đầu tiên làm ảnh bìa (nếu không có thì hiện ô báo trống)
+        let thumbUrl = n > 0 ? (typeof p.images[0] === 'object' ? safeUrl(p.images[0].url) : safeUrl(p.images[0])) : "";
+        linkCardHtml = `
+        <a href="${escapeHtml(p.linkUrl)}" target="_blank" rel="noopener noreferrer" class="link-preview-card">
+            ${thumbUrl ? `<img src="${thumbUrl}" class="link-image" alt="Thumbnail">` : `<div style="height:140px; background:var(--chip); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; font-weight:bold;">🔗 Bài viết không có ảnh bìa</div>`}
+            <div class="link-info">
+                <h4 class="link-title">${escapeHtml(p.linkTitle)}</h4>
+                <div class="link-domain">🌐 Nhấn để xem chi tiết tại nguồn</div>
+            </div>
+        </a>`;
+    } 
+    // Nếu KHÔNG CÓ LINK, hiển thị lưới ảnh/video cũ như bình thường
+    else if (n > 0) {
+        grid = `<div class="post-grid n${Math.min(n, 4)}">${p.images.slice(0, 4).map((item, i) => renderMediaCell(item, i)).join("")}</div>`;
+    }
     const safeAdminPhoto = safeUrl(adminCredentials.photo);
     
     const comments = (p.comments || []).map((c, i) => {
@@ -1450,6 +1499,7 @@ function postHtml(p){
             <button class="admin-only post-del" onclick="deletePost(${p.id})" title="Xóa bài">🗑</button>
         </div>
         ${p.text ? `<p class="post-text">${escapeHtml(p.text)}</p>` : ""}
+        ${linkCardHtml}
         ${grid}
         <div class="post-stats"><span>❤️ ${p.likes || 0} lượt thả tim</span><span>${(p.comments || []).length} bình luận</span></div>
         <div class="post-actions">
