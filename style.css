@@ -701,20 +701,14 @@ body.light-mode tbody tr:hover td.admin-only {
 }
 .link-image {
     width: 100%;
-    aspect-ratio: 16 / 9; /* Ép cứng chuẩn tỷ lệ vàng để không bị méo/dài ảnh */
-    object-fit: cover;
+    max-height: 450px; /* Giới hạn chiều cao để bài không quá dài */
+    object-fit: contain; /* HIỂN THỊ FULL ẢNH, KHÔNG BỊ CẮT */
+    background: #000; /* Nền đen lấp đầy phần thừa nếu ảnh không chuẩn 16:9 */
     border-bottom: 1px solid var(--line);
     display: block;
 }
 .link-info {
     padding: 12px 15px;
-}
-.link-title {
-    color: var(--text);
-    font-size: 15px;
-    font-weight: 700;
-    margin: 0 0 6px 0;
-    line-height: 1.4;
 }
 .link-domain {
     color: var(--muted);
@@ -722,4 +716,42 @@ body.light-mode tbody tr:hover td.admin-only {
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+/* Tiêu đề to rõ ràng ở trên cùng */
+.post-main-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--deep);
+    margin: 12px 0 8px 0;
+    line-height: 1.4;
+}
+
+/* CSS Cho nút Ghim và Nhãn Ghim */
+.post-pin-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 12px;
+    transition: 0.2s;
+}
+.post-pin-btn:hover { transform: scale(1.2); }
+.post-pin-btn.is-pinned {
+    color: var(--danger);
+    filter: drop-shadow(0 0 5px rgba(255,107,107,0.5));
+}
+.pinned-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--danger);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
 }

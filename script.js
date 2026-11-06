@@ -1451,27 +1451,38 @@ function postHtml(p){
 
     let grid = "";
     let linkCardHtml = "";
+    let titleHtml = "";
+
+    // Nếu có tiêu đề, Tách tiêu đề ra để đưa lên trên cùng
+    if (p.linkTitle) {
+        titleHtml = `<div class="post-main-title">${escapeHtml(p.linkTitle)}</div>`;
+    }
 
     // Phân nhánh hiển thị: Nếu bài viết CÓ LINK thì hiện thẻ Link
     if (p.linkUrl) {
-        // Lấy ảnh tải lên đầu tiên làm ảnh bìa (nếu không có thì hiện ô báo trống)
         let thumbUrl = n > 0 ? (typeof p.images[0] === 'object' ? safeUrl(p.images[0].url) : safeUrl(p.images[0])) : "";
         linkCardHtml = `
         <a href="${escapeHtml(p.linkUrl)}" target="_blank" rel="noopener noreferrer" class="link-preview-card">
             ${thumbUrl ? `<img src="${thumbUrl}" class="link-image" alt="Thumbnail">` : `<div style="height:140px; background:var(--chip); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; font-weight:bold;">🔗 Bài viết không có ảnh bìa</div>`}
             <div class="link-info">
-                <h4 class="link-title">${escapeHtml(p.linkTitle)}</h4>
-                <div class="link-domain">🌐 Nhấn để xem chi tiết tại nguồn</div>
+                <div class="link-domain">🌐 Nhấn để xem chi tiết bài viết tại nguồn</div>
+                <div style="font-size:11px; color:var(--muted); margin-top:4px; word-break:break-all;">${escapeHtml(p.linkUrl)}</div>
             </div>
         </a>`;
     } 
-    // Nếu KHÔNG CÓ LINK, hiển thị lưới ảnh/video cũ như bình thường
+    // Nếu KHÔNG CÓ LINK, hiển thị lưới ảnh/video như bình thường
     else if (n > 0) {
         grid = `<div class="post-grid n${Math.min(n, 4)}">${p.images.slice(0, 4).map((item, i) => renderMediaCell(item, i)).join("")}</div>`;
     }
+    
     const safeAdminPhoto = safeUrl(adminCredentials.photo);
     
+    // Check trạng thái Ghim
+    const pinBadge = p.pinned ? `<div class="pinned-badge">📌 Bài viết đã ghim</div>` : "";
+    const pinBtn = isAdmin ? `<button class="post-pin-btn ${p.pinned ? 'is-pinned' : ''}" onclick="togglePin(${p.id})" title="${p.pinned ? 'Bỏ ghim' : 'Ghim bài'}">📌</button>` : "";
+
     const comments = (p.comments || []).map((c, i) => {
+        // ... (phần code comment giữ nguyên không đổi)
         const isAdminComment = c.name === "Admin";
         return `
         <div class="cmt">
@@ -1493,11 +1504,16 @@ function postHtml(p){
     const readonly = isAdmin ? 'readonly style="background:#1f2e28;color:#38d9a9;font-weight:700;"' : '';
 
     return `
+        ${pinBadge}
         <div class="post-head">
             ${safeAdminPhoto ? `<img src="${safeAdminPhoto}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;">` : `<div class="avatar-circle">12A1</div>`}
             <div><strong>Admin · 12A1-k59</strong><div class="post-time">${timeAgo(p.time)} · 🌐</div></div>
-            <button class="admin-only post-del" onclick="deletePost(${p.id})" title="Xóa bài">🗑</button>
+            <div class="admin-only" style="margin-left:auto; display:flex; align-items:center;">
+                ${pinBtn}
+                <button class="post-del" onclick="deletePost(${p.id})" title="Xóa bài">🗑</button>
+            </div>
         </div>
+        ${titleHtml}
         ${p.text ? `<p class="post-text">${escapeHtml(p.text)}</p>` : ""}
         ${linkCardHtml}
         ${grid}
@@ -1515,12 +1531,26 @@ function postHtml(p){
 }
 
 function renderPosts(){
-    const feed=document.getElementById("post-feed"); if(!feed) return;
-    feed.innerHTML="";
-    if(posts.length===0){feed.innerHTML=`<p class="empty-achieve">Chưa có bài đăng nào.</p>`;return;}
-    posts.forEach(p=>{
-        const art=document.createElement("article"); art.className="post-card"; art.id=`post-${p.id}`;
-        art.innerHTML=postHtml(p); feed.appendChild(art);
+    const feed = document.getElementById("post-feed"); 
+    if(!feed) return;
+    feed.innerHTML = "";
+    if(posts.length === 0){feed.innerHTML = `<p class="empty-achieve">Chưa có bài đăng nào.</p>`;return;}
+    
+    // Lọc và sắp xếp: Đẩy bài Ghim lên trên cùng, sau đó xếp theo thời gian mới nhất
+    const sortedPosts = [...posts].sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return b.time - a.time;
+    });
+
+    sortedPosts.forEach(p => {
+        const art = document.createElement("article"); 
+        art.className = "post-card"; 
+        art.id = `post-${p.id}`;
+        // Tô viền đỏ nhẹ nếu bài viết được ghim
+        if(p.pinned) art.style.borderColor = "rgba(255, 107, 107, 0.4)"; 
+        art.innerHTML = postHtml(p); 
+        feed.appendChild(art);
     });
 }
 function refreshPost(id){
@@ -1597,6 +1627,13 @@ async function deletePost(id){
         await saveData();
         renderPosts();
     }
+}
+async function togglePin(id) {
+    const p = posts.find(x => x.id === id);
+    if (!p) return;
+    p.pinned = !p.pinned; // Đảo ngược trạng thái ghim
+    await saveData();
+    renderPosts(); // Tải lại bảng tin để xếp nó lên đầu
 }
 
 let lb={list:[],i:0,caps:""};
