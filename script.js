@@ -1475,7 +1475,7 @@ function postHtml(p){
         <a href="${escapeHtml(p.linkUrl)}" target="_blank" rel="noopener noreferrer" class="link-preview-card">
             ${thumbUrl ? `<img src="${thumbUrl}" class="link-image" alt="Thumbnail">` : `<div style="height:140px; background:var(--chip); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; font-weight:bold;">🔗 Bài viết không có ảnh bìa</div>`}
             <div class="link-info">
-                <h4 class="link-title">${escapeHtml(p.linkTitle)}</h4>
+                <div style="color:var(--text); font-size:14px; margin-bottom:6px;">Xem chi tiết hơn ở:</div>
                 ${actionBtnHtml}
             </div>
         </a>`;
