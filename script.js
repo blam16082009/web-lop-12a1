@@ -2265,6 +2265,7 @@ function playTimerBell() {
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
+            // Vuốt âm lượng to lên
             gain.gain.exponentialRampToValueAtTime(vol, startAt + 0.02);
             gain.gain.exponentialRampToValueAtTime(0.0001, startAt + dur);
             osc.connect(gain);
@@ -2276,8 +2277,9 @@ function playTimerBell() {
         const now = ctx.currentTime;
         for (let i = 0; i < 3; i++) {
             const t = now + i * 1.0;
-            ring(t, 880, 0.35, 0.25);
-            ring(t + 0.4, 660, 0.45, 0.2);
+            // Đã tăng âm lượng ở tham số cuối cùng (từ 0.25 lên 1.2 và 0.2 lên 1.0)
+            ring(t, 880, 0.35, 1.2); 
+            ring(t + 0.4, 660, 0.45, 1.0); 
         }
     } catch (e) {}
 }
