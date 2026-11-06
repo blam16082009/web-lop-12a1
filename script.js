@@ -2183,6 +2183,7 @@ let timerInterval = null;
 let timerRemaining = 0;
 let timerRunning = false;
 let timerEndTime = 0;
+let alarmInterval = null; // Biến giữ nhịp chuông kêu liên tục
 
 function updateTimerDisplay() {
     const el = document.getElementById('timer-display');
@@ -2226,7 +2227,9 @@ function startTimer() {
             timerRunning = false;
             timerRemaining = 0;
             updateTimerDisplay();
-            playTimerBell();
+            
+            // Kích hoạt chuông kêu lặp lại liên tục và hiện bảng thông báo
+            triggerAlarmAndModal();
         }
     }, 200);
 }
@@ -2243,6 +2246,7 @@ function pauseTimer() {
 function resetTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
+    stopAlarm(); // Dừng chuông nếu đang kêu
     timerRunning = false;
     timerRemaining = 0;
     updateTimerDisplay();
@@ -2252,7 +2256,8 @@ function resetTimer() {
     });
 }
 
-function playTimerBell() {
+// Hàm phát 1 hồi chuông to
+function playSingleBell() {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
@@ -2265,7 +2270,6 @@ function playTimerBell() {
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
-            // Vuốt âm lượng to lên
             gain.gain.exponentialRampToValueAtTime(vol, startAt + 0.02);
             gain.gain.exponentialRampToValueAtTime(0.0001, startAt + dur);
             osc.connect(gain);
@@ -2275,13 +2279,42 @@ function playTimerBell() {
         };
 
         const now = ctx.currentTime;
-        for (let i = 0; i < 3; i++) {
-            const t = now + i * 1.0;
-            // Đã tăng âm lượng ở tham số cuối cùng (từ 0.25 lên 1.2 và 0.2 lên 1.0)
-            ring(t, 880, 0.35, 1.2); 
-            ring(t + 0.4, 660, 0.45, 1.0); 
-        }
+        ring(now, 880, 0.4, 1.5);
+        ring(now + 0.45, 660, 0.5, 1.3);
+        ring(now + 0.9, 880, 0.4, 1.5);
     } catch (e) {}
+}
+
+// Bật chuông lặp liên tục mỗi 1.8 giây và hiện bảng thông báo chặn màn hình
+function triggerAlarmAndModal() {
+    playSingleBell();
+    if (alarmInterval) clearInterval(alarmInterval);
+    alarmInterval = setInterval(() => {
+        playSingleBell();
+    }, 1800);
+
+    // Hiển thị bảng thông báo chặn giữa màn hình
+    showModal(`
+        <div style="text-align:center; padding: 15px;">
+            <div style="font-size: 60px; margin-bottom: 10px;">⏰</div>
+            <h3 style="color:var(--danger); font-size:22px; margin-bottom:10px;">HẾT GIỜ RỒI!</h3>
+            <p style="font-size:14px; color:var(--text); margin-bottom:20px;">Thời gian đếm ngược đã kết thúc. Vui lòng tắt chuông báo thức.</p>
+            <button class="primary-btn" style="width:100%; padding:14px; background:var(--danger); font-size:16px; font-weight:800; margin:0;" onclick="stopAlarmAndCloseModal()">🛑 Tắt chuông báo</button>
+        </div>
+    `);
+}
+
+// Hàm tắt chuông và đóng bảng thông báo
+function stopAlarmAndCloseModal() {
+    stopAlarm();
+    closeModal();
+}
+
+function stopAlarm() {
+    if (alarmInterval) {
+        clearInterval(alarmInterval);
+        alarmInterval = null;
+    }
 }
 
 
