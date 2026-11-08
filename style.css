@@ -841,5 +841,5 @@ body.light-mode .mention-dropdown {
 }
 
 .highlighted-row {
-    animation: highlightRow 2.5s ease-out;
+    animation: highlightRow 5s ease-out;
 }

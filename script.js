@@ -1466,7 +1466,7 @@ window.goToMember = function(name) {
             
             setTimeout(() => {
                 targetRow.classList.remove('highlighted-row');
-            }, 2500);
+            }, 5000);
         }
     }, 100); // Đợi 100ms
 };
