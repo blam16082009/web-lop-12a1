@@ -1427,27 +1427,50 @@ function timeAgo(ts){
     const d=Math.floor(h/24); if(d<7) return `${d} ngày trước`;
     return new Date(ts).toLocaleDateString("vi-VN");
 }
-// Hàm chuyển hướng: tự động nhận diện là Thầy cô hay Thành viên để sang đúng trang
 window.goToMember = function(name) {
     const isTeacher = teachers.some(t => (t.name || "").toLowerCase() === name.toLowerCase());
-    if (isTeacher) {
-        showPage('teachers');
-        const searchInput = document.getElementById('search-teacher');
-        if (searchInput) {
-            searchInput.value = name; 
-            renderTeachers(name);      
-        }
-    } else {
-        showPage('members');
-        const searchInput = document.getElementById('search-member');
-        if (searchInput) {
-            searchInput.value = name; 
-            renderMembers(name);      
-        }
+    const pageId = isTeacher ? 'teachers' : 'members';
+    const listId = isTeacher ? 'teacher-list' : 'member-list';
+    const searchInputId = isTeacher ? 'search-teacher' : 'search-member';
+    const renderFunc = isTeacher ? renderTeachers : renderMembers;
+
+    showPage(pageId);
+
+    const searchInput = document.getElementById(searchInputId);
+    if (searchInput) {
+        searchInput.value = '';
+        renderFunc(''); 
     }
+
+    setTimeout(() => {
+        const listBody = document.getElementById(listId);
+        if (!listBody) return;
+
+        const rows = listBody.querySelectorAll('tr');
+        let targetRow = null;
+
+        for (let row of rows) {
+            const nameEl = row.querySelector('td:nth-child(2) strong');
+            if (nameEl && nameEl.textContent.trim().toLowerCase() === name.toLowerCase()) {
+                targetRow = row;
+                break;
+            }
+        }
+
+        if (targetRow) {
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            targetRow.classList.remove('highlighted-row');
+            void targetRow.offsetWidth; 
+            targetRow.classList.add('highlighted-row');
+            
+            setTimeout(() => {
+                targetRow.classList.remove('highlighted-row');
+            }, 2500);
+        }
+    }, 100); // Đợi 100ms
 };
 
-// Hàm định dạng thẻ Tag bôi màu
 function formatMentions(text) {
     if (!text) return "";
     let safeText = escapeHtml(text); 
