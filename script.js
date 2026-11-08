@@ -1498,7 +1498,8 @@ function postHtml(p){
     let linkCardHtml = "";
     let titleHtml = "";
     if (p.linkTitle) {
-        titleHtml = `<div class="post-main-title">${escapeHtml(p.linkTitle)}</div>`;
+        // Đổi escapeHtml thành formatMentions
+        titleHtml = `<div class="post-main-title">${formatMentions(p.linkTitle)}</div>`;
     }
     if (p.linkUrl) {
         let thumbUrl = n > 0 ? (typeof p.images[0] === 'object' ? safeUrl(p.images[0].url) : safeUrl(p.images[0])) : "";
@@ -2480,7 +2481,7 @@ document.body.appendChild(mentionDropdown);
 document.addEventListener('input', (e) => {
     const target = e.target;
     // Kiểm tra xem đang gõ vào khu vực Đăng bài hoặc Bình luận
-    if (target.id === 'post-text' || (target.classList && target.classList.contains('cmt-text'))) {
+    if (target.id === 'post-text' || target.id === 'post-link-title' || (target.classList && target.classList.contains('cmt-text'))) {
         handleMentionInput(target);
     }
 });
@@ -2553,7 +2554,7 @@ function showMentionSuggestions(inputEl, query, atIndex) {
     mentionDropdown.style.width = rect.width + 'px';
     
     // Đăng bài thì bung xuống, bình luận thì bung lên
-    if(inputEl.id === 'post-text') {
+    if(inputEl.id === 'post-text' || inputEl.id === 'post-link-title') {
         mentionDropdown.style.top = (rect.bottom + window.scrollY + 5) + 'px';
         mentionDropdown.style.bottom = 'auto';
     } else {
