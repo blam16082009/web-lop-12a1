@@ -755,3 +755,31 @@ body.light-mode tbody tr:hover td.admin-only {
     margin-bottom: 12px;
     border: 1px solid rgba(255, 107, 107, 0.3);
 }
+/* Giao diện cho thẻ @mention */
+.mention {
+    color: var(--purple);
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(169, 154, 244, 0.15);
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: 0.2s;
+    display: inline-block;
+}
+
+.mention:hover {
+    background: var(--purple);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(169, 154, 244, 0.4);
+}
+
+/* Áp dụng màu tương thích cho chế độ Light Mode */
+body.light-mode .mention {
+    background: rgba(122, 92, 199, 0.15);
+}
+body.light-mode .mention:hover {
+    background: var(--purple);
+    color: #fff;
+}

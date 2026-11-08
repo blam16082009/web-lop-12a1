@@ -1427,7 +1427,36 @@ function timeAgo(ts){
     const d=Math.floor(h/24); if(d<7) return `${d} ngày trước`;
     return new Date(ts).toLocaleDateString("vi-VN");
 }
+window.goToMember = function(name) {
+    showPage('members'); // Chuyển sang trang thành viên
+    const searchInput = document.getElementById('search-member');
+    if (searchInput) {
+        searchInput.value = name; 
+        renderMembers(name);      
+    }
+};
 
+function formatMentions(text) {
+    if (!text) return "";
+    let safeText = escapeHtml(text); 
+
+    
+    const sortedNames = members
+        .map(m => m.name.trim())
+        .filter(n => n)
+        .sort((a, b) => b.length - a.length);
+
+    sortedNames.forEach(name => {
+        const safeNameForRegex = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`@(${safeNameForRegex})`, 'gi');
+        
+        safeText = safeText.replace(regex, (match, matchedName) => {
+            return `<span class="mention" onclick="goToMember('${escapeHtml(name)}')">${match}</span>`;
+        });
+    });
+
+    return safeText;
+}
 function postHtml(p){
     const n = p.images ? p.images.length : 0;
     
@@ -1502,7 +1531,7 @@ function postHtml(p){
             <div>
                 <div class="cmt-bubble">
                     <strong class="${isAdminComment ? 'is-admin' : ''}">${escapeHtml(c.name)}</strong>
-                    <p>${escapeHtml(c.text)}</p>
+                    <p>${formatMentions(c.text)}</p>
                 </div>
                 <div class="cmt-meta">${timeAgo(c.time)}<button class="admin-only cmt-del" onclick="deleteComment(${p.id},${i})">Xóa</button></div>
             </div>
@@ -1523,7 +1552,7 @@ function postHtml(p){
             </div>
         </div>
         ${titleHtml}
-        ${p.text ? `<p class="post-text">${escapeHtml(p.text)}</p>` : ""}
+        ${p.text ? `<p class="post-text">${formatMentions(p.text)}</p>` : ""}
         ${linkCardHtml}
         ${grid}
         <div class="post-stats"><span>❤️ ${p.likes || 0} lượt thả tim</span><span>${(p.comments || []).length} bình luận</span></div>
