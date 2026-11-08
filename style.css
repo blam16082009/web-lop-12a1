@@ -783,3 +783,53 @@ body.light-mode .mention:hover {
     background: var(--purple);
     color: #fff;
 }
+/* CSS Hệ thống gợi ý Tag tên */
+.mention-dropdown {
+    position: absolute;
+    background: var(--card2);
+    border: 1px solid var(--purple);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 9999;
+    display: none;
+}
+
+.mention-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--line);
+    transition: 0.2s;
+}
+
+.mention-item:last-child {
+    border-bottom: none;
+}
+
+.mention-item:hover {
+    background: rgba(169, 154, 244, 0.15);
+}
+
+.mention-avatar {
+    width: 28px; 
+    height: 28px; 
+    border-radius: 50%; 
+    object-fit: cover;
+    background: var(--chip); 
+    display: grid; 
+    place-items: center; 
+    font-size: 12px; 
+    font-weight: bold; 
+    color: var(--deep); 
+    flex-shrink: 0;
+}
+
+/* Tương thích cho Light Mode */
+body.light-mode .mention-dropdown {
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}

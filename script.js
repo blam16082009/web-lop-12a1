@@ -1427,26 +1427,42 @@ function timeAgo(ts){
     const d=Math.floor(h/24); if(d<7) return `${d} ngày trước`;
     return new Date(ts).toLocaleDateString("vi-VN");
 }
+// Hàm chuyển hướng: tự động nhận diện là Thầy cô hay Thành viên để sang đúng trang
 window.goToMember = function(name) {
-    showPage('members'); // Chuyển sang trang thành viên
-    const searchInput = document.getElementById('search-member');
-    if (searchInput) {
-        searchInput.value = name; 
-        renderMembers(name);      
+    const isTeacher = teachers.some(t => (t.name || "").toLowerCase() === name.toLowerCase());
+    if (isTeacher) {
+        showPage('teachers');
+        const searchInput = document.getElementById('search-teacher');
+        if (searchInput) {
+            searchInput.value = name; 
+            renderTeachers(name);      
+        }
+    } else {
+        showPage('members');
+        const searchInput = document.getElementById('search-member');
+        if (searchInput) {
+            searchInput.value = name; 
+            renderMembers(name);      
+        }
     }
 };
 
+// Hàm định dạng thẻ Tag bôi màu
 function formatMentions(text) {
     if (!text) return "";
     let safeText = escapeHtml(text); 
 
-    
-    const sortedNames = members
-        .map(m => m.name.trim())
+    // Gộp cả 2 mảng để quét tên
+    const allPeople = [...members, ...teachers];
+    const sortedNames = allPeople
+        .map(p => (p.name || "").trim())
         .filter(n => n)
         .sort((a, b) => b.length - a.length);
 
-    sortedNames.forEach(name => {
+    // Lọc trùng tên để tránh lỗi thay thế lặp vòng
+    const uniqueNames = [...new Set(sortedNames)];
+
+    uniqueNames.forEach(name => {
         const safeNameForRegex = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`@(${safeNameForRegex})`, 'gi');
         
@@ -2455,3 +2471,103 @@ document.getElementById('post-feed').innerHTML = '<p style="text-align:center;co
 loadDataFromFirebase();
 setInterval(updateCountdowns, 1000);
 showPage("home");
+
+// --- BẮT ĐẦU: HỆ THỐNG GỢI Ý MENTION ---
+const mentionDropdown = document.createElement('div');
+mentionDropdown.className = 'mention-dropdown';
+document.body.appendChild(mentionDropdown);
+
+document.addEventListener('input', (e) => {
+    const target = e.target;
+    // Kiểm tra xem đang gõ vào khu vực Đăng bài hoặc Bình luận
+    if (target.id === 'post-text' || (target.classList && target.classList.contains('cmt-text'))) {
+        handleMentionInput(target);
+    }
+});
+
+function handleMentionInput(inputEl) {
+    const val = inputEl.value;
+    const cursorPos = inputEl.selectionStart;
+    const textBeforeCursor = val.substring(0, cursorPos);
+    const lastAtIndex = textBeforeCursor.lastIndexOf('@');
+    
+    // Nếu có dấu @ gần con trỏ
+    if (lastAtIndex !== -1) {
+        const query = textBeforeCursor.substring(lastAtIndex + 1);
+        // Ngăn hiển thị nếu cụm từ đã quá dài hoặc qua câu khác
+        if (query.length < 35 && !query.includes(',') && !query.includes('.')) {
+            showMentionSuggestions(inputEl, query, lastAtIndex);
+            return;
+        }
+    }
+    hideMentionDropdown();
+}
+
+function showMentionSuggestions(inputEl, query, atIndex) {
+    const allPeople = [
+        ...members.map(m => ({...m, roleTag: 'Thành viên'})), 
+        ...teachers.map(t => ({...t, roleTag: 'Thầy cô'}))
+    ];
+    
+    // Lọc danh sách theo chữ vừa gõ
+    const filtered = allPeople.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+    
+    if (filtered.length === 0) {
+        hideMentionDropdown();
+        return;
+    }
+
+    mentionDropdown.innerHTML = '';
+    filtered.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'mention-item';
+        
+        const safePhoto = safeUrl(p.photo);
+        const avatar = safePhoto ? `<img src="${safePhoto}" class="mention-avatar">` : `<div class="mention-avatar">${escapeHtml(p.name.charAt(0))}</div>`;
+        
+        item.innerHTML = `${avatar}<div><strong style="color:var(--text)">${escapeHtml(p.name)}</strong> <span style="font-size:11px;color:var(--purple);font-weight:bold;margin-left:6px">${p.roleTag}</span></div>`;
+        
+        // onmousedown thay vì onclick để giữ focus cho bàn phím điện thoại
+        item.onmousedown = (e) => { 
+            e.preventDefault(); 
+            const val = inputEl.value;
+            const textBefore = val.substring(0, atIndex);
+            const textAfter = val.substring(inputEl.selectionStart);
+            
+            // Thay thế đoạn text sau @ bằng tên chuẩn
+            inputEl.value = textBefore + '@' + p.name + ' ' + textAfter;
+            
+            // Đẩy con trỏ nháy ra sau tên vừa chèn
+            const newCursorPos = textBefore.length + p.name.length + 2;
+            inputEl.setSelectionRange(newCursorPos, newCursorPos);
+            inputEl.focus();
+            hideMentionDropdown();
+        };
+        mentionDropdown.appendChild(item);
+    });
+
+    // Căn tọa độ hiển thị bảng gợi ý bám sát theo ô Input
+    const rect = inputEl.getBoundingClientRect();
+    mentionDropdown.style.display = 'block';
+    mentionDropdown.style.left = rect.left + 'px';
+    mentionDropdown.style.width = rect.width + 'px';
+    
+    // Đăng bài thì bung xuống, bình luận thì bung lên
+    if(inputEl.id === 'post-text') {
+        mentionDropdown.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+        mentionDropdown.style.bottom = 'auto';
+    } else {
+        mentionDropdown.style.bottom = (window.innerHeight - rect.top + 5) + 'px';
+        mentionDropdown.style.top = 'auto';
+    }
+}
+
+function hideMentionDropdown() {
+    mentionDropdown.style.display = 'none';
+}
+
+// Bấm ra ngoài thì tắt bảng
+document.addEventListener('click', (e) => {
+    if (!mentionDropdown.contains(e.target)) hideMentionDropdown();
+});
+// --- KẾT THÚC: HỆ THỐNG GỢI Ý MENTION ---
