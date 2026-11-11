@@ -32,22 +32,36 @@ function safeUrl(url) {
     return /^https?:\/\//i.test(trimmed) ? escapeHtml(trimmed) : "";
 }
 
+function createMaskedPhone(phone) {
+    if (!phone) return "";
+    const str = String(phone).trim();
+    if (str.includes("*")) return str; 
+    if (str.length <= 4) return "****";
+    return str.slice(0, 3) + "****" + str.slice(-2);
+}
+
+
+function createMaskedGmail(gmail) {
+    if (!gmail) return "";
+    const str = String(gmail).trim();
+    if (str.includes("*")) return str;
+    const parts = str.split("@");
+    const userPart = parts[0] || "";
+    const domainPart = parts[1] || "gmail.com";
+    const visiblePrefix = userPart.length > 2 ? userPart.slice(0, 2) : "*";
+    return `${visiblePrefix}***@${domainPart}`;
+}
+
 function maskPhone(phone) {
     if (!phone) return "--";
     if (isAdmin) return escapeHtml(phone);
-    const str = String(phone).trim();
-    if (str.length <= 4) return "****";
-    return escapeHtml(str.slice(0, 3)) + "****" + escapeHtml(str.slice(-2));
+    return escapeHtml(createMaskedPhone(phone));
 }
 
 function maskGmail(gmail) {
     if (!gmail) return "--";
-    const parts = String(gmail).trim().split("@");
-    const userPart = parts[0] || "";
-    const domainPart = parts[1] || "gmail.com";
-    if (isAdmin) return `${escapeHtml(userPart)}@${escapeHtml(domainPart)}`;
-    const visiblePrefix = userPart.length > 2 ? escapeHtml(userPart.slice(0, 2)) : "*";
-    return `${visiblePrefix}***@${escapeHtml(domainPart)}`;
+    if (isAdmin) return escapeHtml(gmail);
+    return escapeHtml(createMaskedGmail(gmail));
 }
 
 let wheelItems = []; 
@@ -343,11 +357,12 @@ let saveQueue = Promise.resolve();
 function getClassDataPayload() {
     return {
         members, teachers, achievements, posts, bdayData, memoryFolders,
-        countdownEvents, scheduleData, specialEvents, adminCredentials
+        countdownEvents, scheduleData, specialEvents
     };
 }
 
 function storeLocalClassBackup(payload) {
+    if (!isAdmin) return; // CHỈ LƯU BACKUP VÀO TRÌNH DUYỆT KHI LÀ ADMIN
     try {
         const nextData = JSON.stringify(payload);
         const currentRaw = localStorage.getItem(CLASS_BACKUP_KEY);
@@ -377,7 +392,6 @@ function applyClassData(data) {
     countdownEvents = Array.isArray(data.countdownEvents) ? data.countdownEvents : [];
     scheduleData = data.scheduleData && typeof data.scheduleData === 'object' ? data.scheduleData : {};
     specialEvents = Array.isArray(data.specialEvents) ? data.specialEvents : [];
-    adminCredentials = data.adminCredentials && typeof data.adminCredentials === 'object' ? data.adminCredentials : { username: "admin", passwordHash: "" };
 }
 
 function renderAllClassData() {
@@ -394,28 +408,61 @@ function renderAllClassData() {
     if (currentFolderId) renderMedia();
 }
 
+// Hàm tải SĐT & Gmail gốc từ kho mật (Chỉ chạy được khi đã đăng nhập Admin)
+async function loadPrivateContactsForAdmin() {
+    if (!isAdmin || !window.firebaseReady) return;
+    try {
+        const privRef = window.fbDoc(window.db, 'class_data', 'private');
+        const privSnap = await window.fbGetDoc(privRef);
+        if (privSnap.exists()) {
+            const privData = privSnap.data();
+            if (Array.isArray(privData.memberContacts)) {
+                members.forEach((m, idx) => {
+                    if (privData.memberContacts[idx]) {
+                        if (privData.memberContacts[idx].phone) m.phone = privData.memberContacts[idx].phone;
+                        if (privData.memberContacts[idx].gmail) m.gmail = privData.memberContacts[idx].gmail;
+                    }
+                });
+            }
+            if (Array.isArray(privData.teacherContacts)) {
+                teachers.forEach((t, idx) => {
+                    if (privData.teacherContacts[idx]) {
+                        if (privData.teacherContacts[idx].phone) t.phone = privData.teacherContacts[idx].phone;
+                        if (privData.teacherContacts[idx].gmail) t.gmail = privData.teacherContacts[idx].gmail;
+                    }
+                });
+            }
+            storeLocalClassBackup(getClassDataPayload());
+            renderAllClassData();
+        }
+    } catch (e) {
+        console.warn('Không thể tải dữ liệu liên hệ gốc của Admin:', e);
+    }
+}
+
 async function loadDataFromFirebase() {
     while (!window.firebaseReady) await new Promise(r => setTimeout(r, 100));
     try {
         const docRef = window.fbDoc(window.db, 'class_data', 'main');
-        window.fbOnSnapshot(docRef, (docSnap) => {
+        window.fbOnSnapshot(docRef, async (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 firebaseDocumentMissing = false;
                 allowCreateForRestore = false;
                 applyClassData(data);
-                storeLocalClassBackup(getClassDataPayload());
-                renderAllClassData();
+                
+                if (isAdmin) {
+                    await loadPrivateContactsForAdmin();
+                } else {
+                    renderAllClassData();
+                }
             } else {
                 firebaseDocumentMissing = true;
                 applyClassData({});
                 renderAllClassData();
                 if (!missingDocWarningShown) {
                     missingDocWarningShown = true;
-                    let hasBackup = false;
-                    try { hasBackup = !!localStorage.getItem(CLASS_BACKUP_KEY); } catch (e) {}
-                    alert('CẢNH BÁO: Firebase không tìm thấy class_data/main. Website đã chặn tự ghi dữ liệu để tránh ghi đè. ' +
-                        (hasBackup ? 'Trình duyệt này có bản sao lưu cục bộ; hãy đăng nhập Admin và chọn Khôi phục từ file backup.' : 'Hãy đăng nhập Admin và chọn Khôi phục từ file backup-lop-12a1.json.'));
+                    alert('CẢNH BÁO: Firebase không tìm thấy class_data/main. Hãy đăng nhập Admin và chọn Khôi phục từ file backup.');
                 }
             }
         }, (error) => {
@@ -437,7 +484,32 @@ async function saveData() {
 
     const operation = saveQueue.then(async () => {
         const payload = getClassDataPayload();
-        const json = JSON.stringify(payload);
+
+        // 1. Nếu là Admin đang thao tác: Lưu SĐT và Gmail thật vào kho mật 'class_data/private'
+        if (isAdmin) {
+            const memberContacts = members.map(m => ({ phone: m.phone || "", gmail: m.gmail || "" }));
+            const teacherContacts = teachers.map(t => ({ phone: t.phone || "", gmail: t.gmail || "" }));
+            const privRef = window.fbDoc(window.db, 'class_data', 'private');
+            await window.fbSetDoc(privRef, { memberContacts, teacherContacts });
+            storeLocalClassBackup(payload);
+        }
+
+        // 2. Tạo bản dữ liệu Công khai (Luôn luôn biến SĐT & Gmail thành dấu *** trước khi gửi lên 'class_data/main')
+        const publicPayload = {
+            ...payload,
+            members: members.map(m => ({
+                ...m,
+                phone: createMaskedPhone(m.phone),
+                gmail: createMaskedGmail(m.gmail)
+            })),
+            teachers: teachers.map(t => ({
+                ...t,
+                phone: createMaskedPhone(t.phone),
+                gmail: createMaskedGmail(t.gmail)
+            }))
+        };
+
+        const json = JSON.stringify(publicPayload);
         const bytes = new TextEncoder().encode(json).length;
         if (bytes > 700 * 1024) {
             alert('Không thể lưu: dữ liệu đang quá lớn (' + Math.round(bytes / 1024) + ' KB). Giới hạn an toàn là 700 KB.');
@@ -445,9 +517,8 @@ async function saveData() {
         }
         try {
             const docRef = window.fbDoc(window.db, 'class_data', 'main');
-            await window.fbSetDoc(docRef, payload);
+            await window.fbSetDoc(docRef, publicPayload);
             localStorage.setItem('class_my_likes', JSON.stringify(myLikes));
-            storeLocalClassBackup(payload);
             allowCreateForRestore = false;
             firebaseDocumentMissing = false;
             return true;
@@ -1553,7 +1624,7 @@ function postHtml(p){
         grid = `<div class="post-grid n${Math.min(n, 4)}">${p.images.slice(0, 4).map((item, i) => renderMediaCell(item, i)).join("")}</div>`;
     }
     
-    const safeAdminPhoto = safeUrl(adminCredentials.photo);
+    const safeAdminPhoto = "";
     
     // Check trạng thái Ghim
     const pinBadge = p.pinned ? `<div class="pinned-badge">📌 Bài viết đã ghim</div>` : "";
@@ -2396,14 +2467,23 @@ window.setAdminState = function(isLoggedIn) {
             btn.classList.add("logged-in"); 
             btn.innerHTML = `✓ <span>Admin</span>`;
         }
+        loadPrivateContactsForAdmin();
     } else {
         document.body.classList.remove("admin-mode");
         if(btn) {
             btn.classList.remove("logged-in"); 
             btn.innerHTML = `·`;
         }
+        members.forEach(m => {
+            m.phone = createMaskedPhone(m.phone);
+            m.gmail = createMaskedGmail(m.gmail);
+        });
+        teachers.forEach(t => {
+            t.phone = createMaskedPhone(t.phone);
+            t.gmail = createMaskedGmail(t.gmail);
+        });
+        renderAllClassData();
     }
-    renderAllClassData();
 };
 
 function openAdminModal(){
