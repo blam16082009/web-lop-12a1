@@ -362,7 +362,8 @@ function getClassDataPayload() {
 }
 
 function storeLocalClassBackup(payload) {
-    if (!isAdmin) return; // CHỈ LƯU BACKUP VÀO TRÌNH DUYỆT KHI LÀ ADMIN
+    if (!isAdmin) return; 
+
     try {
         const nextData = JSON.stringify(payload);
         const currentRaw = localStorage.getItem(CLASS_BACKUP_KEY);
