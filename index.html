@@ -252,7 +252,10 @@
 
                     <div id="number-grid-container" class="hidden" style="width:100%; box-sizing:border-box; background:var(--card2); border:1px solid var(--line); border-radius:16px; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; gap:16px; padding:14px; margin-bottom:15px;">
                         <div id="number-cells-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(48px, 1fr)); gap:10px; width:100%; max-height:none; overflow:visible; padding:3px; box-sizing:border-box;"></div>
-                        <button class="primary-btn" onclick="startNumberRandom()" style="align-self:center; width:100%; max-width:220px; padding:12px; font-size:16px; font-weight:800; margin:0;">QUAY SỐ</button>
+                        <div style="display:flex; gap:10px; justify-content:center; width:100%;">
+                            <button class="primary-btn" onclick="startNumberRandom()" style="flex:1; max-width:220px; padding:12px; font-size:16px; font-weight:800; margin:0;">QUAY SỐ</button>
+                            <button class="primary-btn" onclick="resetNumberGrid()" style="background:var(--chip); color:var(--muted); border:1px solid var(--line); padding:12px 15px; font-size:14px; font-weight:700; margin:0;" title="Khôi phục lại toàn bộ số">⟲ Đặt lại</button>
+                        </div>
                     </div>
 
                     <div id="wheel-name-config">

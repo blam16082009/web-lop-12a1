@@ -333,17 +333,28 @@ function showWinnerModal(winnerName) {
             
             <div style="display:flex; gap:10px;">
                 <button class="btn-cancel" onclick="closeModal()" style="flex:1; padding:11px; font-weight:700; cursor:pointer;" type="button">Đóng</button>
-                ${currentWheelMode === 'name' ? `<button class="btn-submit" onclick="removeWinnerAndClose()" style="flex:1; padding:11px; background:var(--danger); font-weight:700; cursor:pointer;" type="button">Xóa tên này</button>` : ``}
+                <button class="btn-submit" onclick="removeWinnerAndClose()" style="flex:1; padding:11px; background:var(--danger); font-weight:700; cursor:pointer;" type="button">Xóa ${currentWheelMode === 'name' ? 'tên' : 'số'} này</button>
             </div>
         </div>
     `);
 }
 
 function removeWinnerAndClose() {
-    if (lastWinnerIndex !== null && lastWinnerIndex >= 0 && lastWinnerIndex < wheelItems.length) {
-        wheelItems.splice(lastWinnerIndex, 1);
-        renderWheelList();
+    if (currentWheelMode === 'name') {
+        if (lastWinnerIndex !== null && lastWinnerIndex >= 0 && lastWinnerIndex < wheelItems.length) {
+            wheelItems[lastWinnerIndex].active = false;
+            renderWheelList();
+        }
+    } else {
+        const targetObj = numberGridItems.find(i => i.num === lastWinnerNumber);
+        if (targetObj) targetObj.active = false;
+        renderNumberGridCells(-1);
     }
+    
+    // Reset biến nhớ
+    lastWinnerIndex = null;
+    lastWinnerNumber = null;
+    
     closeModal();
 }
 
@@ -2097,7 +2108,7 @@ async function deleteSpecialEvent(index) {
 
 let numberGridItems = [];
 let isNumberSpinning = false;
-
+let lastWinnerNumber = null;
 function generateNumberGrid() {
     const fromVal = parseInt(document.getElementById("num-from").value);
     const toVal = parseInt(document.getElementById("num-to").value);
@@ -2108,7 +2119,8 @@ function generateNumberGrid() {
 
     numberGridItems = [];
     for (let i = fromVal; i <= toVal; i++) {
-        numberGridItems.push(i);
+        // Đổi thành Object để quản lý trạng thái Tắt/Bật của từng số
+        numberGridItems.push({ num: i, active: true });
     }
     renderNumberGridCells(-1);
 }
@@ -2118,27 +2130,86 @@ function renderNumberGridCells(activeIndex) {
     if (!grid) return;
     grid.innerHTML = "";
 
-    numberGridItems.forEach((num, index) => {
+    numberGridItems.forEach((item, index) => {
         const cell = document.createElement("div");
-        const isActive = index === activeIndex;
+        const isActiveSpin = index === activeIndex;
+        
+        let bg = isActiveSpin ? 'var(--purple)' : 'var(--card)';
+        let color = isActiveSpin ? '#fff' : 'var(--text)';
+        let border = isActiveSpin ? 'var(--blue)' : 'var(--line)';
+        let opacity = '1';
+        let textDeco = 'none';
+
+        // Nếu số đã bị xóa thì làm mờ và gạch ngang
+        if (!item.active) {
+            bg = 'transparent';
+            color = 'var(--muted)';
+            border = '1px dashed var(--line)';
+            opacity = '0.3';
+            textDeco = 'line-through';
+        }
+
         cell.style.cssText = `
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: ${isActive ? 'var(--purple)' : 'var(--card)'};
-            color: ${isActive ? '#fff' : 'var(--text)'};
-            font-size: 18px;
-            font-weight: 800;
-            border-radius: 12px;
-            border: 2px solid ${isActive ? 'var(--blue)' : 'var(--line)'};
-            box-shadow: ${isActive ? '0 0 15px rgba(169,154,244,0.6)' : 'none'};
-            transform: ${isActive ? 'scale(1.08)' : 'scale(1)'};
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            background: ${bg}; color: ${color}; font-size: 18px; font-weight: 800;
+            border-radius: 12px; border: ${isActiveSpin ? '2px solid' : (item.active ? '2px solid' : border)} ${border};
+            opacity: ${opacity}; text-decoration: ${textDeco};
+            box-shadow: ${isActiveSpin ? '0 0 15px rgba(169,154,244,0.6)' : 'none'};
+            transform: ${isActiveSpin ? 'scale(1.08)' : 'scale(1)'};
             transition: all 0.12s ease;
         `;
-        cell.textContent = num;
+        cell.textContent = item.num;
         grid.appendChild(cell);
     });
+}
+
+function startNumberRandom() {
+    // Lọc ra index của các số vẫn còn đang active (chưa bị xóa)
+    const activeIndices = [];
+    numberGridItems.forEach((item, idx) => { if(item.active) activeIndices.push(idx); });
+
+    if (isNumberSpinning || activeIndices.length === 0) {
+        if (activeIndices.length === 0 && numberGridItems.length > 0) {
+            alert("Đã quay hết số! Vui lòng nhấn 'Đặt lại' để quay vòng mới.");
+        } else if (numberGridItems.length === 0) {
+            generateNumberGrid();
+        }
+        return;
+    }
+    isNumberSpinning = true;
+
+    let currentIndexObj = 0; // Vị trí trong mảng activeIndices
+    const totalSteps = activeIndices.length * 2 + Math.floor(Math.random() * activeIndices.length) + 15;
+    const speed = 38;
+    let currentStep = 0;
+
+    function step() {
+        currentIndexObj = (currentIndexObj + 1) % activeIndices.length;
+        const realIndex = activeIndices[currentIndexObj];
+        renderNumberGridCells(realIndex);
+        playSoftNumberTick();
+        currentStep++;
+
+        if (currentStep < totalSteps) {
+            setTimeout(step, speed);
+        } else {
+            isNumberSpinning = false;
+            const winningNumber = numberGridItems[realIndex].num;
+            lastWinnerNumber = winningNumber; // Lưu lại số vừa trúng
+            playSoftNumberWin();
+            setTimeout(() => {
+                showWinnerModal(winningNumber);
+            }, 150);
+        }
+    }
+    step();
+}
+
+// Thêm hàm Đặt lại (Reset)
+function resetNumberGrid() {
+    if (numberGridItems.length === 0) return;
+    numberGridItems.forEach(i => i.active = true);
+    renderNumberGridCells(-1);
 }
 
 let numberAudioContext = null;
