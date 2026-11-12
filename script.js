@@ -285,6 +285,7 @@ function startWheel() {
 
     let spinAngle = Math.random() * 2500 + 4000; 
     let startTime = null;
+    let lastTickIndex = -1; 
 
     function animateSpin(timestamp) {
         if (!startTime) startTime = timestamp;
@@ -296,24 +297,38 @@ function startWheel() {
 
         drawWheel(currentRot);
 
+        const sliceAngle = (2 * Math.PI) / currentActiveItems.length;
+        let normalizedAngle = (1.5 * Math.PI - currentRot) % (2 * Math.PI);
+        if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
+        
+        const currentIndex = Math.floor(normalizedAngle / sliceAngle);
+        
+        if (lastTickIndex !== -1 && lastTickIndex !== currentIndex) {
+            if (typeof playSoftNumberTick === 'function') playSoftNumberTick();
+        }
+        lastTickIndex = currentIndex;
+
         if (progress < 1) {
             requestAnimationFrame(animateSpin);
         } else {
             isSpinning = false;
             currentAngle = currentRot % (2 * Math.PI);
 
-            const sliceAngle = (2 * Math.PI) / currentActiveItems.length;
-            let normalizedAngle = (1.5 * Math.PI - currentAngle) % (2 * Math.PI);
-            if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
+            // Tính toán người chiến thắng
+            let finalNormalized = (1.5 * Math.PI - currentAngle) % (2 * Math.PI);
+            if (finalNormalized < 0) finalNormalized += 2 * Math.PI;
             
-            const winningSubIndex = Math.floor(normalizedAngle / sliceAngle) % currentActiveItems.length;
+            const winningSubIndex = Math.floor(finalNormalized / sliceAngle) % currentActiveItems.length;
             const winnerName = currentActiveItems[winningSubIndex];
 
             lastWinnerIndex = wheelItems.findIndex(i => i.name === winnerName && i.active);
 
+            // Phát tiếng Ting Ting khi trúng thưởng
+            if (typeof playSoftNumberWin === 'function') playSoftNumberWin();
+
             setTimeout(() => {
                 showWinnerModal(winnerName);
-            }, 100);
+            }, 150);
         }
     }
 
@@ -610,6 +625,16 @@ async function handleBackupFile(event) {
     }
 }
 
+function showCustomAlert(message, icon = "⚠️", title = "Lưu ý") {
+    showModal(`
+        <div style="text-align:center; padding: 15px;">
+            <div style="font-size: 55px; margin-bottom: 5px;">${icon}</div>
+            <h3 style="color:var(--danger); font-size:20px; margin-bottom:10px;">${title}</h3>
+            <p style="font-size:15px; color:var(--text); margin-bottom:20px;">${message}</p>
+            <button class="primary-btn" style="width:100%; padding:12px; margin:0;" onclick="closeModal()">Đã hiểu</button>
+        </div>
+    `);
+}
 function showModal(html){document.getElementById("modal-container").innerHTML=`<div class="modal-overlay"><div class="modal-card">${html}</div></div>`;}
 function showProgressModal(title) {
     showModal(`
@@ -2266,12 +2291,12 @@ function startTimer() {
         const hourVal = parseInt(document.getElementById('timer-hour').value) || 0;
         const minVal  = parseInt(document.getElementById('timer-min').value)  || 0;
         const secVal  = parseInt(document.getElementById('timer-sec').value)  || 0;
-
-        if (minVal > 59 || secVal > 59) return alert('Phút và Giây phải nhỏ hơn 60!');
-        if (hourVal > 99) return alert('Giờ tối đa là 99!');
+        if (minVal > 59 || secVal > 59) return showCustomAlert('Phút và Giây phải nhỏ hơn 60!');
+        if (hourVal > 99) return showCustomAlert('Giờ tối đa là 99!');
 
         const total = hourVal * 3600 + minVal * 60 + secVal;
-        if (total <= 0) return alert('Vui lòng nhập thời gian lớn hơn 0!');
+        if (total <= 0) return showCustomAlert('Vui lòng nhập thời gian lớn hơn 0!');
+        
         timerRemaining = total;
         updateTimerDisplay();
     }
