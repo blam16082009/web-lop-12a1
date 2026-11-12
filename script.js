@@ -15,6 +15,8 @@ let previewBubbles = false;
 let countdownEvents = [];
 let scheduleData = {};
 let lastActionTimestamp = 0;
+let myLikes = JSON.parse(localStorage.getItem('class_my_likes') || '{}');
+let composerFiles = [];
 
 const TKB_DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"];
 const TKB_PERIODS_SANG = [1, 2, 3, 4, 5, 6];
@@ -1442,14 +1444,42 @@ function toggleLinkAttachment() {
         document.getElementById("post-link-url").value = "";
     }
 }
-function previewPostFiles(){
-    const files = [...document.getElementById("post-files").files];
-    document.getElementById("post-preview").innerHTML = files.map(f => {
-        if (f.type.startsWith('video/')) {
-            return `<video src="${URL.createObjectURL(f)}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;"></video>`;
-        }
-        return `<img src="${URL.createObjectURL(f)}" alt="" style="width:60px;height:60px;border-radius:8px;object-fit:cover;">`;
+function previewPostFiles() {
+    const fileInput = document.getElementById("post-files");
+    const newFiles = Array.from(fileInput.files);
+    
+    if (composerFiles.length + newFiles.length > 12) {
+        showCustomAlert("Chỉ được đăng tối đa 12 ảnh/video cùng lúc!");
+        fileInput.value = "";
+        return;
+    }
+    
+    composerFiles = composerFiles.concat(newFiles);
+    fileInput.value = ""; // Reset input để có thể chọn tiếp
+    renderComposerPreview();
+}
+
+function renderComposerPreview() {
+    const preview = document.getElementById("post-preview");
+    preview.innerHTML = composerFiles.map((f, index) => {
+        const url = URL.createObjectURL(f);
+        const isVideo = f.type.startsWith('video/');
+        const mediaHtml = isVideo
+            ? `<video src="${url}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;"></video>`
+            : `<img src="${url}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;">`;
+            
+        return `
+            <div style="position:relative; display:inline-block; margin-right:8px; margin-bottom:8px; animation: appear 0.2s ease;">
+                ${mediaHtml}
+                <button type="button" onclick="removeComposerFile(${index})" title="Xóa file này" style="position:absolute; top:-6px; right:-6px; background:var(--danger); color:white; border:none; border-radius:50%; width:22px; height:22px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">×</button>
+            </div>
+        `;
     }).join("");
+}
+
+function removeComposerFile(index) {
+    composerFiles.splice(index, 1); // Xóa file khỏi mảng
+    renderComposerPreview(); // Vẽ lại giao diện
 }
 
 async function submitPost(){
@@ -1458,7 +1488,7 @@ async function submitPost(){
     const linkTitle = document.getElementById("post-link-title") ? document.getElementById("post-link-title").value.trim() : "";
     const linkUrl = document.getElementById("post-link-url") ? document.getElementById("post-link-url").value.trim() : "";
     
-    const files = [...document.getElementById("post-files").files].slice(0, 12);
+    const files = composerFiles;
     
     if (!text && files.length === 0 && !linkUrl) return alert("Hãy viết gì đó, chọn ảnh hoặc gắn link nhé!");
     if (linkUrl && !linkTitle) return alert("Vui lòng nhập tiêu đề cho Link!");
@@ -1512,10 +1542,10 @@ async function submitPost(){
         return;
     }
     
-    // Xóa rỗng form sau khi đăng thành công
     document.getElementById("post-text").value = "";
     document.getElementById("post-files").value = "";
-    document.getElementById("post-preview").innerHTML = "";
+    composerFiles = [];
+    renderComposerPreview(); 
     if(document.getElementById("post-link-title")) document.getElementById("post-link-title").value = "";
     if(document.getElementById("post-link-url")) document.getElementById("post-link-url").value = "";
     
