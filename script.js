@@ -1,13 +1,13 @@
-let isAdmin = false;
+Object.defineProperty(window, 'isAdmin', {
+    get: () => typeof window.checkIsRealAdmin === 'function' && window.checkIsRealAdmin(),
+    set: () => console.warn("Hệ thống bảo mật: Không thể giả mạo quyền Admin!"),
+    configurable: false
+});
 let members = [];
 let specialEvents = [];
 let teachers = [];
 let achievements = [];
 let posts = [];
-let myLikes = (() => {
-    try { return JSON.parse(localStorage.getItem('class_my_likes')) || {}; }
-    catch (e) { return {}; }
-})();
 let bdayData = {};
 let memoryFolders = [];
 let currentFolderId = null;
@@ -1667,17 +1667,7 @@ function postHtml(p){
         ${p.text ? `<p class="post-text">${formatMentions(p.text)}</p>` : ""}
         ${linkCardHtml}
         ${grid}
-        <div class="post-stats"><span>❤️ ${p.likes || 0} lượt thả tim</span><span>${(p.comments || []).length} bình luận</span></div>
-        <div class="post-actions">
-            <button class="${myLikes[p.id] ? "on" : ""}" onclick="toggleLike(${p.id})"><span class="heart-icon">${myLikes[p.id] ? "❤️" : "🤍"}</span> Thả tim</button>
-            <button onclick="document.getElementById('c-text-${p.id}').focus()">💬 Bình luận</button>
-        </div>
-        <div class="cmt-list">${comments}</div>
-        <div class="cmt-form">
-            <input class="cmt-name" type="text" id="c-name-${p.id}" maxlength="35" placeholder="Tên bạn" value="${savedName}" ${readonly}>
-            <input class="cmt-text" type="text" id="c-text-${p.id}" maxlength="500" placeholder="Viết bình luận..." onkeydown="if(event.key==='Enter')addComment(${p.id})">
-            <button onclick="addComment(${p.id})">Gửi</button>
-        </div>`;
+    `;
 }
 
 function renderPosts(){
@@ -1703,21 +1693,6 @@ function renderPosts(){
         feed.appendChild(art);
     });
 }
-function refreshPost(id){
-    const p = posts.find(x => x.id === id);
-    const el = document.getElementById(`post-${id}`);
-    if(!p || !el) return;
-    
-    el.innerHTML = postHtml(p);
-    document.getElementById(`c-text-${id}`).value = "";
-    
-    const nameInput = document.getElementById(`c-name-${id}`);
-    if(isAdmin) {
-        nameInput.value = "Admin";
-    } else {
-        nameInput.value = localStorage.getItem('class_visitor') || "";
-    }
-}
 function openPostImage(id,i){
     const p=posts.find(x=>x.id===id);
     if(p && p.images) {
@@ -1725,51 +1700,7 @@ function openPostImage(id,i){
         openLightbox(urls, i, (p.text || "").slice(0,120));
     }
 }
-async function toggleLike(id){
-    const p=posts.find(x=>x.id===id);
-    if(!p) return;
-    if(myLikes[id]){delete myLikes[id];p.likes=Math.max(0,(p.likes||0)-1);}
-    else{myLikes[id]=true;p.likes=(p.likes||0)+1;} 
-    await saveData(); 
-    refreshPost(id);
-}
 
-async function addComment(id){
-    if (Date.now() - lastActionTimestamp < 4000) {
-        return alert("Bạn bình luận quá nhanh, vui lòng đợi vài giây!");
-    }
-    const p = posts.find(x => x.id === id);
-    if (!p) return;
-    const nameInput = document.getElementById(`c-name-${id}`);
-    const textInput = document.getElementById(`c-text-${id}`);
-    
-    let name = nameInput.value.trim();
-    const text = textInput.value.trim();
-    
-    if(isAdmin) {
-        name = "Admin";
-    } else {
-        if(!name) return alert("Vui lòng nhập tên của bạn!");
-        if(name.toLowerCase().includes("admin")) return alert("Không được giả mạo tên Admin!");
-        localStorage.setItem('class_visitor', name);
-    }
-
-    if(!text) return alert("Vui lòng nhập nội dung bình luận!");
-    if(name.length > 35 || text.length > 500) return alert("Tên hoặc bình luận vượt quá độ dài cho phép!");
-
-    lastActionTimestamp = Date.now();
-    if (!Array.isArray(p.comments)) p.comments = [];
-    p.comments.push({name, text, time: Date.now()}); 
-    await saveData(); 
-    refreshPost(id);
-}
-async function deleteComment(id,i){
-    if(confirm("Xóa bình luận này?")){
-        posts.find(x=>x.id===id).comments.splice(i,1);
-        await saveData();
-        refreshPost(id);
-    }
-}
 async function deletePost(id){
     if(confirm("Xóa bài đăng này?")){
         posts=posts.filter(x=>x.id!==id);
@@ -1826,53 +1757,6 @@ function renderBirthdays(){
         banner.classList.add("hidden");
     }
 }
-function openWishChat(index){
-    const m=members[index]; if(!m) return;
-    const wishes=(bdayData[bdayKey(m)]||{}).wishes||[];
-    const list=wishes.length
-        ? wishes.map((w,i)=>{
-            const isAdminW = w.name === "Admin";
-            return `<div class="chat-msg"><div class="chat-name" style="${isAdminW?'color:#38d9a9;':''}">${escapeHtml(w.name)} <span>${timeAgo(w.time)}</span><button class="admin-only chat-del" onclick="deleteWish(${index},${i})">✕</button></div><div class="chat-text">${escapeHtml(w.text)}</div></div>`;
-        }).join("")
-        : `<p class="chat-empty">Chưa có lời chúc. Hãy là người đầu tiên! 🎈</p>`;
-    
-    const savedName = isAdmin ? "Admin" : escapeHtml(localStorage.getItem('class_visitor')||"");
-    const readonly = isAdmin ? 'readonly style="background:#1f2e28;color:#38d9a9;font-weight:700;"' : '';
-    
-    showModal(`
-        <h3>🎂 Lời chúc cho ${escapeHtml(m.name)}</h3>
-        <div class="chat-list" id="chat-list">${list}</div>
-        <div class="form-group"><input type="text" id="w-name" maxlength="35" placeholder="Tên bạn" value="${savedName}" ${readonly}></div>
-        <div class="chat-send"><input type="text" id="w-text" maxlength="400" placeholder="Viết lời chúc..." onkeydown="if(event.key==='Enter')sendWish(${index})"><button class="btn-submit" onclick="sendWish(${index})">Gửi</button></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Đóng</button></div>
-    `);
-    const cl=document.getElementById("chat-list"); cl.scrollTop=cl.scrollHeight;
-}
-async function sendWish(index){
-    if (Date.now() - lastActionTimestamp < 4000) {
-        return alert("Bạn gửi quá nhanh, vui lòng đợi vài giây!");
-    }
-    const m=members[index]; 
-    let name = document.getElementById("w-name").value.trim();
-    if(isAdmin) name = "Admin";
-    else {
-        if(!name) return alert("Nhập tên!");
-        if(name.toLowerCase().includes("admin")) return alert("Không được giả mạo tên Admin!");
-        localStorage.setItem('class_visitor',name);
-    }
-    const text=document.getElementById("w-text").value.trim(); if(!text) return;
-    lastActionTimestamp = Date.now();
-    getBd(bdayKey(m)).wishes.push({name,text,time:Date.now()}); 
-    await saveData(); 
-    openWishChat(index);
-}
-async function deleteWish(index,i){
-    if(!confirm("Xóa lời chúc?"))return;
-    getBd(bdayKey(members[index])).wishes.splice(i,1);
-    await saveData();
-    openWishChat(index);
-}
-
 const WISHES=[
     "Chúc {name} luôn xinh đẹp, rạng rỡ và có thật nhiều niềm vui trong ngày 20/10 nhé! 🌷",
     "20/10 vui vẻ nha {name}! Mong bạn luôn khỏe mạnh, hạnh phúc và đạt được mọi ước mơ. ✨",
@@ -2459,10 +2343,11 @@ function stopAlarm() {
 }
 
 
-window.setAdminState = function(isLoggedIn) {
-    isAdmin = isLoggedIn;
+window.syncAdminUI = function() {
+    const realAdmin = window.isAdmin;
     const btn = document.getElementById("admin-toggle-btn");
-    if (isLoggedIn) {
+    
+    if (realAdmin) {
         document.body.classList.add("admin-mode");
         if(btn) {
             btn.classList.add("logged-in"); 
@@ -2485,6 +2370,11 @@ window.setAdminState = function(isLoggedIn) {
         });
         renderAllClassData();
     }
+};
+
+window.setAdminState = function() {
+    console.warn("Lệnh vô hiệu! Hệ thống đã được bọc thép.");
+    window.syncAdminUI();
 };
 
 function openAdminModal(){

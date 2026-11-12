@@ -413,16 +413,22 @@ window.fbSignOut = async (authInstance) => {
 };
 
 window.fbAuth = auth;
-onAuthStateChanged(auth, (user) => {
-    const isValidAdmin = Boolean(
+const ADMIN_EMAIL = "baolam1608.vanxuan2009@gmail.com";
+
+window.checkIsRealAdmin = () => {
+    const user = auth.currentUser;
+    return Boolean(
         window.allowAdminSession && 
         user && 
         !user.isAnonymous && 
-        user.email
+        user.email === ADMIN_EMAIL
     );
+};
 
-    if (typeof window.setAdminState === 'function') {
-        window.setAdminState(isValidAdmin);
+window.fbAuth = auth;
+onAuthStateChanged(auth, (user) => {
+    if (typeof window.syncAdminUI === 'function') {
+        window.syncAdminUI();
     }
 });
 </script>
