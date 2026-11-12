@@ -2242,38 +2242,6 @@ function playSoftNumberWin() {
     playSoftNumberTone(784, 0.2, 0.022, 0.11);
 }
 
-function startNumberRandom() {
-    if (isNumberSpinning || numberGridItems.length === 0) {
-        if (numberGridItems.length === 0) generateNumberGrid();
-        return;
-    }
-    isNumberSpinning = true;
-
-    let currentIndex = 0;
-    const totalSteps = numberGridItems.length * 2 + Math.floor(Math.random() * numberGridItems.length);
-    const speed = 38;
-    let currentStep = 0;
-
-    function step() {
-        currentIndex = (currentIndex + 1) % numberGridItems.length;
-        renderNumberGridCells(currentIndex);
-        playSoftNumberTick();
-        currentStep++;
-
-        if (currentStep < totalSteps) {
-            setTimeout(step, speed);
-        } else {
-            isNumberSpinning = false;
-            const winningNumber = numberGridItems[currentIndex];
-            playSoftNumberWin();
-            setTimeout(() => {
-                showWinnerModal(winningNumber);
-            }, 150);
-        }
-    }
-
-    step();
-}
 
 let timerInterval = null;
 let timerRemaining = 0;
